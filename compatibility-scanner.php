@@ -197,11 +197,6 @@ function vipgocs_open_issues(
 
 		$issue_statistics['issues_opened']++;
 
-
-		/* FIXME: if ( $res ) { 
-		* }
-		 */
-
 		/*
 		 * Clean up and return.
 		 */
@@ -234,6 +229,8 @@ function vipgocs_compatibility_scanner() {
 		'Initializing...',
 		array()
 	);
+
+	$startup_time = time();
 
 	/*
 	 * Report any errors to the user.
@@ -330,11 +327,38 @@ function vipgocs_compatibility_scanner() {
 		$all_results
 	);
 
+	/*
+	 * Get API rate limit usage.
+	 */
+	$github_api_rate_limit_usage =
+		vipgoci_github_rate_limit_usage(
+			$options['token']
+		);
+
+	/*
+	 * Collect counter-information.
+	 */
+	$counter_report = vipgoci_counter_report(
+		VIPGOCI_COUNTERS_DUMP,
+		null,
+		null
+	);
+
 	vipgoci_log(
 		'Complete, shutting down...',
 		array(
 			'repo-owner'	=> $options['repo-owner'],
 			'repo-name'	=> $options['repo-name'],
+			'run_time_seconds'      => time() - $startup_time,
+			'run_time_measurements' =>
+				vipgoci_runtime_measure(
+					VIPGOCI_RUNTIME_DUMP,
+					null
+				),
+			'counters_report'       => $counter_report,
+
+			'github_api_rate_limit' =>
+				$github_api_rate_limit_usage->resources->core,
 		)
 	);
 
