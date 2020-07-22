@@ -3,10 +3,6 @@
 
 define( 'VIPGOCI_INCLUDED', true );
 
-$vipgoci_root = '/home/teamcity-buildagent/vip-go-ci-tools/vip-go-ci';
-
-require_once( $vipgoci_root . '/vip-go-ci.php' );
-
 /*
  * Scan all PHP files in the
  * repository using the options
@@ -222,10 +218,7 @@ function vipgocs_open_issues(
  */
 
 function vipgocs_compatibility_scanner() {
-	vipgoci_log(
-		'Initializing...',
-		array()
-	);
+	echo 'Initializing...' . PHP_EOL;
 
 	$startup_time = time();
 
@@ -244,6 +237,7 @@ function vipgocs_compatibility_scanner() {
 	$options = getopt(
 		null,
 		array(
+			'vipgoci-path:',
 			'repo-owner:',
 			'repo-name:',
 			'token:',
@@ -253,32 +247,79 @@ function vipgocs_compatibility_scanner() {
 			'phpcs-runtime-set:',
 		)
 	);
-
-	/* FIXME: These should be options */
-	$options['phpcs-runtime-set'] = array(
-		array('testVersion', '7.2-')
-	);
-
-	$options['phpcs-sniffs-exclude'] = array();
-	$options['phpcs-severity'] = 1;
-
 	/*
 	 * Check if any options are missing.
 	 */
 	if ( ! isset(
+		$options['vipgoci-path'],
 		$options['repo-owner'],
 		$options['repo-name'],
 		$options['token'],
 		$options['local-git-repo'],
 		$options['phpcs-path'],
 		$options['phpcs-standard'],
-		$options['phpcs-runtime-set']
 	) ) {
-		vipgoci_sysexit(
-			'Essential parameter missing',
-			array()
+		echo 'Essential parameter missing' . PHP_EOL;
+
+		// FIXME: Usage.
+
+		exit(253);
+	}
+
+	/*
+	 * Check if the --vipgoci-path parameter is 
+	 * invalid, should be a folder.
+	 */
+	if ( ! is_dir( $options['vipgoci-path'] ) ) {
+		echo 'Path specified in --vipgoci-path is invalid, is not a directory' . PHP_EOL;
+		exit(253);
+	}
+
+	/*
+	 * Include vip-go-ci as a library.
+	 */
+	echo 'Attempting to include vip-go-ci...' . PHP_EOL;
+
+	require_once( $options['vipgoci-path'] . '/vip-go-ci.php' );
+
+	vipgoci_log(
+		'Successfully included vip-go-ci'
+	);
+
+	/*
+	 * Parse rest of options
+	 */
+	if ( empty( 'phpcs-runtime-set' ) ) {
+		$options['phpcs-runtime-set'] = array();
+	}
+
+	else {
+		vipgoci_option_array_handle(
+			$options,
+			'phpcs-runtime-set',
+			array(),
+			array(),
+			','
 		);
 	}
+
+	if ( empty( $options['phpcs-sniffs-exclude'] ) ) {
+		$options['phpcs-sniffs-exclude'] = array();
+	}
+
+	else {
+		vipgoci_option_array_handle(
+			$options,
+			'phpcs-sniffs-exclude',
+			array(),
+			array(),
+			',',
+			false
+		);
+	}
+
+	$options['phpcs-severity'] = 1;
+
 
 	/*
 	 * Print cleaned option-values.
@@ -323,7 +364,9 @@ function vipgocs_compatibility_scanner() {
 	 * Scan all files in the Git repository,
 	 * get results.
 	 */
-	$all_results = vipgocs_scan_files( $options );
+	$all_results = vipgocs_scan_files(
+		$options
+	);
 
 	/*
 	 * Process each file which as any issues
