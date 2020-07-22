@@ -1,14 +1,11 @@
 #!/usr/bin/env php
 <?php
 
+define( 'VIPGOCI_INCLUDED', true );
+
 $vipgoci_root = '/home/teamcity-buildagent/vip-go-ci-tools/vip-go-ci';
 
-require_once("$vipgoci_root/defines.php");
-require_once("$vipgoci_root/git-repo.php");
-require_once("$vipgoci_root/github-api.php");
-require_once("$vipgoci_root/phpcs-scan.php");
-require_once("$vipgoci_root/statistics.php");
-require_once("$vipgoci_root/misc.php");
+require_once( $vipgoci_root . '/vip-go-ci.php' );
 
 /*
  * Scan all PHP files in the
@@ -61,7 +58,7 @@ function vipgocs_scan_files(
 		/*
 		 * Determine file-extension, and if it is not PHP, skip the file.
 		 */
-		$file_extension = vipgoci_file_extension(
+		$file_extension = vipgoci_file_extension_get(
 			$file_path
 		);
 
@@ -208,7 +205,7 @@ function vipgocs_open_issues(
 		
 		gc_collect_cycles();
 
-		sleep( 2 + rand(0, 3 ));
+		sleep( 2 + rand( 0, 3 ));
 	}
 
 	vipgoci_log(
@@ -286,8 +283,17 @@ function vipgocs_compatibility_scanner() {
 	/*
 	 * Print cleaned option-values.
 	 */
-	$options_clean = $options;
-	$options_clean['token'] = '***';
+	
+	$options_clean = vipgoci_options_sensitive_clean(
+		null,
+		array(
+			'token',
+		)
+	);
+
+	$options_clean = vipgoci_options_sensitive_clean(
+		$options
+	);
 
 	vipgoci_log(
 		'Starting up...',
@@ -297,12 +303,14 @@ function vipgocs_compatibility_scanner() {
 	unset( $options_clean );
 
 	/*
-	 * A bit a hack; get the HEAD commit
+	 * Get the HEAD commit
 	 * from the local repository -- this
-	 * would be the latest commit.
+	 * would be the latest commit. Used
+	 * by the PHPCS scanning function
+	 * and elsewhere.
 	 */
 
-	$vipgoci_git_repo_head = vipgoci_git_repo_get_head(
+	$vipgoci_git_repo_head = vipgoci_gitrepo_get_head(
 		$options['local-git-repo']
 	);
 
