@@ -146,11 +146,11 @@ function vipgocs_open_issues(
 
 		foreach( $file_issues['messages'] as $file_issue ) {
 			$error_msg .=
-				'* ' . ucfirst(
+				'* <b>' . ucfirst(
 						strtolower(
 							$file_issue['type']
 						)
-					) . ': ';
+					) . '</b>: ';
 
 			$error_msg .= $file_issue['message'] . ' ';
 
@@ -180,10 +180,14 @@ function vipgocs_open_issues(
 		$res = vipgoci_github_post_url(
 			$github_url,
 			array(
-				'title'		=> 'PHP compatibility issues found in ' . $file_name,
-				'body'		=> 'The following issues were found when scanning for PHP compatibility issues: ' . PHP_EOL .
-							$error_msg,
-				'labels'	=> array( 'PHP Compatibility Issues'),
+				'title'		=>
+					'PHP Upgrade: Compatibility issues found in ' . $file_name,
+				'body'		=>
+					'The following issues were found when scanning for PHP compatibility issues in preparation for upgrade to PHP version 7.4: ' . PHP_EOL .
+					$error_msg .
+					'Note that this is an automated report. We recommend that the issues noted here are looked into, as it will make the transition to the new PHP version easier.',
+				'labels'	=>
+					array( 'PHP Compatibility Issues'),
 			),
 			$options['token']
 		);
@@ -280,7 +284,7 @@ function vipgocs_compatibility_scanner() {
 	 */
 	echo 'Attempting to include vip-go-ci...' . PHP_EOL;
 
-	require_once( $options['vipgoci-path'] . '/vip-go-ci.php' );
+	require_once( $options['vipgoci-path'] . '/main.php' );
 
 	vipgoci_log(
 		'Successfully included vip-go-ci'
@@ -290,7 +294,10 @@ function vipgocs_compatibility_scanner() {
 	 * Parse rest of options
 	 */
 	if ( empty( 'phpcs-runtime-set' ) ) {
-		$options['phpcs-runtime-set'] = array();
+		$options['phpcs-runtime-set'] = array(
+			'testVersion',
+			'7.2-'
+		);
 	}
 
 	else {
