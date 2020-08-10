@@ -323,6 +323,16 @@ function vipgocs_compatibility_scanner() {
 	/*
 	 * Parse rest of options
 	 */
+	
+	vipgoci_option_array_handle(
+		$options,
+		'phpcs-standard',
+		array(),
+		array(),
+		',',
+		false
+	);
+
 	if ( empty( 'phpcs-runtime-set' ) ) {
 		$options['phpcs-runtime-set'] = array(
 			'testVersion',
@@ -457,22 +467,6 @@ function vipgocs_compatibility_scanner() {
 		null
 	);
 
-	/*
-	 * Provide a URL to newly created issues.
-	 */
-	foreach(
-		$options['github-labels'] as $label_name
-	) {
-		vipgoci_log(
-			'Find newly created issues here: ' . 
-				'https://github.com/' .
-					rawurlencode( $options['repo-owner'] ) . '/' .
-					rawurlencode( $options['repo-name'] ) . '/' .
-					'labels/' .
-					rawurlencode( $label_name )
-		);
-	}
-
 
 	/*
 	 * Log information and return.
@@ -494,6 +488,23 @@ function vipgocs_compatibility_scanner() {
 				$github_api_rate_limit_usage->resources->core,
 		)
 	);
+
+	/*
+	 * Provide a URL to newly created issues.
+	 */
+	echo PHP_EOL;
+
+	foreach(
+		$options['github-labels'] as $label_name
+	) {
+		echo 'Find newly created issues here: ' . 
+				'https://github.com/' .
+					rawurlencode( $options['repo-owner'] ) . '/' .
+					rawurlencode( $options['repo-name'] ) . '/' .
+					'labels/' .
+					rawurlencode( $label_name ) .
+		PHP_EOL;
+	}
 
 	return 0;
 }
