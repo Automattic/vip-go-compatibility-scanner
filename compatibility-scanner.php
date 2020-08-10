@@ -105,7 +105,8 @@ function vipgocs_scan_files(
  */
 function vipgocs_open_issues(
 	$options,
-	$all_results
+	$all_results,
+	$labels
 ) {
 
 	/*
@@ -177,8 +178,7 @@ function vipgocs_open_issues(
 		/*
 		 * Create issue on GitHub.
 		 */
-		$res = vipgoci_github_post_url(
-			$github_url,
+		$github_req_body =
 			array(
 				'title'		=>
 					'PHP Upgrade: Compatibility issues found in ' . $file_name,
@@ -186,9 +186,15 @@ function vipgocs_open_issues(
 					'The following issues were found when scanning for PHP compatibility issues in preparation for upgrade to PHP version 7.4: ' . PHP_EOL .
 					$error_msg .
 					'Note that this is an automated report. We recommend that the issues noted here are looked into, as it will make the transition to the new PHP version easier.',
-				'labels'	=>
-					array( 'PHP Compatibility Issues'),
-			),
+			);
+
+		if ( ! empty( $options['github-labels'] ) ) {
+			$github_req_body['labels'] = $labels;
+		}
+
+		$res = vipgoci_github_post_url(
+			$github_url,
+			$github_req_body,
 			$options['token']
 		);
 
@@ -224,6 +230,9 @@ function vipgocs_open_issues(
 function vipgocs_compatibility_scanner() {
 	echo 'Initializing...' . PHP_EOL;
 
+	/*
+	 * Log startup time
+	 */
 	$startup_time = time();
 
 	/*
@@ -233,7 +242,6 @@ function vipgocs_compatibility_scanner() {
 
 	error_reporting( E_ALL );
 	ini_set( 'display_errors', 'on' );
-
 
 	/*
 	 * Get option-values
@@ -249,10 +257,12 @@ function vipgocs_compatibility_scanner() {
 			'phpcs-path:',
 			'phpcs-standard:',
 			'phpcs-runtime-set:',
+			'github-labels:',
 		)
 	);
+
 	/*
-	 * Check if any options are missing.
+	 * Check if any required options are missing.
 	 */
 	if ( ! isset(
 		$options['vipgoci-path'],
@@ -263,9 +273,27 @@ function vipgocs_compatibility_scanner() {
 		$options['phpcs-path'],
 		$options['phpcs-standard'],
 	) ) {
-		echo 'Essential parameter missing' . PHP_EOL;
+		echo 'Error: Essential parameter missing.' . PHP_EOL;
 
-		// FIXME: Usage.
+		print 'Usage: ' . $argv[0] . PHP_EOL .
+			"\t" . '--vipgoci-path=STRING          Path to were vip-go-ci lives, should be folder. ' . PHP_EOL .
+			PHP_EOL .
+			"\t" . '--repo-owner=STRING            Specify repository owner, can be an organization' . PHP_EOL .
+			"\t" . '--repo-name=STRING             Specify name of the repository' . PHP_EOL .
+			"\t" . '--token=STRING                 The access-token to use to communicate with GitHub' . PHP_EOL .
+			"\t" . '--github-labels=STRING         Comma separated list of labels to attach to GitHub issues opened.' . PHP_EOL .
+			PHP_EOL .
+			"\t" . '--local-git-repo=FILE          The local git repository to use for direct access to code' . PHP_EOL .
+			PHP_EOL .
+			"\t" . '--phpcs-path=FILE              Full path to PHPCS script' . PHP_EOL .
+			"\t" . '--phpcs-standard=STRING        Specify which PHPCS standard to use' . PHP_EOL .
+			"\t" . '--phpcs-runtime-set=STRING     Specify --runtime-set values passed on to PHPCS' . PHP_EOL .
+			"\t" . '                               -- expected to be a comma-separated value string of ' . PHP_EOL .
+			"\t" . '                               key-value pairs.' . PHP_EOL .
+			"\t" . '                               For example: --phpcs-runtime-set="foo1 bar1, foo2,bar2"' . PHP_EOL .
+			"\t" . '--phpcs-sniffs-exclude=ARRAY   Specify which sniffs to exclude from PHPCS scanning, ' . PHP_EOL .
+			"\t" . '                               should be an array with items separated by commas. ' . PHP_EOL .
+			PHP_EOL;
 
 		exit(253);
 	}
@@ -284,7 +312,9 @@ function vipgocs_compatibility_scanner() {
 	 */
 	echo 'Attempting to include vip-go-ci...' . PHP_EOL;
 
-	require_once( $options['vipgoci-path'] . '/main.php' );
+	require_once(
+		$options['vipgoci-path'] . '/main.php'
+	);
 
 	vipgoci_log(
 		'Successfully included vip-go-ci'
@@ -328,6 +358,22 @@ function vipgocs_compatibility_scanner() {
 	$options['phpcs-severity'] = 1;
 
 
+	if ( empty( $options['github-labels'] ) ) {
+		$options['github-labels'] = array();
+	}
+
+	else {
+		vipgoci_option_array_handle(
+			$options,
+			'github-labels',
+			array(),
+			null,
+			',',
+			false
+		);
+	}
+
+
 	/*
 	 * Print cleaned option-values.
 	 */
@@ -368,6 +414,14 @@ function vipgocs_compatibility_scanner() {
 	$options['commit'] = $vipgoci_git_repo_head;
 
 	/*
+	 * Main processing starts.
+	 */
+
+	vipgoci_log(
+		'Starting processing...'
+	);
+
+	/*
 	 * Scan all files in the Git repository,
 	 * get results.
 	 */
@@ -382,7 +436,8 @@ function vipgocs_compatibility_scanner() {
 
 	vipgocs_open_issues(
 		$options,
-		$all_results
+		$all_results,
+		$options['github-labels']
 	);
 
 	/*
@@ -402,6 +457,26 @@ function vipgocs_compatibility_scanner() {
 		null
 	);
 
+	/*
+	 * Provide a URL to newly created issues.
+	 */
+	foreach(
+		$options['github-labels'] as $label_name
+	) {
+		vipgoci_log(
+			'Find newly created issues here: ' . 
+				'https://github.com/' .
+					rawurlencode( $options['repo-owner'] ) . '/' .
+					rawurlencode( $options['repo-name'] ) . '/' .
+					'labels/' .
+					rawurlencode( $label_name )
+		);
+	}
+
+
+	/*
+	 * Log information and return.
+	 */
 	vipgoci_log(
 		'Complete, shutting down...',
 		array(
@@ -423,6 +498,9 @@ function vipgocs_compatibility_scanner() {
 	return 0;
 }
 
+/*
+ * Main invocation function.
+ */
 $status = vipgocs_compatibility_scanner();
 
 exit( $status );
