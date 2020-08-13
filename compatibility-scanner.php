@@ -121,9 +121,12 @@ function vipgocs_open_issues(
 	vipgoci_log(
 		'Opening up issues on GitHub for problems found',
 		array(
-			'repo-owner'	=> $options['repo-owner'],
-			'repo-name'	=> $options['repo-name'],
-			'issues'	=> $all_results,
+			'repo-owner'			=> $options['repo-owner'],
+			'repo-name'			=> $options['repo-name'],
+			'github_issue_title'		=> $options['github-issue-title'],
+			'github_issue_body_intro'	=> $options['github-issue-body-intro'],
+			'github_issue_body_end'		=> $options['github-issue-body-end'],
+			'issues'			=> $all_results,
 		)
 	);
 
@@ -181,11 +184,11 @@ function vipgocs_open_issues(
 		$github_req_body =
 			array(
 				'title'		=>
-					'PHP Upgrade: Compatibility issues found in ' . $file_name,
+					$options['github-issue-title'] . $file_name,
 				'body'		=>
-					'The following issues were found when scanning for PHP compatibility issues in preparation for upgrade to PHP version 7.4: ' . PHP_EOL .
+					$options['github-issue-body-intro'] . PHP_EOL .
 					$error_msg .
-					'Note that this is an automated report. We recommend that the issues noted here are looked into, as it will make the transition to the new PHP version easier.',
+					$options['github-issue-body-end'],
 			);
 
 		if ( ! empty( $options['github-labels'] ) ) {
@@ -228,6 +231,8 @@ function vipgocs_open_issues(
  */
 
 function vipgocs_compatibility_scanner() {
+	global $argv;
+
 	echo 'Initializing...' . PHP_EOL;
 
 	/*
@@ -258,6 +263,9 @@ function vipgocs_compatibility_scanner() {
 			'phpcs-standard:',
 			'phpcs-runtime-set:',
 			'github-labels:',
+			'github-issue-title:',
+			'github-issue-body-intro:',
+			'github-issue-body-end:',
 		)
 	);
 
@@ -269,6 +277,9 @@ function vipgocs_compatibility_scanner() {
 		$options['repo-owner'],
 		$options['repo-name'],
 		$options['token'],
+		$options['github-issue-title'],
+		$options['github-issue-body-intro'],
+		$options['github-issue-body-end'],
 		$options['local-git-repo'],
 		$options['phpcs-path'],
 		$options['phpcs-standard'],
@@ -276,23 +287,30 @@ function vipgocs_compatibility_scanner() {
 		echo 'Error: Essential parameter missing.' . PHP_EOL;
 
 		print 'Usage: ' . $argv[0] . PHP_EOL .
-			"\t" . '--vipgoci-path=STRING          Path to were vip-go-ci lives, should be folder. ' . PHP_EOL .
+			"\t" . 'Options --vipgoci-path, --repo-owner, --repo-name, --token, ' . PHP_EOL .
+			"\t" . '        --github-issue-title, --github-issue-body-intro, --github-issue-body-end, ' . PHP_EOL .
+			"\t" . '        --local-git-repo, --phpcs-path, --phpcs-standard are mandatory parameters' . PHP_EOL .
 			PHP_EOL .
-			"\t" . '--repo-owner=STRING            Specify repository owner, can be an organization' . PHP_EOL .
-			"\t" . '--repo-name=STRING             Specify name of the repository' . PHP_EOL .
-			"\t" . '--token=STRING                 The access-token to use to communicate with GitHub' . PHP_EOL .
-			"\t" . '--github-labels=STRING         Comma separated list of labels to attach to GitHub issues opened.' . PHP_EOL .
+			"\t" . '--vipgoci-path=STRING             Path to were vip-go-ci lives, should be folder. ' . PHP_EOL .
 			PHP_EOL .
-			"\t" . '--local-git-repo=FILE          The local git repository to use for direct access to code' . PHP_EOL .
+			"\t" . '--repo-owner=STRING               Specify repository owner, can be an organization' . PHP_EOL .
+			"\t" . '--repo-name=STRING                Specify name of the repository' . PHP_EOL .
+			"\t" . '--token=STRING                    The access-token to use to communicate with GitHub' . PHP_EOL .
+			"\t" . '--github-labels=STRING            Comma separated list of labels to attach to GitHub issues opened.' . PHP_EOL .
+			"\t" . '--github-issue-title=STRING       Title to use for GitHub issues created.' . PHP_EOL .
+			"\t" . '--github-issue-body-intro=STRING  String each created GitHub issue will start with.' . PHP_EOL .
+			"\t" . '--github-issue-body-end=STRING    String each created GitHub issue will end with.' . PHP_EOL .
 			PHP_EOL .
-			"\t" . '--phpcs-path=FILE              Full path to PHPCS script' . PHP_EOL .
-			"\t" . '--phpcs-standard=STRING        Specify which PHPCS standard to use' . PHP_EOL .
-			"\t" . '--phpcs-runtime-set=STRING     Specify --runtime-set values passed on to PHPCS' . PHP_EOL .
-			"\t" . '                               -- expected to be a comma-separated value string of ' . PHP_EOL .
-			"\t" . '                               key-value pairs.' . PHP_EOL .
-			"\t" . '                               For example: --phpcs-runtime-set="foo1 bar1, foo2,bar2"' . PHP_EOL .
-			"\t" . '--phpcs-sniffs-exclude=ARRAY   Specify which sniffs to exclude from PHPCS scanning, ' . PHP_EOL .
-			"\t" . '                               should be an array with items separated by commas. ' . PHP_EOL .
+			"\t" . '--local-git-repo=FILE             The local git repository to use for direct access to code' . PHP_EOL .
+			PHP_EOL .
+			"\t" . '--phpcs-path=FILE                 Full path to PHPCS script' . PHP_EOL .
+			"\t" . '--phpcs-standard=STRING           Specify which PHPCS standard to use' . PHP_EOL .
+			"\t" . '--phpcs-runtime-set=STRING        Specify --runtime-set values passed on to PHPCS' . PHP_EOL .
+			"\t" . '                                  -- expected to be a comma-separated value string of ' . PHP_EOL .
+			"\t" . '                                  key-value pairs.' . PHP_EOL .
+			"\t" . '                                  For example: --phpcs-runtime-set="foo1 bar1, foo2,bar2"' . PHP_EOL .
+			"\t" . '--phpcs-sniffs-exclude=ARRAY      Specify which sniffs to exclude from PHPCS scanning, ' . PHP_EOL .
+			"\t" . '                                  should be an array with items separated by commas. ' . PHP_EOL .
 			PHP_EOL;
 
 		exit(253);
