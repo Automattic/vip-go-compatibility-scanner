@@ -28,7 +28,7 @@ popd && \
 ```
 ## Usage for multiple repositories
 
-Included is a script to run the `vip-go-compatibility-scanner` for multple repositories. The script will clone each repository into a temporary directory, run `vip-go-compatibility-scanner`, and will leave a log for each execution in the temporary directory. It will clean up the cloned repositories after scanning.
+Included is a script to run the `vip-go-compatibility-scanner` for multiple repositories. The script will clone each repository into a temporary directory, run `vip-go-compatibility-scanner`, and will leave a log for each execution in the temporary directory. It will remove the repositories cloned after scanning.
 
 Here is how the script can be run:
 
