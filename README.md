@@ -2,9 +2,9 @@
 
 Find compatibility issues in selected repositories
 
-This tool is to be used to search for any compatibility issues found in VIP Go repositories. It will scan a given repository with PHPCS, using a specified PHPCS standard, and then post GitHub issue for each file that has any issues detailing what was found. It will add labels to each issue, if specified, and print links to the labels in its output. Note that the tool needs to have the repository cloned and ready to be used when started.
+This tool is to be used to search for any compatibility issues in VIP Go repositories. It will scan a given repository with PHPCS, using a specified PHPCS standard, and then post GitHub issue for each file that has any detected issues detailing what was found. It will add labels to each issue created, if specified, and print links to the labels in its output. Note that the tool needs to have the repository cloned and ready to be used when started.
 
-This tool can be used for any GitHub repository.
+This tool can be used for any GitHub repository and with any PHPCS standard.
 
 The tool uses [vip-go-ci](https://github.com/automattic/vip-go-ci/) as a library, and uses some of its dependencies as well. See below.
 
