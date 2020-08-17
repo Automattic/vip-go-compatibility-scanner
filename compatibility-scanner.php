@@ -4,6 +4,41 @@
 define( 'VIPGOCI_INCLUDED', true );
 
 /*
+ * Get outside collaborators who are admins for
+ * the repository.
+ */
+function vipgocs_get_repo_collaborators_admins(
+	$options
+) {
+	$repo_outside_collaborators_admins =
+		vipgoci_github_repo_collaborators_get(
+			$options['repo-owner'],
+			$options['repo-name'],
+			$options['token'],
+			$options['github-issue-assign'],
+			array(
+				'admin' => true
+			)
+		);
+
+	$repo_outside_collaborators_admins = array_map(
+		function( $user_item ) {
+			return $user_item->login;
+		},
+		$repo_outside_collaborators_admins
+	);
+
+	vipgoci_log(
+		'Found ' . $options['github-issue-assign'] . ' collaborators (admin) for repository',
+		array(
+			'collaborators' => $repo_outside_collaborators_admins,
+		)
+	);
+
+	return $repo_outside_collaborators_admins;
+}
+
+/*
  * Scan all PHP files in the
  * repository using the options
  * given, return the issues found
@@ -106,7 +141,8 @@ function vipgocs_scan_files(
 function vipgocs_open_issues(
 	$options,
 	$all_results,
-	$labels
+	$labels,
+	$assignees = array()
 ) {
 
 	/*
@@ -127,6 +163,7 @@ function vipgocs_open_issues(
 			'github_issue_body_intro'	=> $options['github-issue-body-intro'],
 			'github_issue_body_end'		=> $options['github-issue-body-end'],
 			'issues'			=> $all_results,
+			'assignees'			=> $assignees,
 		)
 	);
 
@@ -195,6 +232,11 @@ function vipgocs_open_issues(
 			$github_req_body['labels'] = $labels;
 		}
 
+		if ( ! empty( $assignees ) ) {
+			$github_req_body['assignees'] = $assignees;
+		}
+
+
 		$res = vipgoci_github_post_url(
 			$github_url,
 			$github_req_body,
@@ -254,6 +296,7 @@ function vipgocs_compatibility_scanner() {
 	$options = getopt(
 		null,
 		array(
+			'help',
 			'vipgoci-path:',
 			'repo-owner:',
 			'repo-name:',
@@ -266,25 +309,34 @@ function vipgocs_compatibility_scanner() {
 			'github-issue-title:',
 			'github-issue-body-intro:',
 			'github-issue-body-end:',
+			'github-issue-assign:',
 		)
 	);
 
 	/*
 	 * Check if any required options are missing.
 	 */
-	if ( ! isset(
-		$options['vipgoci-path'],
-		$options['repo-owner'],
-		$options['repo-name'],
-		$options['token'],
-		$options['github-issue-title'],
-		$options['github-issue-body-intro'],
-		$options['github-issue-body-end'],
-		$options['local-git-repo'],
-		$options['phpcs-path'],
-		$options['phpcs-standard'],
-	) ) {
-		echo 'Error: Essential parameter missing.' . PHP_EOL;
+	if (
+		( ! isset(
+			$options['vipgoci-path'],
+			$options['repo-owner'],
+			$options['repo-name'],
+			$options['token'],
+			$options['github-issue-title'],
+			$options['github-issue-body-intro'],
+			$options['github-issue-body-end'],
+			$options['local-git-repo'],
+			$options['phpcs-path'],
+			$options['phpcs-standard'],
+		) )
+		||
+		(
+			( isset( $options['help'] ) )
+		)
+	) {
+		if ( ! isset( $options['help'] ) ) {
+			echo 'Error: Essential parameter missing.' . PHP_EOL;
+		}
 
 		print 'Usage: ' . $argv[0] . PHP_EOL .
 			"\t" . 'Options --vipgoci-path, --repo-owner, --repo-name, --token, ' . PHP_EOL .
@@ -300,6 +352,8 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '--github-issue-title=STRING       Title to use for GitHub issues created.' . PHP_EOL .
 			"\t" . '--github-issue-body-intro=STRING  String each created GitHub issue will start with.' . PHP_EOL .
 			"\t" . '--github-issue-body-end=STRING    String each created GitHub issue will end with.' . PHP_EOL .
+			"\t" . '--github-issue-assign=STRING      Assign specified admins as collaborators for each created issue' . PHP_EOL .
+			"\t" . '                                  -- outside, direct, or all.' . PHP_EOL .
 			PHP_EOL .
 			"\t" . '--local-git-repo=FILE             The local git repository to use for direct access to code' . PHP_EOL .
 			PHP_EOL .
@@ -401,6 +455,24 @@ function vipgocs_compatibility_scanner() {
 		);
 	}
 
+	if ( isset( $options['github-issue-assign'] ) ) {
+		$options['github-issue-assign'] = trim(
+			$options['github-issue-assign']
+		);
+
+		if (
+			( 'all' !== $options['github-issue-assign'] ) &&
+			( 'direct' !== $options['github-issue-assign'] ) &&
+			( 'outside' !== $options['github-issue-assign'] )
+		) {
+			vipgoci_sysexit(
+				'--github-issue-assign is assigned invalid parameter',
+				array(
+					'github-issue-assign' => $options['github-issue-assign']
+				)
+			);
+		}
+	}
 
 	/*
 	 * Print cleaned option-values.
@@ -458,6 +530,22 @@ function vipgocs_compatibility_scanner() {
 	);
 
 	/*
+	 * Get outside collaborators for the
+	 * the repository who are admin, assign
+	 * them to the issues created.
+	 */
+
+	if ( ! empty( $options['github-issue-assign'] ) ) {
+		$assignees = vipgocs_get_repo_collaborators_admins(
+			$options
+		);
+	}
+
+	else {
+		$assignees = array();
+	}
+
+	/*
 	 * Process each file which as any issues
 	 * tagged against it.
 	 */
@@ -465,7 +553,8 @@ function vipgocs_compatibility_scanner() {
 	vipgocs_open_issues(
 		$options,
 		$all_results,
-		$options['github-labels']
+		$options['github-labels'],
+		$assignees
 	);
 
 	/*
