@@ -160,8 +160,7 @@ function vipgocs_open_issues(
 			'repo-owner'			=> $options['repo-owner'],
 			'repo-name'			=> $options['repo-name'],
 			'github_issue_title'		=> $options['github-issue-title'],
-			'github_issue_body_intro'	=> $options['github-issue-body-intro'],
-			'github_issue_body_end'		=> $options['github-issue-body-end'],
+			'github_issue_body'		=> $options['github-issue-body'],
 			'issues'			=> $all_results,
 			'assignees'			=> $assignees,
 		)
@@ -223,9 +222,11 @@ function vipgocs_open_issues(
 				'title'		=>
 					$options['github-issue-title'] . $file_name,
 				'body'		=>
-					$options['github-issue-body-intro'] . PHP_EOL .
-					$error_msg .
-					$options['github-issue-body-end'],
+					str_replace(
+						'%error_msg%',
+						PHP_EOL . $error_msg . PHP_EOL,
+						$options['github-issue-body'] . PHP_EOL
+					)
 			);
 
 		if ( ! empty( $options['github-labels'] ) ) {
@@ -307,8 +308,7 @@ function vipgocs_compatibility_scanner() {
 			'phpcs-runtime-set:',
 			'github-labels:',
 			'github-issue-title:',
-			'github-issue-body-intro:',
-			'github-issue-body-end:',
+			'github-issue-body:',
 			'github-issue-assign:',
 		)
 	);
@@ -323,8 +323,7 @@ function vipgocs_compatibility_scanner() {
 			$options['repo-name'],
 			$options['token'],
 			$options['github-issue-title'],
-			$options['github-issue-body-intro'],
-			$options['github-issue-body-end'],
+			$options['github-issue-body'],
 			$options['local-git-repo'],
 			$options['phpcs-path'],
 			$options['phpcs-standard'],
@@ -340,8 +339,8 @@ function vipgocs_compatibility_scanner() {
 
 		print 'Usage: ' . $argv[0] . PHP_EOL .
 			"\t" . 'Options --vipgoci-path, --repo-owner, --repo-name, --token, ' . PHP_EOL .
-			"\t" . '        --github-issue-title, --github-issue-body-intro, --github-issue-body-end, ' . PHP_EOL .
-			"\t" . '        --local-git-repo, --phpcs-path, --phpcs-standard are mandatory parameters' . PHP_EOL .
+			"\t" . '        --github-issue-title, --github-issue-body, --local-git-repo' . PHP_EOL .
+			"\t" . '        --phpcs-path, --phpcs-standard are mandatory parameters' . PHP_EOL .
 			PHP_EOL .
 			"\t" . '--vipgoci-path=STRING             Path to were vip-go-ci lives, should be folder. ' . PHP_EOL .
 			PHP_EOL .
@@ -350,8 +349,8 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '--token=STRING                    The access-token to use to communicate with GitHub' . PHP_EOL .
 			"\t" . '--github-labels=STRING            Comma separated list of labels to attach to GitHub issues opened.' . PHP_EOL .
 			"\t" . '--github-issue-title=STRING       Title to use for GitHub issues created.' . PHP_EOL .
-			"\t" . '--github-issue-body-intro=STRING  String each created GitHub issue will start with.' . PHP_EOL .
-			"\t" . '--github-issue-body-end=STRING    String each created GitHub issue will end with.' . PHP_EOL .
+			"\t" . '--github-issue-body=STRING        Body for each created GitHub issue; make sure to include ' .
+			"\t" . '                                  %error_msg% in the body for list of problems.' . PHP_EOL .
 			"\t" . '--github-issue-assign=STRING      Assign specified admins as collaborators for each created issue' . PHP_EOL .
 			"\t" . '                                  -- outside, direct, or all.' . PHP_EOL .
 			PHP_EOL .
@@ -439,6 +438,17 @@ function vipgocs_compatibility_scanner() {
 
 	$options['phpcs-severity'] = 1;
 
+	if ( strpos(
+		$options['github-issue-body'],
+		'%error_msg%'
+	) === false ) {
+		vipgoci_sysexit(
+			'--github-issue-body is missing %error_msg% string',
+			array(
+				'github-issue-body'	=> $options['github-issue-body'],
+			)
+		);
+	}
 
 	if ( empty( $options['github-labels'] ) ) {
 		$options['github-labels'] = array();
