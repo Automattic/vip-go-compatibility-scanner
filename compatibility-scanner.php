@@ -1,9 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-require_once( __DIR__ . '/git-repo.php' );
-require_once( __DIR__ . '/scan.php' );
-require_once( __DIR__ . '/submit-issues.php' );
+require_once( __DIR__ . '/github-api.php' );
+require_once( __DIR__ . '/scan-files.php' );
+require_once( __DIR__ . '/open-issues.php' );
 require_once( __DIR__ . '/zendesk-api.php' );
 
 
