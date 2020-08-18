@@ -4,6 +4,7 @@
 require_once( __DIR__ . '/git-repo.php' );
 require_once( __DIR__ . '/scan.php' );
 require_once( __DIR__ . '/submit-issues.php' );
+require_once( __DIR__ . '/zendesk-api.php' );
 
 
 define( 'VIPGOCI_INCLUDED', true );
