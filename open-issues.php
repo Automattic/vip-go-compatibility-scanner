@@ -141,5 +141,7 @@ function vipgocs_open_issues(
 			'issue_statistics' => $issue_statistics,
 		)
 	);
+
+	return $issue_statistics;
 }
 
