@@ -24,7 +24,7 @@ The tool itself is meant to be used on a per-repo bases. Here is an example of h
 pushd /tmp && \
 git clone git@github.com:githubuser/testing123.git && \
 popd && \
-./compatibility-scanner.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/"  --repo-owner="mygithubuser" --repo-name="testing123" --token="xyz" --github-labels='PHP Compatibility' --github-issue-title="PHP Upgrade: Compatibility issues found in " --github-issue-body="The following issues were found when scanning for compatibility problems:  %error_msg% This is an automated report." --github-issue-assign="direct" --local-git-repo="/tmp/testing123" --phpcs-path="$HOME/vip-go-ci-tools/phpcs/bin/phpcs" --phpcs-standard="PHPCompatibilityWP" --phpcs-runtime-set='testVersion 7.2-'
+./compatibility-scanner.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/"  --repo-owner="mygithubuser" --repo-name="testing123" --token="xyz" --github-labels='PHP Compatibility' --github-issue-title="PHP Upgrade: Compatibility issues found in " --github-issue-body="The following issues were found when scanning branch <code>%branch_name%</code> for compatibility problems:  %error_msg% This is an automated report." --github-issue-assign="direct" --local-git-repo="/tmp/testing123" --phpcs-path="$HOME/vip-go-ci-tools/phpcs/bin/phpcs" --phpcs-standard="PHPCompatibilityWP" --phpcs-runtime-set='testVersion 7.2-'
 ```
 ## Usage for multiple repositories
 
@@ -42,7 +42,7 @@ The parameters are the following, respectively:
  * GitHub access token
  * Label(s) to apply to newly created GitHub issues, comma separated
  * Title prefix for each issue created
- * Body of created issue, with `%error_msg%` to be replaced by a list of problems noted
+ * Body of created issue. String `%error_msg%` will be replaced by a list of problems noted, and `%branch_name%` with name of branch.
  * Type of admin collaborators to assign issues (direct, outside, all)
  * PHPCS standard to use when scanning
  * PHPCS runtime set
