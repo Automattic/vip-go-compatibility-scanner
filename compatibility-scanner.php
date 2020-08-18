@@ -414,22 +414,10 @@ function vipgocs_compatibility_scanner() {
 		false
 	);
 
-	if ( empty( 'phpcs-runtime-set' ) ) {
-		$options['phpcs-runtime-set'] = array(
-			'testVersion',
-			'7.2-'
-		);
-	}
-
-	else {
-		vipgoci_option_array_handle(
-			$options,
-			'phpcs-runtime-set',
-			array(),
-			array(),
-			','
-		);
-	}
+	vipgoci_option_phpcs_runtime_set(
+		$options,
+		'phpcs-runtime-set'
+	);
 
 	if ( empty( $options['phpcs-sniffs-exclude'] ) ) {
 		$options['phpcs-sniffs-exclude'] = array();
