@@ -105,6 +105,21 @@ function vipgocs_scan_files(
 		}
 
 		/*
+		 * Get path to file relative
+		 * to repository. 
+		 *
+		 * Replace '.'/ with '/'.
+		 */
+		$file_path_dir = dirname(
+			$file_path
+		);
+
+		if ( '.' === $file_path_dir ) {
+			$file_path_dir = '/';
+		}
+
+
+		/*
 		 * Scan a single PHP file, and process the results
 		 * -- i.e., collect the information and save it.
 		 */
@@ -114,11 +129,42 @@ function vipgocs_scan_files(
 		);
 
 		$temp_file_name = $file_results['temp_file_name'];
-		$file_results_master = $file_results['file_issues_arr_master'];
-	
 
-		$all_results['files'][ $file_path ]['messages'] =
-				$file_results_master['files'][ $temp_file_name ]['messages'];
+		/*
+		 * Loop through each PHPCS message, add 'file_path'
+		 * attribute with actual path to file (relative
+		 * to repository).
+		 */
+		$file_results
+			['file_issues_arr_master']
+			['files']
+			[ $temp_file_name ]
+			['messages']
+		= array_map(
+			function( $msg ) use ( $file_path ) {
+				$msg['file_path'] = $file_path;
+
+				return $msg;
+			},
+			$file_results
+				['file_issues_arr_master']
+				['files']
+				[ $temp_file_name ]
+				['messages']
+		);
+
+		$file_results_master = $file_results['file_issues_arr_master'];
+
+
+		if ( ! isset( $all_results['files'][ $file_path_dir ]['messages'] ) ) {
+			$all_results['files'][ $file_path_dir ]['messages'] = array();
+		}
+
+		$all_results['files'][ $file_path_dir ]['messages'] = array_merge(
+			$all_results['files'][ $file_path_dir ]['messages'],
+			$file_results_master['files'][ $temp_file_name ]['messages']
+		);
+
 
 		$all_results['warnings'] += $file_results_master['totals']['warnings'];
 		$all_results['errors'] += $file_results_master['totals']['errors'];
@@ -169,7 +215,7 @@ function vipgocs_open_issues(
 
 	foreach(
 		$all_results['files'] as
-			$file_name => $file_issues
+			$file_path => $file_issues
 	) {
 
 		/*
@@ -187,11 +233,13 @@ function vipgocs_open_issues(
 
 		foreach( $file_issues['messages'] as $file_issue ) {
 			$error_msg .=
-				'* <b>' . ucfirst(
-						strtolower(
-							$file_issue['type']
-						)
-					) . '</b>: ';
+				'* <b>' .
+					ucfirst ( strtolower(
+						$file_issue['type']
+					) ) .
+				' in ' .
+				 $file_issue['file_path'] .
+				'</b>: ';
 
 			$error_msg .= $file_issue['message'] . ' ';
 
@@ -200,7 +248,7 @@ function vipgocs_open_issues(
 				$options['repo-name'] . '/' .
 				'blob/' .
 				$options['commit'] . '/' .
-				$file_name .
+				$file_issue['file_path'] .
 				'#L' . $file_issue['line'];
 
 			$error_msg .= PHP_EOL . PHP_EOL;
@@ -221,7 +269,7 @@ function vipgocs_open_issues(
 		$github_req_body =
 			array(
 				'title'		=>
-					$options['github-issue-title'] . $file_name,
+					$options['github-issue-title'] . $file_path,
 				'body'		=>
 					str_replace(
 						array(
@@ -229,7 +277,7 @@ function vipgocs_open_issues(
 							'%branch_name%',
 						),
 						array(
-							PHP_EOL . $error_msg . PHP_EOL,
+							PHP_EOL . $error_msg . PHP_EOL . PHP_EOL,
 							$git_branch,
 						),
 						$options['github-issue-body'] . PHP_EOL
@@ -258,7 +306,7 @@ function vipgocs_open_issues(
 		 */
 		unset( $github_url );
 		unset( $res );
-		unset( $file_name );
+		unset( $file_path );
 		unset( $file_issues );
 		unset( $error_msg );
 		
