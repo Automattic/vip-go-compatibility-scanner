@@ -2,11 +2,294 @@
 <?php
 
 require_once( __DIR__ . '/git-repo.php' );
-require_once( __DIR__ . '/scan.php' );
-require_once( __DIR__ . '/submit-issues.php' );
 
 
 define( 'VIPGOCI_INCLUDED', true );
+
+/*
+ * Scan all PHP files in the
+ * repository using the options
+ * given, return the issues found
+ * in one array.
+ */
+function vipgocs_scan_files(
+	$options
+) {
+	vipgoci_log(
+		'Fetching tree of files in the repository',
+		array(
+			'repo_owner'		=> $options['repo-owner'],
+			'repo_name'		=> $options['repo-name'],
+			'local_git_repo'	=> $options['local-git-repo'],
+		)
+	);
+
+	/*
+	 * Get tree of files that are
+	 * available in the commit specified.
+	 */
+	$tree = vipgoci_gitrepo_fetch_tree(
+		$options,
+		$options['commit']
+	);
+
+	$all_results = array(
+		'files'		=> array(),
+		'warnings'	=> 0,
+		'errors'	=> 0,
+		'fixable'	=> 0,
+	);
+
+	/*
+	 * Loop through each file, note any issues.
+	 */
+	foreach( $tree as $file_path ) {
+		vipgoci_log(
+			'Looking at file ' . $file_path,
+			array(
+				'repo-owner'	=> $options['repo-owner'],
+				'repo-name'	=> $options['repo-name'],
+				'file_path'	=> $file_path,
+				'commit'	=> $options['commit']
+			)
+		);
+
+		/*
+		 * Determine file-extension, and if it is not PHP, skip the file.
+		 */
+		$file_extension = vipgoci_file_extension_get(
+			$file_path
+		);
+
+		if ( 'php' !== $file_extension ) {
+			vipgoci_log(
+				'Skipping file, as it is not a PHP file',
+				array(
+					'file_path' => $file_path,
+				)
+			);
+
+			continue;
+		}
+
+		/*
+		 * Get path to file relative
+		 * to repository. 
+		 *
+		 * Replace '.'/ with '/'.
+		 */
+		$file_path_dir = dirname(
+			$file_path
+		);
+
+		if ( '.' === $file_path_dir ) {
+			$file_path_dir = '/';
+		}
+
+
+		/*
+		 * Scan a single PHP file, and process the results
+		 * -- i.e., collect the information and save it.
+		 */
+		$file_results = vipgoci_phpcs_scan_single_file(
+			$options,
+			$file_path
+		);
+
+		$temp_file_name = $file_results['temp_file_name'];
+
+		/*
+		 * Loop through each PHPCS message, add 'file_path'
+		 * attribute with actual path to file (relative
+		 * to repository).
+		 */
+		$file_results
+			['file_issues_arr_master']
+			['files']
+			[ $temp_file_name ]
+			['messages']
+		= array_map(
+			function( $msg ) use ( $file_path ) {
+				$msg['file_path'] = $file_path;
+
+				return $msg;
+			},
+			$file_results
+				['file_issues_arr_master']
+				['files']
+				[ $temp_file_name ]
+				['messages']
+		);
+
+		$file_results_master = $file_results['file_issues_arr_master'];
+
+
+		if ( ! isset( $all_results['files'][ $file_path_dir ]['messages'] ) ) {
+			$all_results['files'][ $file_path_dir ]['messages'] = array();
+		}
+
+		$all_results['files'][ $file_path_dir ]['messages'] = array_merge(
+			$all_results['files'][ $file_path_dir ]['messages'],
+			$file_results_master['files'][ $temp_file_name ]['messages']
+		);
+
+
+		$all_results['warnings'] += $file_results_master['totals']['warnings'];
+		$all_results['errors'] += $file_results_master['totals']['errors'];
+
+		unset( $file_extension );
+		unset( $file_results );
+		unset( $file_results_master );
+		unset( $temp_file_name );
+
+		gc_collect_cycles();
+	}
+
+	return $all_results;
+}
+
+/*
+ * Open up issues on GitHub for each
+ * problem we found when scanning.
+ */
+function vipgocs_open_issues(
+	$options,
+	$all_results,
+	$git_branch,
+	$labels,
+	$assignees = array()
+) {
+
+	/*
+	 * Keep some statistics on what
+	 * we do.
+	 */
+	$issue_statistics = array(
+		'issues_found'	=> 0,
+		'issues_opened'	=> 0,
+	);
+
+	vipgoci_log(
+		'Opening up issues on GitHub for problems found',
+		array(
+			'repo-owner'			=> $options['repo-owner'],
+			'repo-name'			=> $options['repo-name'],
+			'github_issue_title'		=> $options['github-issue-title'],
+			'github_issue_body'		=> $options['github-issue-body'],
+			'issues'			=> $all_results,
+			'assignees'			=> $assignees,
+		)
+	);
+
+	foreach(
+		$all_results['files'] as
+			$file_path => $file_issues
+	) {
+
+		/*
+		 * No issues, nothing to do.
+		 */
+		if ( empty( $file_issues['messages'] ) ) {
+			continue;
+		}
+
+
+		/*
+		 * Compose string to post as body of an issue.
+		 */
+		$error_msg = '';
+
+		foreach( $file_issues['messages'] as $file_issue ) {
+			$error_msg .=
+				'* <b>' .
+					ucfirst ( strtolower(
+						$file_issue['type']
+					) ) .
+				' in ' .
+				 $file_issue['file_path'] .
+				'</b>: ';
+
+			$error_msg .= $file_issue['message'] . ' ';
+
+			$error_msg .= 'https://github.com/' .
+				$options['repo-owner'] . '/' .
+				$options['repo-name'] . '/' .
+				'blob/' .
+				$options['commit'] . '/' .
+				$file_issue['file_path'] .
+				'#L' . $file_issue['line'];
+
+			$error_msg .= PHP_EOL . PHP_EOL;
+
+			$issue_statistics['issues_found']++;
+		}
+
+		$github_url =
+			VIPGOCI_GITHUB_BASE_URL . '/' .
+			'repos/' .
+			rawurlencode( $options['repo-owner'] ) . '/' .
+			rawurlencode( $options['repo-name'] ) . '/' .
+			'issues';
+
+		/*
+		 * Create issue on GitHub.
+		 */
+		$github_req_body =
+			array(
+				'title'		=>
+					$options['github-issue-title'] . $file_path,
+				'body'		=>
+					str_replace(
+						array(
+							'%error_msg%',
+							'%branch_name%',
+						),
+						array(
+							PHP_EOL . $error_msg . PHP_EOL . PHP_EOL,
+							$git_branch,
+						),
+						$options['github-issue-body'] . PHP_EOL
+					)
+			);
+
+		if ( ! empty( $options['github-labels'] ) ) {
+			$github_req_body['labels'] = $labels;
+		}
+
+		if ( ! empty( $assignees ) ) {
+			$github_req_body['assignees'] = $assignees;
+		}
+
+
+		$res = vipgoci_github_post_url(
+			$github_url,
+			$github_req_body,
+			$options['token']
+		);
+
+		$issue_statistics['issues_opened']++;
+
+		/*
+		 * Clean up and return.
+		 */
+		unset( $github_url );
+		unset( $res );
+		unset( $file_path );
+		unset( $file_issues );
+		unset( $error_msg );
+		
+		gc_collect_cycles();
+
+		sleep( 2 + rand( 0, 3 ));
+	}
+
+	vipgoci_log(
+		'Finished opening up issues on GitHub',
+		array(
+			'issue_statistics' => $issue_statistics,
+		)
+	);
+}
 
 /*
  * main() -- prepare to do actual work,
