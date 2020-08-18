@@ -141,6 +141,7 @@ function vipgocs_scan_files(
 function vipgocs_open_issues(
 	$options,
 	$all_results,
+	$git_branch,
 	$labels,
 	$assignees = array()
 ) {
@@ -223,8 +224,14 @@ function vipgocs_open_issues(
 					$options['github-issue-title'] . $file_name,
 				'body'		=>
 					str_replace(
-						'%error_msg%',
-						PHP_EOL . $error_msg . PHP_EOL,
+						array(
+							'%error_msg%',
+							'%branch_name%',
+						),
+						array(
+							PHP_EOL . $error_msg . PHP_EOL,
+							$git_branch,
+						),
 						$options['github-issue-body'] . PHP_EOL
 					)
 			);
@@ -349,7 +356,10 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '--token=STRING                    The access-token to use to communicate with GitHub' . PHP_EOL .
 			"\t" . '--github-labels=STRING            Comma separated list of labels to attach to GitHub issues opened.' . PHP_EOL .
 			"\t" . '--github-issue-title=STRING       Title to use for GitHub issues created.' . PHP_EOL .
-			"\t" . '--github-issue-body=STRING        Body for each created GitHub issue; make sure to include ' .
+			"\t" . '--github-issue-body=STRING        Body for each created GitHub issue. ' . PHP_EOL .
+			"\t" . '                                  The option supports tokens that will be replaced with values: ' . PHP_EOL .
+			"\t" . '                                      * %error_msg%: Will be replaced with problems noted. ' . PHP_EOL .
+			"\t" . '                                      * %branch_name%: Will be replaced with name of current branch. ' . PHP_EOL .
 			"\t" . '                                  %error_msg% in the body for list of problems.' . PHP_EOL .
 			"\t" . '--github-issue-assign=STRING      Assign specified admins as collaborators for each created issue' . PHP_EOL .
 			"\t" . '                                  -- outside, direct, or all.' . PHP_EOL .
@@ -556,6 +566,17 @@ function vipgocs_compatibility_scanner() {
 	}
 
 	/*
+	 * Get git branch being used.
+	 */
+	$git_branch = vipgoci_gitrepo_branch_current_get(
+		$options['local-git-repo']
+	);
+
+	if ( empty( $git_branch ) ) {
+		$git_branch = '[UNKNOWN]';
+	}
+
+	/*
 	 * Process each file which as any issues
 	 * tagged against it.
 	 */
@@ -563,6 +584,7 @@ function vipgocs_compatibility_scanner() {
 	vipgocs_open_issues(
 		$options,
 		$all_results,
+		$git_branch,
 		$options['github-labels'],
 		$assignees
 	);
