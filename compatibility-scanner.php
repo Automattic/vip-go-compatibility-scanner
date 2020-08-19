@@ -301,7 +301,14 @@ function vipgocs_compatibility_scanner() {
 		) )
 	) {
 		vipgoci_sysexit(
-			'Authentication with Zendesk failed'
+			'Authentication with Zendesk failed',
+			array(
+				'zendesk-access-username' =>
+					@$options['zendesk-access-username'],
+
+				'zendesk-subdomain' =>
+					@$options['zendesk-subdomain'],
+			)
 		);
 	}
 
