@@ -67,3 +67,6 @@ The parameters are the following, respectively:
  * PHPCS standard to use when scanning
  * PHPCS runtime set
  * Git branch to check out
+
+There are also optional parameters for Zendesk. See help message.
+
