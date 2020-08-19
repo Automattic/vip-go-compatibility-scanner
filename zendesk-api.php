@@ -9,6 +9,10 @@
 function vipgocs_zendesk_check_auth(
 	$options
 ) {
+	vipgoci_log(
+		'Checking authentication credentials with Zendesk...'
+	);
+
 	$sessions = vipgocs_zendesk_send_request(
 		'GET',
 		$options['zendesk-subdomain'],
@@ -28,8 +32,16 @@ function vipgocs_zendesk_check_auth(
 			$sessions['sessions']
 		) > 0 )
 	) {
+		vipgoci_log(
+			'Zendesk authentication successful'
+		);
+
 		return true;
 	}
+
+	vipgoci_log(
+		'Zendesk authentication failed'
+	);
 
 	return false;
 }
