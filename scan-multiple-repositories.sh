@@ -93,8 +93,7 @@ for REPO_NAME in $(echo "$GITHUB_REPOS") ; do
 
 	pushd "$TEMP_DIR" && \
 	echo "Cloning repository from GitHub..." && \
-#	git clone "git@github.com:$GITHUB_ORGANISATION/$REPO_NAME.git" && \
-	cp -R /tmp/$REPO_NAME $TEMP_DIR && \
+	git clone "git@github.com:$GITHUB_ORGANISATION/$REPO_NAME.git" && \
 	cd $REPO_NAME && \
 	git checkout "$GIT_BRANCH" && \
 	cd .. && \
