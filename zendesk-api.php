@@ -362,6 +362,12 @@ function vipgocs_zendesk_prepare_auth_fields(
 ) {
 	$auth_fields = array();
 
+	if ( ! isset(
+		$options['zendesk-subdomain']
+	) ) {
+		return null;
+	}
+
 	if (
 		( isset( $options['zendesk-access-username'] ) ) &&
 		( isset( $options['zendesk-access-token'] ) )
