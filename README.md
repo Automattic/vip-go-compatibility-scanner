@@ -27,11 +27,13 @@ pushd /tmp && \
 git clone git@github.com:githubuser/testing123.git && \
 popd && \
 ./compatibility-scanner.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/"  --repo-owner="mygithubuser" --repo-name="testing123" --token="xyz" --github-labels='PHP Compatibility' --github-issue-title="PHP Upgrade: Compatibility issues found in " --github-issue-body="The following issues were found when scanning branch <code>%branch_name%</code> for compatibility problems:  %error_msg% This is an automated report." --github-issue-assign="direct" --local-git-repo="/tmp/testing123" --phpcs-path="$HOME/vip-go-ci-tools/phpcs/bin/phpcs" --phpcs-standard="PHPCompatibilityWP" --phpcs-runtime-set='testVersion 7.2-' 
+```
 
 ### Zendesk functionality
 
 If you wish to also create Zendesk tickets to notify about the issues found, you can add parameters such as these to the command:
 
+```
 > --zendesk-access-username="user@email" --zendesk-access-token="xyz" --zendesk-subdomain="myzendesksubdomain" --zendesk-ticket-subject="PHP Upgrade: Issues that need solving" --zendesk-ticket-body="Some issues were found. See issues here: %github_issues_link%" --zendesk-csv-data-path="file.csv"
 ```
 
