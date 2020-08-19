@@ -54,7 +54,13 @@ function vipgocs_zendesk_search_for_user(
 	$options,
 	$email
 ) {
-	
+	vipgoci_log(
+		'Searching for user on Zendesk...',
+		array(
+			'email'	=> $email,
+		)
+	);
+
 	$zendesk_api_datafields = array(
 		'query' => 'type:user "' . $email . '"'
 	);
@@ -73,8 +79,23 @@ function vipgocs_zendesk_search_for_user(
 		( isset( $resp_data['results'] ) ) &&
 		( count( $resp_data['results'] ) > 0 )
 	) {
+		vipgoci_log(
+			'Zendesk user found',
+			array(
+				'email' => $email,
+				'zendesk_user_id' => $resp_data['results'][0]['id'],
+			)
+		);
+
 		return $resp_data['results'][0];
 	}
+
+	vipgoci_log(
+		'No user found',
+		array(
+			'email'	=> $email,
+		)
+	);
 
 	return null;
 }
