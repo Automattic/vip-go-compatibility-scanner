@@ -5,6 +5,7 @@ require_once( __DIR__ . '/github-api.php' );
 require_once( __DIR__ . '/scan-files.php' );
 require_once( __DIR__ . '/open-issues.php' );
 require_once( __DIR__ . '/zendesk-api.php' );
+require_once( __DIR__ . '/csv-data.php' );
 
 
 define( 'VIPGOCI_INCLUDED', true );
@@ -51,6 +52,13 @@ function vipgocs_compatibility_scanner() {
 			'github-issue-title:',
 			'github-issue-body:',
 			'github-issue-assign:',
+			'zendesk-subdomain:',
+			'zendesk-access-username:',
+			'zendesk-access-token:',
+			'zendesk-access-password:',
+			'zendesk-ticket-subject:',
+			'zendesk-ticket-body:',
+			'zendesk-csv-data-path:',
 		)
 	);
 
@@ -80,34 +88,48 @@ function vipgocs_compatibility_scanner() {
 
 		print 'Usage: ' . $argv[0] . PHP_EOL .
 			"\t" . 'Options --vipgoci-path, --repo-owner, --repo-name, --token, ' . PHP_EOL .
-			"\t" . '        --github-issue-title, --github-issue-body, --local-git-repo' . PHP_EOL .
-			"\t" . '        --phpcs-path, --phpcs-standard are mandatory parameters' . PHP_EOL .
+			"\t" . '	--github-issue-title, --github-issue-body, --local-git-repo' . PHP_EOL .
+			"\t" . '	--phpcs-path, --phpcs-standard are mandatory parameters' . PHP_EOL .
 			PHP_EOL .
-			"\t" . '--vipgoci-path=STRING             Path to were vip-go-ci lives, should be folder. ' . PHP_EOL .
+			"\t" . '--vipgoci-path=STRING	            Path to were vip-go-ci lives, should be folder. ' . PHP_EOL .
 			PHP_EOL .
-			"\t" . '--repo-owner=STRING               Specify repository owner, can be an organization' . PHP_EOL .
-			"\t" . '--repo-name=STRING                Specify name of the repository' . PHP_EOL .
-			"\t" . '--token=STRING                    The access-token to use to communicate with GitHub' . PHP_EOL .
-			"\t" . '--github-labels=STRING            Comma separated list of labels to attach to GitHub issues opened.' . PHP_EOL .
-			"\t" . '--github-issue-title=STRING       Title to use for GitHub issues created.' . PHP_EOL .
-			"\t" . '--github-issue-body=STRING        Body for each created GitHub issue. ' . PHP_EOL .
-			"\t" . '                                  The option supports tokens that will be replaced with values: ' . PHP_EOL .
-			"\t" . '                                      * %error_msg%: Will be replaced with problems noted. ' . PHP_EOL .
-			"\t" . '                                      * %branch_name%: Will be replaced with name of current branch. ' . PHP_EOL .
-			"\t" . '                                  %error_msg% in the body for list of problems.' . PHP_EOL .
-			"\t" . '--github-issue-assign=STRING      Assign specified admins as collaborators for each created issue' . PHP_EOL .
-			"\t" . '                                  -- outside, direct, or all.' . PHP_EOL .
+			"\t" . '--repo-owner=STRING	            Specify repository owner, can be an organization' . PHP_EOL .
+			"\t" . '--repo-name=STRING                  Specify name of the repository' . PHP_EOL .
+			"\t" . '--token=STRING		            The access-token to use to communicate with GitHub' . PHP_EOL .
+			"\t" . '--github-labels=STRING	            Comma separated list of labels to attach to GitHub issues opened.' . PHP_EOL .
+			"\t" . '--github-issue-title=STRING         Title to use for GitHub issues created.' . PHP_EOL .
+			"\t" . '--github-issue-body=STRING          Body for each created GitHub issue. ' . PHP_EOL .
+			"\t" . '                                    The option supports tokens that will be replaced with values: ' . PHP_EOL .
+			"\t" . '				      * %error_msg%: Will be replaced with problems noted. ' . PHP_EOL .
+			"\t" . '				      * %branch_name%: Will be replaced with name of current branch. ' . PHP_EOL .
+			"\t" . '				    %error_msg% in the body for list of problems.' . PHP_EOL .
+			"\t" . '--github-issue-assign=STRING        Assign specified admins as collaborators for each created issue' . PHP_EOL .
+			"\t" . '				    -- outside, direct, or all.' . PHP_EOL .
 			PHP_EOL .
-			"\t" . '--local-git-repo=FILE             The local git repository to use for direct access to code' . PHP_EOL .
+			"\t" . '--local-git-repo=FILE	            The local git repository to use for direct access to code' . PHP_EOL .
 			PHP_EOL .
-			"\t" . '--phpcs-path=FILE                 Full path to PHPCS script' . PHP_EOL .
-			"\t" . '--phpcs-standard=STRING           Specify which PHPCS standard to use' . PHP_EOL .
-			"\t" . '--phpcs-runtime-set=STRING        Specify --runtime-set values passed on to PHPCS' . PHP_EOL .
-			"\t" . '                                  -- expected to be a comma-separated value string of ' . PHP_EOL .
-			"\t" . '                                  key-value pairs.' . PHP_EOL .
-			"\t" . '                                  For example: --phpcs-runtime-set="foo1 bar1, foo2,bar2"' . PHP_EOL .
-			"\t" . '--phpcs-sniffs-exclude=ARRAY      Specify which sniffs to exclude from PHPCS scanning, ' . PHP_EOL .
-			"\t" . '                                  should be an array with items separated by commas. ' . PHP_EOL .
+			"\t" . '--phpcs-path=FILE                   Full path to PHPCS script' . PHP_EOL .
+			"\t" . '--phpcs-standard=STRING             Specify which PHPCS standard to use' . PHP_EOL .
+			"\t" . '--phpcs-runtime-set=STRING          Specify --runtime-set values passed on to PHPCS' . PHP_EOL .
+			"\t" . '				    -- expected to be a comma-separated value string of ' . PHP_EOL .
+			"\t" . '				    key-value pairs.' . PHP_EOL .
+			"\t" . '				    For example: --phpcs-runtime-set="foo1 bar1, foo2,bar2"' . PHP_EOL .
+			"\t" . '--phpcs-sniffs-exclude=ARRAY        Specify which sniffs to exclude from PHPCS scanning, ' . PHP_EOL .
+			"\t" . '				    should be an array with items separated by commas. ' . PHP_EOL .
+			PHP_EOL .
+			"\t" . '--zendesk-subdomain=STRING          Subdomain to use when communicating with Zendesk. ' . PHP_EOL .
+			"\t" . '--zendesk-access-username=STRING    Username of the Zendesk user to use.' . PHP_EOL .
+			"\t" . '--zendesk-access-token=STRING       Access token to use when communicating with Zendesk REST API. ' . PHP_EOL .
+			"\t" . '--zendesk-access-password=STRING    Password to use when communicating with Zendesk REST API. ' . PHP_EOL .
+			"\t" . '                                    Use if token is not an option.' . PHP_EOL .
+			"\t" . '--zendesk-ticket-subject=STRING     Subject to use for Zendesk tickets.' . PHP_EOL .
+			"\t" . '--zendesk-ticket-body=STRING        Body of Zendesk ticket. String %github_issues_link%' . PHP_EOL .
+			"\t" . '                                    will be replaced with link to GitHub issues created;' . PHP_EOL .
+			"\t" . '                                    the link will be the first label specified in --github--label' . PHP_EOL .
+			"\t" . '--zendesk-csv-data-path=PATH        CSV data to use for Zendesk ticket creation. The ' . PHP_EOL .
+			"\t" . '                                    data is used to pair a user\'s email address to repository.' . PHP_EOL .
+			"\t" . '                                    The file should have two fields: customer_email and source_repo' . PHP_EOL .
+			"\t" . '                                    -- first line of the file should be columns.' . PHP_EOL .
 			PHP_EOL;
 
 		exit(253);
@@ -224,6 +246,9 @@ function vipgocs_compatibility_scanner() {
 		null,
 		array(
 			'token',
+			'zendesk-access-username',
+			'zendesk-access-password',
+			'zendesk-access-token',
 		)
 	);
 
@@ -231,12 +256,109 @@ function vipgocs_compatibility_scanner() {
 		$options
 	);
 
+	/*
+	 * Check if GitHub token is okay.
+	 */
+	$current_user_info = vipgoci_github_authenticated_user_get(
+		$options['token']
+	);
+
+	if (
+		( false === $current_user_info ) ||
+		( ! isset( $current_user_info->login ) ) ||
+		( empty( $current_user_info->login ) )
+	) {
+		vipgoci_sysexit(
+			'Unable to get information about token-holder user from GitHub',
+			array(
+			),
+			VIPGOCI_EXIT_GITHUB_PROBLEM
+		);
+	}
+
+	else {
+		vipgoci_log(
+			'Got information about token-holder user from GitHub',
+			array(
+				'login' => $current_user_info->login,
+				'html_url' => $current_user_info->html_url,
+			)
+		);
+	}
+
+
+	/*
+	 * Check if Zendesk auth is ok
+	 */
+
+	if (
+		( null === vipgocs_zendesk_prepare_auth_fields(
+			$options
+		) )
+		||
+		( true !== vipgocs_zendesk_check_auth(
+			$options
+		) )
+	) {
+		vipgoci_sysexit(
+			'Authentication with Zendesk failed'
+		);
+	}
+
+	else {
+		vipgoci_log(
+			'Authentication with Zendesk successful'
+		);
+	}
+
+	/*
+	 * Read in CSV data, if --zendesk-csv-data is specified
+	 */
+
+	$zendesk_csv_data = array();
+	$zendesk_requestee_email = null;
+
+	if ( isset( $options['zendesk-csv-data-path'] ) ) {
+		$zendesk_csv_data = vipgocs_csv_parse_data(
+			$options['zendesk-csv-data-path']
+		);
+
+		$zendesk_requestee_email = vipgocs_csv_get_email_for_repo(
+			$zendesk_csv_data,
+			$options['repo-owner'],
+			$options['repo-name']
+		);
+
+		$log_msg = '';
+
+		if ( ! empty( $zendesk_requestee_email ) ) {
+			$log_msg = 'Got email for Zendesk ticket creation that matches repository owner and name';
+		}
+
+		else {
+			$log_msg = 'Got no email for Zendesk ticket creation that matches repository owner and name; will not be created';
+		}
+
+		vipgoci_log(
+			$log_msg,
+			array(
+				'zendesk_requestee_email'	=> $zendesk_requestee_email,
+				'repo-owner'			=> $options['repo-owner'],
+				'repo-name'			=> $options['repo-name'],
+				'csv-data-count'		=> count( $zendesk_csv_data ),
+			)
+		);
+	}
+
+
 	vipgoci_log(
 		'Starting up...',
 		$options_clean
 	);
 
 	unset( $options_clean );
+
+	sleep( 5 );
 
 	/*
 	 * Get the HEAD commit
@@ -254,6 +376,7 @@ function vipgocs_compatibility_scanner() {
 		str_replace( '\'', '', $vipgoci_git_repo_head );
 
 	$options['commit'] = $vipgoci_git_repo_head;
+
 
 	/*
 	 * Main processing starts.
@@ -303,13 +426,74 @@ function vipgocs_compatibility_scanner() {
 	 * tagged against it.
 	 */
 
-	vipgocs_open_issues(
+	$issue_statistics = vipgocs_open_issues(
 		$options,
 		$all_results,
 		$git_branch,
 		$options['github-labels'],
 		$assignees
 	);
+
+	/*
+	 * Construct links to issues,
+	 * use labels to search.
+	 */
+	$github_issues_links = array();
+
+	foreach(
+		$options['github-labels'] as $label_name
+	) {
+		$github_issues_links[] =
+			'https://github.com/' .
+				rawurlencode( $options['repo-owner'] ) . '/' .
+				rawurlencode( $options['repo-name'] ) . '/' .
+				'labels/' .
+				rawurlencode( $label_name ); 
+	}
+
+	/*
+	 * If configured to create Zendesk
+	 * tickets and we did open issues,
+	 * do create tickets.
+	 */
+
+	$zendesk_ticket_url = null;
+
+	if (
+		( null !==
+			vipgocs_zendesk_prepare_auth_fields( $options )
+		)
+		&&
+		( ! empty(
+			$options['zendesk-subdomain']
+		) )
+		&&
+		( ! empty(
+			$options['zendesk-ticket-subject']
+		) )
+		&&
+		( ! empty(
+			$options['zendesk-ticket-body']
+		) )
+		&&
+		( ! empty(
+			$zendesk_requestee_email
+		) )
+		&&
+		( $issue_statistics['issues_opened'] > 0 )
+	) {
+		$zendesk_ticket_url = vipgocs_zendesk_open_ticket(
+			$options,
+			$zendesk_requestee_email,
+			$github_issues_links
+		);
+	}
+
+	else {
+		vipgoci_log(
+			'Note: Not opening Zendesk ticket as not all requirements fulfilled',
+		);
+	}
 
 	/*
 	 * Get API rate limit usage.
@@ -337,34 +521,33 @@ function vipgocs_compatibility_scanner() {
 		array(
 			'repo-owner'	=> $options['repo-owner'],
 			'repo-name'	=> $options['repo-name'],
-			'run_time_seconds'      => time() - $startup_time,
+			'run_time_seconds'	=> time() - $startup_time,
 			'run_time_measurements' =>
 				vipgoci_runtime_measure(
 					VIPGOCI_RUNTIME_DUMP,
 					null
 				),
-			'counters_report'       => $counter_report,
+			'counters_report'	=> $counter_report,
 
 			'github_api_rate_limit' =>
 				$github_api_rate_limit_usage->resources->core,
 		)
 	);
 
+	
 	/*
 	 * Provide a URL to newly created issues.
 	 */
 	echo PHP_EOL;
 
-	foreach(
-		$options['github-labels'] as $label_name
-	) {
-		echo 'Find newly created issues here: ' . 
-				'https://github.com/' .
-					rawurlencode( $options['repo-owner'] ) . '/' .
-					rawurlencode( $options['repo-name'] ) . '/' .
-					'labels/' .
-					rawurlencode( $label_name ) .
-		PHP_EOL;
+	echo 'Find newly created issues here: ' . PHP_EOL;
+
+	foreach( $github_issues_links as $github_issue_link ) {
+		echo "* " . $github_issue_link . PHP_EOL;
+	}
+
+	if ( ! empty( $zendesk_ticket_url ) ) {
+		echo 'Find Zendesk ticket here: ' . $zendesk_ticket_url . PHP_EOL;
 	}
 
 	return 0;
