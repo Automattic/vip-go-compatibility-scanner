@@ -66,7 +66,10 @@ function vipgocs_csv_parse_data(
 				continue;
 			}
 
-			$item_arr[ $key ] = $item[ $i++ ];
+			/*
+			 * Assign item, trim any whitespace characters.
+			 */
+			$item_arr[ $key ] = trim( $item[ $i++ ] );
 		}
 
 		if ( ! empty( $item_arr ) ) {
