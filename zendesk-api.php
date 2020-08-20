@@ -126,9 +126,15 @@ function vipgocs_zendesk_open_ticket(
 			'subject'	=> $options['zendesk-ticket-subject'],
 			'comment'	=> array(
 				'body' => str_replace(
-					'%github_issues_link%',
-					$github_issues_links[0],
-					$options['zendesk-ticket-body']
+					array(
+						'%github_issues_link%',
+						'%linebreak%',
+					),
+					array(
+						$github_issues_links[0],
+						PHP_EOL,
+					),
+					$options['zendesk-ticket-body'],
 				)
 			)
 		)
