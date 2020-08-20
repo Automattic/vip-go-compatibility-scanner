@@ -126,10 +126,12 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '--zendesk-access-password=STRING    Password to use when communicating with Zendesk REST API. ' . PHP_EOL .
 			"\t" . '                                    Use if token is not an option.' . PHP_EOL .
 			"\t" . '--zendesk-ticket-subject=STRING     Subject to use for Zendesk tickets.' . PHP_EOL .
-			"\t" . '--zendesk-ticket-body=STRING        Body of Zendesk ticket. String %github_issues_link%' . PHP_EOL .
-			"\t" . '                                    will be replaced with link to GitHub issues created;' . PHP_EOL .
-			"\t" . '                                    the link will be the first label specified in --github--label' . PHP_EOL .
-			"\t" . '                                    %linebreak% will be replaced with \n.' . PHP_EOL .
+			"\t" . '--zendesk-ticket-body=STRING        Body of Zendesk ticket. Markdown is supported. ' . PHP_EOL .
+			"\t" . '                                    Also certain strings are replaced with other values: ' . PHP_EOL .
+			"\t" . '                                     * String %github_issues_link% will be replaced' . PHP_EOL .
+			"\t" . '                                       with link to GitHub issues created; the link' . PHP_EOL .
+			"\t" . '                                       will be the first label specified in --github--label' . PHP_EOL .
+			"\t" . '                                     * %linebreak% will be replaced with \n.' . PHP_EOL .
 			"\t" . '--zendesk-csv-data-path=PATH        CSV data to use for Zendesk ticket creation. The ' . PHP_EOL .
 			"\t" . '                                    data is used to pair a user\'s email address to repository.' . PHP_EOL .
 			"\t" . '                                    The file should have two fields: customer_email and source_repo' . PHP_EOL .
