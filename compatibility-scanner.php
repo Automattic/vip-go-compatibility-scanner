@@ -135,6 +135,7 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '                                    data is used to pair a user\'s email address to repository.' . PHP_EOL .
 			"\t" . '                                    The file should have two fields: customer_email and source_repo' . PHP_EOL .
 			"\t" . '                                    -- first line of the file should be columns.' . PHP_EOL .
+			"\t" . '                                    Valid columns are: client_email, source_repo ' . PHP_EOL .
 			PHP_EOL;
 
 		exit(253);
@@ -362,6 +363,16 @@ function vipgocs_compatibility_scanner() {
 			$options['zendesk-csv-data-path']
 		);
 
+		if ( empty( $zendesk_csv_data ) ) {
+			vipgoci_sysexit(
+				'Read CSV file, but no data seems to have been available, or data is invalid',
+				array(
+					'zendesk-csv-data-path'		=> $options['zendesk-csv-data-path'],
+					'csv-data-count'		=> count( $zendesk_csv_data ),
+				)
+			);
+		}
+
 		$zendesk_requestee_email = vipgocs_csv_get_email_for_repo(
 			$zendesk_csv_data,
 			$options['repo-owner'],
@@ -384,6 +395,7 @@ function vipgocs_compatibility_scanner() {
 				'zendesk_requestee_email'	=> $zendesk_requestee_email,
 				'repo-owner'			=> $options['repo-owner'],
 				'repo-name'			=> $options['repo-name'],
+				'zendesk-csv-data-path'		=> $options['zendesk-csv-data-path'],
 				'csv-data-count'		=> count( $zendesk_csv_data ),
 			)
 		);
