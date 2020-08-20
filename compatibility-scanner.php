@@ -139,7 +139,7 @@ function vipgocs_compatibility_scanner() {
 	}
 
 	/*
-	 * Check if the --vipgoci-path parameter is 
+	 * Check if the --vipgoci-path parameter is
 	 * invalid, should be a folder.
 	 */
 	if ( ! is_dir( $options['vipgoci-path'] ) ) {
@@ -163,7 +163,7 @@ function vipgocs_compatibility_scanner() {
 	/*
 	 * Parse rest of options
 	 */
-	
+
 	vipgoci_option_array_handle(
 		$options,
 		'phpcs-standard',
@@ -263,7 +263,7 @@ function vipgocs_compatibility_scanner() {
 	/*
 	 * Print cleaned option-values.
 	 */
-	
+
 	$options_clean = vipgoci_options_sensitive_clean(
 		null,
 		array(
@@ -313,31 +313,29 @@ function vipgocs_compatibility_scanner() {
 	 * Check if Zendesk auth is ok
 	 */
 
-	if (
-		( null === vipgocs_zendesk_prepare_auth_fields(
+	if ( null !== vipgocs_zendesk_prepare_auth_fields(
+		$options
+	) ) {
+		if ( true !== vipgocs_zendesk_check_auth(
 			$options
-		) )
-		||
-		( true !== vipgocs_zendesk_check_auth(
-			$options
-		) )
-	) {
-		vipgoci_sysexit(
-			'Authentication with Zendesk failed',
-			array(
-				'zendesk-access-username' =>
-					@$options['zendesk-access-username'],
+		) ) {
+			vipgoci_sysexit(
+				'Authentication with Zendesk failed',
+				array(
+					'zendesk-access-username' =>
+						@$options['zendesk-access-username'],
 
-				'zendesk-subdomain' =>
-					@$options['zendesk-subdomain'],
-			)
-		);
-	}
+					'zendesk-subdomain' =>
+						@$options['zendesk-subdomain'],
+				)
+			);
+		}
 
-	else {
-		vipgoci_log(
-			'Authentication with Zendesk successful'
-		);
+		else {
+			vipgoci_log(
+				'Authentication with Zendesk successful'
+			);
+		}
 	}
 
 	/*
@@ -401,7 +399,7 @@ function vipgocs_compatibility_scanner() {
 		$options['local-git-repo']
 	);
 
-	$vipgoci_git_repo_head = 
+	$vipgoci_git_repo_head =
 		str_replace( '\'', '', $vipgoci_git_repo_head );
 
 	$options['commit'] = $vipgoci_git_repo_head;
@@ -477,7 +475,7 @@ function vipgocs_compatibility_scanner() {
 				rawurlencode( $options['repo-owner'] ) . '/' .
 				rawurlencode( $options['repo-name'] ) . '/' .
 				'labels/' .
-				rawurlencode( $label_name ); 
+				rawurlencode( $label_name );
 	}
 
 	/*
@@ -563,7 +561,7 @@ function vipgocs_compatibility_scanner() {
 		)
 	);
 
-	
+
 	/*
 	 * Provide a URL to newly created issues.
 	 */
