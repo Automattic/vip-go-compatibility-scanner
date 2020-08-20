@@ -134,6 +134,9 @@ function vipgocs_zendesk_open_ticket(
 		)
 	);
 
+	/*
+	 * Assign requestee to the ticket.
+	 */
 	$zendesk_req_id = vipgocs_zendesk_search_for_user(
 		$options,
 		$zendesk_requestee_email
@@ -152,6 +155,31 @@ function vipgocs_zendesk_open_ticket(
 
 	$zendesk_api_postfields['ticket']['requester_id'] =
 		$zendesk_req_id['id'];
+
+	/*
+	 * Assign submitter to the ticket --
+	 * this is so that it does not appear
+	 * that clients open tickets, but whoever
+	 * runs the program.
+	 */
+	$zendesk_submitter_id = vipgocs_zendesk_search_for_user(
+		$options,
+		$options['zendesk-access-username']
+	);
+
+	if ( empty( $zendesk_submitter_id['id'] ) ) {
+		vipgoci_log(
+			'Unable to open ticket for repository, as no user was found for email address specified',
+			array(
+				'zendesk-submitter-email'	=> $options['zendesk-access-username'],
+			)
+		);
+
+		return;
+	}
+	$zendesk_api_postfields['ticket']['submitter_id'] =
+		$zendesk_submitter_id['id'];
+
 
 	$resp_data = vipgocs_zendesk_send_request(
 		'POST',
