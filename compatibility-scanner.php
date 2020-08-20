@@ -52,6 +52,7 @@ function vipgocs_compatibility_scanner() {
 			'github-issue-title:',
 			'github-issue-body:',
 			'github-issue-assign:',
+			'github-issue-group-by:',
 			'zendesk-subdomain:',
 			'zendesk-access-username:',
 			'zendesk-access-token:',
@@ -105,6 +106,8 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '				    %error_msg% in the body for list of problems.' . PHP_EOL .
 			"\t" . '--github-issue-assign=STRING        Assign specified admins as collaborators for each created issue' . PHP_EOL .
 			"\t" . '				    -- outside, direct, or all.' . PHP_EOL .
+			"\t" . '--github-issue-group-by=STRING      How to group the issues found; either by "file" or "folder".' . PHP_EOL .
+			"\t" . '                                    "file" is default.' . PHP_EOL .
 			PHP_EOL .
 			"\t" . '--local-git-repo=FILE	            The local git repository to use for direct access to code' . PHP_EOL .
 			PHP_EOL .
@@ -234,6 +237,25 @@ function vipgocs_compatibility_scanner() {
 				array(
 					'github-issue-assign' => $options['github-issue-assign']
 				)
+			);
+		}
+	}
+
+	if ( ! isset( $options['github-issue-group-by'] ) ) {
+		$options['github-issue-group-by'] = 'file';
+	}
+
+	else {
+		$options['github-issue-group-by'] = trim(
+			$options['github-issue-group-by']
+		);
+
+		if (
+			( 'file' !== $options['github-issue-group-by'] ) &&
+			( 'folder' !== $options['github-issue-group-by'] )
+		) {
+			vipgoci_sysexit(
+				'Invalid argument provided to option --github-issue-group-by; should be "file" or "folder".',
 			);
 		}
 	}

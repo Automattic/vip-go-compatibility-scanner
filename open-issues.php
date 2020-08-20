@@ -56,10 +56,14 @@ function vipgocs_open_issues(
 				'* <b>' .
 					ucfirst ( strtolower(
 						$file_issue['type']
-					) ) .
-				' in ' .
-				 $file_issue['file_path'] .
-				'</b>: ';
+					) );
+
+			if ( 'folder' === $options['github-issue-group-by'] ) {
+				$error_msg .= ' in ' .
+				 $file_issue['file_path'];
+			}
+
+			$error_msg .= '</b>: ';		
 
 			$error_msg .= $file_issue['message'] . ' ';
 

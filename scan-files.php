@@ -117,13 +117,33 @@ function vipgocs_scan_files(
 
 		$file_results_master = $file_results['file_issues_arr_master'];
 
-
-		if ( ! isset( $all_results['files'][ $file_path_dir ]['messages'] ) ) {
-			$all_results['files'][ $file_path_dir ]['messages'] = array();
+		/*
+		 * Figure out how to group
+		 * issues, either by file or folder.
+		 */
+		if ( 'file' === $options['github-issue-group-by'] ) {
+			$group_issues_by = $file_path;
 		}
 
-		$all_results['files'][ $file_path_dir ]['messages'] = array_merge(
-			$all_results['files'][ $file_path_dir ]['messages'],
+		else if ( 'folder' === $options['github-issue-group-by'] ) {
+			$group_issues_by = $file_path_dir;
+		}
+
+		else {
+			vipgoci_sysexit(
+				'Unexpected value for option --github-issue-group-by',
+				array(
+					'github-issue-group-by' => $options['github-issue-group-by'],
+				)
+			);
+		}
+
+		if ( ! isset( $all_results['files'][ $group_issues_by ]['messages'] ) ) {
+			$all_results['files'][ $group_issues_by ]['messages'] = array();
+		}
+
+		$all_results['files'][ $group_issues_by ]['messages'] = array_merge(
+			$all_results['files'][ $group_issues_by ]['messages'],
 			$file_results_master['files'][ $temp_file_name ]['messages']
 		);
 
