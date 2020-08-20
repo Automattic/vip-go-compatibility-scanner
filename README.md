@@ -36,8 +36,10 @@ Use the `--github-issue-group-by` option to switch between posting issues on a p
 If you wish to also create Zendesk tickets to notify about the issues found, you can add parameters such as these to the command:
 
 ```
---zendesk-access-username="user@email" --zendesk-access-token="xyz" --zendesk-subdomain="myzendesksubdomain" --zendesk-ticket-subject="PHP Upgrade: Issues that need solving" --zendesk-ticket-body="Some issues were found. See issues here: %github_issues_link%" --zendesk-csv-data-path="file.csv"
+--zendesk-access-username="user@email" --zendesk-access-token="xyz" --zendesk-subdomain="myzendesksubdomain" --zendesk-ticket-subject="PHP Upgrade: Issues that need solving" --zendesk-ticket-body="Hi! %linebreak% Some issues were found. %linebreak% See issues here: %github_issues_link%" --zendesk-csv-data-path="file.csv"
 ```
+
+The `--zendesk-ticket-body` parameter supports `%linebreak%` strings, which will be replaced with actual line-breaks. 
 
 The `--zendesk-csv-data-path` parameter should point to a CSV file that is used to pair together the repository and the email address used as assignee of the Zendesk ticket. The CSV should look like this:
 
