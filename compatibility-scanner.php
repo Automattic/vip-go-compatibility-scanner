@@ -150,6 +150,11 @@ function vipgocs_compatibility_scanner() {
 		exit(253);
 	}
 
+	if ( ! is_file( $options['vipgoci-path'] . '/main.php' ) ) {
+		echo 'No main.php found in --vipgoci-path; is it a valid vip-go-ci installation?' . PHP_EOL;
+		exit(253);
+	}
+
 	/*
 	 * Include vip-go-ci as a library.
 	 */
