@@ -170,6 +170,11 @@ function vipgocs_compatibility_scanner() {
 	/*
 	 * Parse rest of options
 	 */
+	vipgoci_option_file_handle(
+		$options,
+		'phpcs-path',
+		null
+	);
 
 	vipgoci_option_array_handle(
 		$options,
