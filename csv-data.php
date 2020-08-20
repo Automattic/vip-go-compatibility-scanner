@@ -102,6 +102,13 @@ function vipgocs_csv_get_email_for_repo(
 	foreach(
 		$csv_data_arr as $csv_item
 	) {
+		if (
+			( ! isset( $csv_item['source_repo'] ) ) ||
+			( ! isset( $csv_item['client_email'] ) )
+		) {
+			continue;
+		}
+
 		if ( 
 			$csv_item['source_repo'] !==
 			$repo_owner .'/' . $repo_name
