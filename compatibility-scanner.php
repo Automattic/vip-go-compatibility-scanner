@@ -103,7 +103,6 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '                                    The option supports tokens that will be replaced with values: ' . PHP_EOL .
 			"\t" . '				      * %error_msg%: Will be replaced with problems noted. ' . PHP_EOL .
 			"\t" . '				      * %branch_name%: Will be replaced with name of current branch. ' . PHP_EOL .
-			"\t" . '				    %error_msg% in the body for list of problems.' . PHP_EOL .
 			"\t" . '--github-issue-assign=STRING        Assign specified admins as collaborators for each created issue' . PHP_EOL .
 			"\t" . '				    -- outside, direct, or all.' . PHP_EOL .
 			"\t" . '--github-issue-group-by=STRING      How to group the issues found; either by "file" or "folder".' . PHP_EOL .
@@ -412,6 +411,28 @@ function vipgocs_compatibility_scanner() {
 
 	$options['commit'] = $vipgoci_git_repo_head;
 
+	/*
+	 * Verify if we can find this commit
+	 * in GitHub, and also verify that
+	 * repo exists.
+	 */
+	$commit_info = vipgoci_github_fetch_commit_info(
+		$options['repo-owner'],
+		$options['repo-name'],
+		$options['commit'],
+		$options['token']
+	);
+
+	if ( ! isset( $commit_info->sha ) ) {
+		vipgoci_sysexit(
+			'Unable to fetch information about commit from GitHub; wrong parameter specified?',
+			array(
+				'repo-owner'	=> $options['repo-owner'],
+				'repo-name'	=> $options['repo-name'],
+				'commit'	=> $options['commit'],
+			)
+		);
+	}
 
 	/*
 	 * Main processing starts.
