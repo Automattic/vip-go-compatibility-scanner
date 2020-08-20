@@ -107,7 +107,7 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '--github-issue-assign=STRING        Assign specified admins as collaborators for each created issue' . PHP_EOL .
 			"\t" . '				    -- outside, direct, or all.' . PHP_EOL .
 			"\t" . '--github-issue-group-by=STRING      How to group the issues found; either by "file" or "folder".' . PHP_EOL .
-			"\t" . '                                    "file" is default.' . PHP_EOL .
+			"\t" . '                                    "folder" is default.' . PHP_EOL .
 			PHP_EOL .
 			"\t" . '--local-git-repo=FILE	            The local git repository to use for direct access to code' . PHP_EOL .
 			PHP_EOL .
@@ -242,7 +242,7 @@ function vipgocs_compatibility_scanner() {
 	}
 
 	if ( ! isset( $options['github-issue-group-by'] ) ) {
-		$options['github-issue-group-by'] = 'file';
+		$options['github-issue-group-by'] = 'folder';
 	}
 
 	else {
