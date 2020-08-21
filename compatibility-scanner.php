@@ -135,7 +135,7 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '--zendesk-ticket-tags=STRING        Tags to assign to Zendesk ticket. Comma separated. ' . PHP_EOL .
 			"\t" . '--zendesk-csv-data-path=PATH        CSV data to use for Zendesk ticket creation. The ' . PHP_EOL .
 			"\t" . '                                    data is used to pair a user\'s email address to repository.' . PHP_EOL .
-			"\t" . '                                    The file should have two fields: customer_email and source_repo' . PHP_EOL .
+			"\t" . '                                    The file should have two fields: client_email and source_repo' . PHP_EOL .
 			"\t" . '                                    -- first line of the file should be columns.' . PHP_EOL .
 			"\t" . '                                    Valid columns are: client_email, source_repo ' . PHP_EOL .
 			PHP_EOL;
