@@ -21,7 +21,7 @@ ZENDESK_CSV_DATA_PATH="${17}"
 if [ "" == "$GITHUB_ORGANISATION" ] || [ "" == "$GITHUB_REPOS" ] || [ "" == "$GITHUB_TOKEN" ] || [ "" == "$GITHUB_LABELS" ] || [ "" == "$GITHUB_ISSUE_TITLE" ]|| [ "" == "$GITHUB_ISSUE_BODY" ]|| [ "" == "$GITHUB_ISSUE_ASSIGN" ]  || [ "" == "$PHPCS_STANDARDS" ] || [ "" == "$PHPCS_RUNTIME_SET" ] ; then
 	echo "Scan multiple repositories with vip-go-compatibility-scanner and note issues found"
 	echo ""
-	echo "Usage: $0 github-organisation github-repos github-token github-labels github-issue-title github-issue-body github-issue-assign phpcs-standard phpcs-runtime-set git-branch zendesk-subdomain zendesk-access-username zendesk-access-token zendesk-ticket-subject zendesk-ticket-body"
+	echo "Usage: $0 github-organisation github-repos github-token github-labels github-issue-title github-issue-body github-issue-assign phpcs-standard phpcs-runtime-set git-branch zendesk-subdomain zendesk-access-username zendesk-access-token zendesk-ticket-subject zendesk-ticket-body zendesk-ticket-tags zendesk-csv-data-path"
 	echo ""
 	echo "          github-organisation: GitHub organisation repositories belong to"
 	echo "          github-repos: Comma separated string of repositories to scan"
