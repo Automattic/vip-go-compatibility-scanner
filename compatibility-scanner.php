@@ -59,6 +59,7 @@ function vipgocs_compatibility_scanner() {
 			'zendesk-access-password:',
 			'zendesk-ticket-subject:',
 			'zendesk-ticket-body:',
+			'zendesk-ticket-tags:',
 			'zendesk-csv-data-path:',
 		)
 	);
@@ -131,6 +132,7 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '                                       with link to GitHub issues created; the link' . PHP_EOL .
 			"\t" . '                                       will be the first label specified in --github--label' . PHP_EOL .
 			"\t" . '                                     * %linebreak% will be replaced with \n.' . PHP_EOL .
+			"\t" . '--zendesk-ticket-tags=STRING        Tags to assign to Zendesk ticket. Comma separated. ' . PHP_EOL .
 			"\t" . '--zendesk-csv-data-path=PATH        CSV data to use for Zendesk ticket creation. The ' . PHP_EOL .
 			"\t" . '                                    data is used to pair a user\'s email address to repository.' . PHP_EOL .
 			"\t" . '                                    The file should have two fields: customer_email and source_repo' . PHP_EOL .
