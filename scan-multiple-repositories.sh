@@ -15,12 +15,13 @@ ZENDESK_ACCESS_USERNAME="${12}"
 ZENDESK_ACCESS_TOKEN="${13}"
 ZENDESK_TICKET_SUBJECT="${14}"
 ZENDESK_TICKET_BODY="${15}"
-ZENDESK_CSV_DATA_PATH="${16}"
+ZENDESK_TICKET_TAGS="${16}"
+ZENDESK_CSV_DATA_PATH="${17}"
 
 if [ "" == "$GITHUB_ORGANISATION" ] || [ "" == "$GITHUB_REPOS" ] || [ "" == "$GITHUB_TOKEN" ] || [ "" == "$GITHUB_LABELS" ] || [ "" == "$GITHUB_ISSUE_TITLE" ]|| [ "" == "$GITHUB_ISSUE_BODY" ]|| [ "" == "$GITHUB_ISSUE_ASSIGN" ]  || [ "" == "$PHPCS_STANDARDS" ] || [ "" == "$PHPCS_RUNTIME_SET" ] ; then
 	echo "Scan multiple repositories with vip-go-compatibility-scanner and note issues found"
 	echo ""
-	echo "Usage: $0 github-organisation github-repos github-token github-labels github-issue-title github-issue-body github-issue-assign phpcs-standard phpcs-runtime-set git-branch zendesk-subdomain zendesk-access-username zendesk-access-token zendesk-ticket-subject zendesk-ticket-body"
+	echo "Usage: $0 github-organisation github-repos github-token github-labels github-issue-title github-issue-body github-issue-assign phpcs-standard phpcs-runtime-set git-branch zendesk-subdomain zendesk-access-username zendesk-access-token zendesk-ticket-subject zendesk-ticket-body zendesk-ticket-tags zendesk-csv-data-path"
 	echo ""
 	echo "          github-organisation: GitHub organisation repositories belong to"
 	echo "          github-repos: Comma separated string of repositories to scan"
@@ -37,6 +38,7 @@ if [ "" == "$GITHUB_ORGANISATION" ] || [ "" == "$GITHUB_REPOS" ] || [ "" == "$GI
 	echo "          zendesk-access-token: Access token to use with Zendesk REST API."
 	echo "          zendesk-ticket-subject: Subject to use for new Zendesk tickets."
 	echo "          zendesk-ticket-body: Body to use for new Zendesk tickets."
+	echo "          zendesk-ticket-tags: Tags to use for new Zendesk tickets."
 	echo "          zendesk-csv-data-path: Path to CSV data file."
 	echo ""
 	exit 1
@@ -59,7 +61,8 @@ echo "-- Git branch: $GIT_BRANCH"
 echo "-- Zendesk subdomain: $ZENDESK_SUBDOMAIN"
 echo "     --    access username: $ZENDESK_ACCESS_USERNAME"
 echo "     --    ticket subject: $ZENDESK_TICKET_SUBJECT"
-echo "     --    ticket body: $ZENDESK_TICKET_BODY" 
+echo "     --    ticket body: $ZENDESK_TICKET_BODY"
+echo "     --    ticket tags: $ZENDESK_TICKET_TAGS"
 echo "     --    CSV data file: $ZENDESK_CSV_DATA_PATH"
 echo ""
 echo -n "Do you want to continue? (Y/N) "
@@ -81,6 +84,7 @@ if [ "" != "$ZENDESK_SUBDOMAIN" ] ; then
 	ZENDESK_ACCESS_TOKEN="--zendesk-access-token=$ZENDESK_ACCESS_TOKEN"
 	ZENDESK_TICKET_SUBJECT="--zendesk-ticket-subject=$ZENDESK_TICKET_SUBJECT"
 	ZENDESK_TICKET_BODY="--zendesk-ticket-body=$ZENDESK_TICKET_BODY"
+	ZENDESK_TICKET_TAGS="--zendesk-ticket-tags=$ZENDESK_TICKET_TAGS"
 	ZENDESK_CSV_DATA_PATH="--zendesk-csv-data-path=$ZENDESK_CSV_DATA_PATH"
 fi
 
@@ -99,7 +103,7 @@ for REPO_NAME in $(echo "$GITHUB_REPOS") ; do
 	cd .. && \
 	echo "Running scanner..." && \
 	popd && \
-	./compatibility-scanner.php --repo-owner="$GITHUB_ORGANISATION" --repo-name="$REPO_NAME" --token="$GITHUB_TOKEN" --github-issue-title="$GITHUB_ISSUE_TITLE" --github-issue-body="$GITHUB_ISSUE_BODY" --github-issue-assign="$GITHUB_ISSUE_ASSIGN" --local-git-repo="$TEMP_DIR/$REPO_NAME" --phpcs-path="$HOME/vip-go-ci-tools/phpcs/bin/phpcs" --phpcs-standard="$PHPCS_STANDARDS"  --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/" --phpcs-runtime-set="$PHPCS_RUNTIME_SET" --github-labels="$GITHUB_LABELS" "${ZENDESK_SUBDOMAIN[@]}" "${ZENDESK_ACCESS_USERNAME[@]}" "${ZENDESK_ACCESS_TOKEN[@]}" "${ZENDESK_TICKET_SUBJECT[@]}" "${ZENDESK_TICKET_BODY[@]}" "${ZENDESK_CSV_DATA_PATH[@]}" | tee "$TEMP_LOG_FILE" && \
+	./compatibility-scanner.php --repo-owner="$GITHUB_ORGANISATION" --repo-name="$REPO_NAME" --token="$GITHUB_TOKEN" --github-issue-title="$GITHUB_ISSUE_TITLE" --github-issue-body="$GITHUB_ISSUE_BODY" --github-issue-assign="$GITHUB_ISSUE_ASSIGN" --local-git-repo="$TEMP_DIR/$REPO_NAME" --phpcs-path="$HOME/vip-go-ci-tools/phpcs/bin/phpcs" --phpcs-standard="$PHPCS_STANDARDS"  --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/" --phpcs-runtime-set="$PHPCS_RUNTIME_SET" --github-labels="$GITHUB_LABELS" "${ZENDESK_SUBDOMAIN[@]}" "${ZENDESK_ACCESS_USERNAME[@]}" "${ZENDESK_ACCESS_TOKEN[@]}" "${ZENDESK_TICKET_SUBJECT[@]}" "${ZENDESK_TICKET_BODY[@]}" "${ZENDESK_TICKET_TAGS[@]}" "${ZENDESK_CSV_DATA_PATH[@]}" | tee "$TEMP_LOG_FILE" && \
 	echo "Processing of $REPO_NAME done." && \
 	rm -rf "$TEMP_DIR/$REPO_NAME" && \
 	echo "Removed cloned repository from $TEMP_DIR" && \

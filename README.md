@@ -41,6 +41,8 @@ If you wish to also create Zendesk tickets to notify about the issues found, you
 
 The `--zendesk-ticket-body` parameter supports `%linebreak%` strings, which will be replaced with actual line-breaks. 
 
+The `--zendesk-ticket-tags` parameter is optional and supports a comma separated list of tags to be added. 
+
 The `--zendesk-csv-data-path` parameter should point to a CSV file that is used to pair together the repository and the email address used as assignee of the Zendesk ticket. The CSV should look like this:
 
 ```

@@ -117,6 +117,7 @@ function vipgocs_zendesk_open_ticket(
 			'zendesk-requestee-email'	=> $zendesk_requestee_email,
 			'zendesk-ticket-subject'	=> $options['zendesk-ticket-subject'],
 			'zendesk-ticket-body'		=> $options['zendesk-ticket-body'],
+			'zendesk-ticket-tags'		=> $options['zendesk-ticket-tags'],
 			'github_issues_link'		=> $github_issues_links,
 		)
 	);
@@ -139,6 +140,10 @@ function vipgocs_zendesk_open_ticket(
 			)
 		)
 	);
+
+	if ( ! empty( $options['zendesk-ticket-tags'] ) ) {
+		$zendesk_api_postfields['ticket']['tags'] = $options['zendesk-ticket-tags'];
+	}
 
 	/*
 	 * Assign requestee to the ticket.
@@ -250,7 +255,7 @@ function vipgocs_zendesk_send_request(
 	/*
 	 * Prepare data
 	 */
-	$zendesk_api_url = 
+	$zendesk_api_url =
 		'https://' .
 			$zendesk_api_subdomain . '.zendesk.com/' .
 			'api/' .
@@ -259,7 +264,7 @@ function vipgocs_zendesk_send_request(
 
 	/*
 	 * Prepare cURL for request.
-	 */	
+	 */
 	$ch = curl_init();
 
 	curl_setopt(
@@ -339,7 +344,7 @@ function vipgocs_zendesk_send_request(
 		);
 	}
 
-	else if ( 
+	else if (
 		( isset( $zendesk_api_auth['zendesk-access-username'] ) ) &&
 		( isset( $zendesk_api_auth['zendesk-access-password'] ) )
 	) {
@@ -380,7 +385,7 @@ function vipgocs_zendesk_send_request(
 	$resp_data = json_decode(
 		$resp_data,
 		true // Array result
-	);	
+	);
 
 	return $resp_data;
 }
@@ -413,7 +418,7 @@ function vipgocs_zendesk_prepare_auth_fields(
 			$options['zendesk-access-token'];
 	}
 
-	else if ( 
+	else if (
 		( isset( $options['zendesk-access-username'] ) ) &&
 		( isset( $options['zendesk-access-password'] ) )
 	) {
