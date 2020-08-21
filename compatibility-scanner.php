@@ -275,6 +275,21 @@ function vipgocs_compatibility_scanner() {
 		}
 	}
 
+	if ( empty( $options['zendesk-ticket-tags'] ) ) {
+		$options['zendesk-ticket-tags'] = array();
+	}
+
+	else {
+		vipgoci_option_array_handle(
+			$options,
+			'zendesk-ticket-tags',
+			array(),
+			null,
+			',',
+			false
+		);
+	}
+
 	/*
 	 * Print cleaned option-values.
 	 */

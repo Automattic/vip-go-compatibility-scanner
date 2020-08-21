@@ -137,10 +137,13 @@ function vipgocs_zendesk_open_ticket(
 					),
 					$options['zendesk-ticket-body'],
 				)
-			),
-			'tags'		=> explode( ',', $options['zendesk-ticket-tags'] )
+			)
 		)
 	);
+
+	if ( ! empty( $options['zendesk-ticket-tags'] ) ) {
+		$zendesk_api_postfields['ticket']['tags'] = $options['zendesk-ticket-tags'];
+	}
 
 	/*
 	 * Assign requestee to the ticket.
