@@ -77,7 +77,7 @@ function vipgocs_compatibility_scanner() {
 			$options['github-issue-body'],
 			$options['local-git-repo'],
 			$options['phpcs-path'],
-			$options['phpcs-standard'],
+			$options['phpcs-standard']
 		) )
 		||
 		(
@@ -270,7 +270,7 @@ function vipgocs_compatibility_scanner() {
 			( 'folder' !== $options['github-issue-group-by'] )
 		) {
 			vipgoci_sysexit(
-				'Invalid argument provided to option --github-issue-group-by; should be "file" or "folder".',
+				'Invalid argument provided to option --github-issue-group-by; should be "file" or "folder".'
 			);
 		}
 	}
@@ -581,7 +581,7 @@ function vipgocs_compatibility_scanner() {
 
 	else {
 		vipgoci_log(
-			'Note: Not opening Zendesk ticket as not all requirements fulfilled',
+			'Note: Not opening Zendesk ticket as not all requirements fulfilled'
 		);
 	}
 
