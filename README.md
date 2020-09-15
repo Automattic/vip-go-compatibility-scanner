@@ -10,6 +10,11 @@ The tool will also create Zendesk tickets using the REST API if set up to do so.
 
 The tool uses [vip-go-ci](https://github.com/automattic/vip-go-ci/) as a library, and uses some of its dependencies as well. See below.
 
+
+## System requirements
+
+`vip-go-compatibility-scanner` requires PHP 7.3 or later. PHP 7.4 is preferred.
+
 ## Installing
 
 Included is a script to install `vip-go-compatibility-scanner`. You can use it like this:
