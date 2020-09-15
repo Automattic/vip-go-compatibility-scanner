@@ -135,7 +135,7 @@ function vipgocs_zendesk_open_ticket(
 						$github_issues_links[0],
 						PHP_EOL,
 					),
-					$options['zendesk-ticket-body'],
+					$options['zendesk-ticket-body']
 				)
 			)
 		)
@@ -359,7 +359,7 @@ function vipgocs_zendesk_send_request(
 	curl_setopt(
 		$ch,
 		CURLOPT_HTTPHEADER,
-		$zendesk_api_headers,
+		$zendesk_api_headers
 	);
 
 	/*

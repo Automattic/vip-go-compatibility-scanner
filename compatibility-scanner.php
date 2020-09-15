@@ -21,6 +21,17 @@ function vipgocs_compatibility_scanner() {
 	echo 'Initializing...' . PHP_EOL;
 
 	/*
+	 * Check if we are running on PHP 7.3 or later.
+	 */
+	if ( version_compare(
+		phpversion(),
+		'7.3.0'
+	) < 0 ) {
+		echo 'Error: PHP 7.3 is required as a minimum.';
+		exit( 251 ); /* System problem */
+	}
+
+	/*
 	 * Log startup time
 	 */
 	$startup_time = time();
@@ -77,7 +88,7 @@ function vipgocs_compatibility_scanner() {
 			$options['github-issue-body'],
 			$options['local-git-repo'],
 			$options['phpcs-path'],
-			$options['phpcs-standard'],
+			$options['phpcs-standard']
 		) )
 		||
 		(
@@ -270,7 +281,7 @@ function vipgocs_compatibility_scanner() {
 			( 'folder' !== $options['github-issue-group-by'] )
 		) {
 			vipgoci_sysexit(
-				'Invalid argument provided to option --github-issue-group-by; should be "file" or "folder".',
+				'Invalid argument provided to option --github-issue-group-by; should be "file" or "folder".'
 			);
 		}
 	}
@@ -581,7 +592,7 @@ function vipgocs_compatibility_scanner() {
 
 	else {
 		vipgoci_log(
-			'Note: Not opening Zendesk ticket as not all requirements fulfilled',
+			'Note: Not opening Zendesk ticket as not all requirements fulfilled'
 		);
 	}
 

@@ -40,7 +40,7 @@ function vipgocs_csv_parse_data(
 
 	if ( empty( $first ) ) {
 		vipgoci_sysexit(
-			'CSV file seems empty? First line should be columns.',
+			'CSV file seems empty? First line should be columns.'
 		);
 	}
 
