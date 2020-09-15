@@ -19,6 +19,6 @@ if (
 
 require_once( __DIR__ . '/../compatibility-scanner.php' );
 
-require_once( $vipgoci_include_path . '/main.php' );
+require_once( $vipgoci_include_path . '/tests/IncludesForTests.php' );
 
 
