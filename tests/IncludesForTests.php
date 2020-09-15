@@ -7,11 +7,6 @@ if ( ! defined( 'VIPGOCS_UNIT_TESTING' ) ) {
 	define( 'VIPGOCS_UNIT_TESTING', true );
 }
 
-if ( ! defined( 'VIPGOCI_INCLUDED' ) ) {
-	define( 'VIPGOCI_INCLUDED', true );
-}
-
-
 $vipgoci_include_path = getenv( 'VIPGOCI_PATH' );
 
 if (
@@ -22,7 +17,8 @@ if (
 	exit( 255 );
 }
 
+require_once( __DIR__ . '/../compatibility-scanner.php' );
+
 require_once( $vipgoci_include_path . '/main.php' );
 
-require_once( __DIR__ . '/../compatibility-scanner.php' );
 
