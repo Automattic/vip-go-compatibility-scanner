@@ -27,7 +27,7 @@ function vipgocs_compatibility_scanner() {
 		phpversion(),
 		'7.3.0'
 	) < 0 ) {
-		echo 'Error: PHP 7.3 is required as a minimum.';
+		echo 'Error: PHP 7.3 is required as a minimum.' . PHP_EOL;
 		exit( 251 ); /* System problem */
 	}
 
