@@ -22,10 +22,14 @@ final class CsvGetEmailForRepoTest extends TestCase {
 				'myemail2@myemailb.com,myorg2/myrepo2 ' . "\n\r" .
 				'myemail3@myemailc.com ,myorg3/myrepo3' . "\n\r"
 		);
+
+		vipgoci_unittests_output_suppress();
 		
 		$csv_data = vipgocs_csv_parse_data(
 			$temp_file_name
 		);
+
+		vipgoci_unittests_output_unsuppress();
 
 		unlink(
 			$temp_file_name
