@@ -654,10 +654,11 @@ function vipgocs_compatibility_scanner() {
 	return 0;
 }
 
-/*
- * Main invocation function.
- */
-$status = vipgocs_compatibility_scanner();
+if ( ( ! defined( 'VIPGOCS_UNIT_TESTING' ) ) || ( false === VIPGOCS_UNIT_TESTING ) ) {
+	/*
+	 * Main invocation function.
+	 */
+	$status = vipgocs_compatibility_scanner();
 
-exit( $status );
-
+	exit( $status );
+}
