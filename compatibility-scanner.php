@@ -21,13 +21,13 @@ function vipgocs_compatibility_scanner() {
 	echo 'Initializing...' . PHP_EOL;
 
 	/*
-	 * Check if we are running on PHP 7.4 or later.
+	 * Check if we are running on PHP 7.3 or later.
 	 */
 	if ( version_compare(
 		phpversion(),
-		'7.4.0'
+		'7.3.0'
 	) < 0 ) {
-		echo 'Error: PHP 7.4 is required as a minimum.';
+		echo 'Error: PHP 7.3 is required as a minimum.';
 		exit( 251 ); /* System problem */
 	}
 
