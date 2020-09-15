@@ -39,7 +39,7 @@ jobs:
       - build-cmd
 
 workflows:
-  vipgocitests:
+  vipgocompatibilityscannertests:
     jobs:
      - testphp73
      - testphp74
