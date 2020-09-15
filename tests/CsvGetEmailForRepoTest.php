@@ -50,7 +50,7 @@ final class CsvGetEmailForRepoTest extends TestCase {
 		);
 
 		/*
-		 * Look for myorg0/myrepo0, should be no match
+		 * Look for myorg0/myrepo1, should be no match
 		 */
 		$email = vipgocs_csv_get_email_for_repo(
 			$csv_data,
