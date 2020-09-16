@@ -394,6 +394,15 @@ function vipgocs_zendesk_send_request(
 /*
  * Prepare fields for authentication
  * with Zendesk.
+ *
+ * This tool supports both username and
+ * password authentication, and username and token
+ * authentication. Here we check if required
+ * fields are present for either of these,
+ * and if not, we return null. 
+
+ * There is also a check for existance of a subdomain 
+ * field, resulting in returning null when not existing.
  */
 
 function vipgocs_zendesk_prepare_auth_fields(
@@ -401,7 +410,7 @@ function vipgocs_zendesk_prepare_auth_fields(
 ) {
 	$auth_fields = array();
 
-	if ( ! isset(
+	if ( empty(
 		$options['zendesk-subdomain']
 	) ) {
 		return null;
