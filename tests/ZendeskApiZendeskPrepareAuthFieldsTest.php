@@ -32,7 +32,7 @@ final class ZendeskApiZendeskPrepareAuthFieldsTest extends TestCase {
 		 */
 
 		$options = array(
-			'zendesk-subdomain' => 'mydomain';
+			'zendesk-subdomain' => 'mydomain'
 		);
 
 		$this->assertNull(
