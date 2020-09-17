@@ -19,6 +19,8 @@ if (
 
 require_once( __DIR__ . '/../compatibility-scanner.php' );
 
+define( 'VIPGOCI_UNIT_TESTS_INI_DIR_PATH', dirname( __DIR__ ) );
+
 require_once( $vipgoci_include_path . '/tests/IncludesForTests.php' );
 
 
