@@ -17,13 +17,15 @@ commands:
       - run: composer require --dev phpunit/phpunit ^7
       # By default, php is not available in /usr/bin, fix that
       - run: sudo ln -s /usr/local/bin/php /usr/bin/php
-      # Install all the tools vip-go-compatibility-scanner needs, remove vip-go-compatibility-scanner itself though
+      # Install all the tools vip-go-compatibility-scanner needs, remove vip-go-compatibility-scanner and vip-go-ci
       - run: bash ~/project/install.sh
-      - run: rm -rf ~/vip-go-ci-tools/vip-go-compatibility-scanner
+      - run: rm -rf ~/vip-go-ci-tools/vip-go-compatibility-scanner ~/vip-go-ci-tools/vip-go-ci
+      # Install vip-go-ci from master branch
+      - run: wget -O ~/vip-go-ci-tools/vip-go-ci.tar.gz https://github.com/Automattic/vip-go-ci/archive/master.tar.gz && tar -zxvf vip-go-ci.tar.gz && mv vip-go-ci-master vip-go-ci && rm -f vip-go-ci.tar.gz
       # Change path to vital tools needed
       - run: sed 's/\/home\/phpunit\//\/home\/circleci\//' < ~/project/unittests.ini > ~/project/unittests2.ini
-      - run: mv ~/project/unittests2.ini ~/project/unittests.ini
-      # Run unit-tests
+      - run: mv -f ~/project/unittests2.ini ~/project/unittests.ini
+       # Run unit-tests
       - run: VIPGOCI_PATH="$HOME/vip-go-ci-tools/vip-go-ci" ./vendor/bin/phpunit -vv ~/project/tests
 
 # List of images at: https://circleci.com/docs/2.0/circleci-images/
