@@ -85,6 +85,17 @@ function vipgoci_unittests_http_server_stop( $pid_file ) {
 }
 
 /*
+ * Check if there is support for pcntl functions.
+ */
+function vipgoci_unittests_pcntl_supported() {
+	if ( function_exists( 'pcntl_fork' ) ) {
+		return true;
+	}
+
+	return false;
+}
+
+/*
  * Require files needed for testing.
  */
 require_once( __DIR__ . '/../compatibility-scanner.php' );
