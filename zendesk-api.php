@@ -253,14 +253,25 @@ function vipgocs_zendesk_send_request(
 	);
 
 	/*
-	 * Prepare data
+	 * Prepare URL
 	 */
-	$zendesk_api_url =
-		'https://' .
-			$zendesk_api_subdomain . '.zendesk.com/' .
-			'api/' .
-			'v2/' .
-			$zendesk_api_endpoint;
+
+	if (
+		( defined( 'VIPGOCS_UNIT_TESTING' ) ) &&
+		( true === VIPGOCS_UNIT_TESTING )
+	) {
+		$zendesk_api_url = 
+			VIPGOCI_GITHUB_BASE_URL;
+	}
+
+	else {
+		$zendesk_api_url =
+			'https://' .
+				$zendesk_api_subdomain . '.zendesk.com/' .
+				'api/' .
+				'v2/' .
+				$zendesk_api_endpoint;
+	}
 
 	/*
 	 * Prepare cURL for request.
