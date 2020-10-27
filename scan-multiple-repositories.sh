@@ -100,6 +100,8 @@ for REPO_NAME in $(echo "$GITHUB_REPOS") ; do
 	git clone "git@github.com:$GITHUB_ORGANISATION/$REPO_NAME.git" && \
 	cd $REPO_NAME && \
 	git checkout "$GIT_BRANCH" && \
+	git submodule init && \
+	git submodule update --recursive && \
 	cd .. && \
 	echo "Running scanner..." && \
 	popd && \
