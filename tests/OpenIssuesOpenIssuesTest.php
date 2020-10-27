@@ -9,7 +9,7 @@ final class OpenIssuesOpenIssuesTest extends TestCase {
 		'php-path'              => null,
 	);
 
-	protected function setUp() {
+	protected function setUp() :void {
 		vipgoci_unittests_get_config_values(
 			'php',
 			$this->options_php
@@ -48,7 +48,7 @@ final class OpenIssuesOpenIssuesTest extends TestCase {
 	
 	}
 
-	protected function tearDown() {
+	protected function tearDown() :void {
 		vipgoci_unittests_http_server_stop(
 			$this->pid_file
 		);

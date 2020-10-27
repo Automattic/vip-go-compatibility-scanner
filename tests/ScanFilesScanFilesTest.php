@@ -129,7 +129,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 		unset( $this->local_git_repo );
 	}
 
-	protected function setUp() {
+	protected function setUp() :void {
 		vipgoci_unittests_get_config_values(
 			'git',
 			$this->options_git
@@ -167,7 +167,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 		$this->options['commit'] = $vipgoci_git_repo_head;
 	}
 
-	protected function tearDown() {
+	protected function tearDown() :void {
 		$this->_git_repo_teardown();
 
 		unset(
