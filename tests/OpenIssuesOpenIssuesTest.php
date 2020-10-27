@@ -10,6 +10,14 @@ final class OpenIssuesOpenIssuesTest extends TestCase {
 	);
 
 	protected function setUp() :void {
+		if ( ! vipgoci_unittests_pcntl_supported() ) {
+			$this->markTestSkipped(
+				'PCNTL module is not available'
+			);
+
+			return;
+		}
+
 		vipgoci_unittests_get_config_values(
 			'php',
 			$this->options_php
@@ -73,13 +81,6 @@ final class OpenIssuesOpenIssuesTest extends TestCase {
 	 * @covers ::vipgocs_open_issues
 	 */
 	public function testOpenIssue1() {
-		if ( ! vipgoci_unittests_pcntl_supported() ) {
-			$this->markTestSkipped(
-				'PCNTL module is not available'
-			);
-
-			return;
-		}
 
 		$issue_statistics = vipgocs_open_issues(
 			$this->options,

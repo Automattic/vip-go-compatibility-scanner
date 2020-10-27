@@ -10,6 +10,14 @@ final class ZendeskSendRequestTest extends TestCase {
 	);
 
 	protected function setUp() :void {
+		if ( ! vipgoci_unittests_pcntl_supported() ) {
+			$this->markTestSkipped(
+				'PCNTL module is not available'
+			);
+
+			return;
+		}
+
 		vipgoci_unittests_get_config_values(
 			'php',
 			$this->options
@@ -58,14 +66,6 @@ final class ZendeskSendRequestTest extends TestCase {
 	 * @covers ::vipgocs_zendesk_send_request
 	 */
 	public function testZendeskSendRequest() {
-		if ( ! vipgoci_unittests_pcntl_supported() ) {
-			$this->markTestSkipped(
-				'PCNTL module is not available'
-			);
-
-			return;
-		}
-
 		vipgocs_zendesk_send_request(
 			'GET',
 			'mytest-domain',
