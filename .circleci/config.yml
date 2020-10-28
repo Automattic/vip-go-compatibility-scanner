@@ -1,0 +1,50 @@
+# PHP CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-php/ for more details
+#
+version: 2.1
+
+commands:
+  build-cmd:
+   steps:
+      # Get the code
+      - checkout
+      # Print PHP version
+      - run: php -v
+      # Update software and install a few things
+      - run: sudo apt update
+      - run: sudo docker-php-ext-install zip
+      - run: composer require --dev phpunit/phpunit ^7
+      # By default, php is not available in /usr/bin, fix that
+      - run: sudo ln -s /usr/local/bin/php /usr/bin/php
+      # Install all the tools vip-go-compatibility-scanner needs, remove vip-go-compatibility-scanner and vip-go-ci
+      - run: bash ~/project/install.sh
+      - run: rm -rf ~/vip-go-ci-tools/vip-go-compatibility-scanner ~/vip-go-ci-tools/vip-go-ci
+      # Install vip-go-ci from master branch
+      - run: pushd ~/vip-go-ci-tools && wget -O vip-go-ci.tar.gz https://github.com/Automattic/vip-go-ci/archive/master.tar.gz && tar -zxvf vip-go-ci.tar.gz && mv vip-go-ci-master vip-go-ci && rm -f vip-go-ci.tar.gz && popd
+      # Change path to vital tools needed
+      - run: sed 's/\/home\/phpunit\//\/home\/circleci\//' < ~/project/unittests.ini > ~/project/unittests2.ini
+      - run: mv -f ~/project/unittests2.ini ~/project/unittests.ini
+       # Run unit-tests
+      - run: VIPGOCI_PATH="$HOME/vip-go-ci-tools/vip-go-ci" ./vendor/bin/phpunit -vv ~/project/tests
+
+# List of images at: https://circleci.com/docs/2.0/circleci-images/
+jobs:
+  testphp73:
+    docker:
+      - image: circleci/php:7.3.22-cli
+    steps:
+      - build-cmd
+
+
+  testphp74:
+    docker:
+      - image: circleci/php:7.4.10-cli
+    steps:
+      - build-cmd
+
+workflows:
+  vipgocompatibilityscannertests:
+    jobs:
+     - testphp73
+     - testphp74

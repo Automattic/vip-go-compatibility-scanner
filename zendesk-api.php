@@ -253,14 +253,25 @@ function vipgocs_zendesk_send_request(
 	);
 
 	/*
-	 * Prepare data
+	 * Prepare URL
 	 */
-	$zendesk_api_url =
-		'https://' .
-			$zendesk_api_subdomain . '.zendesk.com/' .
-			'api/' .
-			'v2/' .
-			$zendesk_api_endpoint;
+
+	if (
+		( defined( 'VIPGOCS_UNIT_TESTING' ) ) &&
+		( true === VIPGOCS_UNIT_TESTING )
+	) {
+		$zendesk_api_url = 
+			VIPGOCI_GITHUB_BASE_URL;
+	}
+
+	else {
+		$zendesk_api_url =
+			'https://' .
+				$zendesk_api_subdomain . '.zendesk.com/' .
+				'api/' .
+				'v2/' .
+				$zendesk_api_endpoint;
+	}
 
 	/*
 	 * Prepare cURL for request.
@@ -394,6 +405,15 @@ function vipgocs_zendesk_send_request(
 /*
  * Prepare fields for authentication
  * with Zendesk.
+ *
+ * This tool supports both username and
+ * password authentication, and username and token
+ * authentication. Here we check if required
+ * fields are present for either of these,
+ * and if not, we return null. 
+
+ * There is also a check for existance of a subdomain 
+ * field, resulting in returning null when not existing.
  */
 
 function vipgocs_zendesk_prepare_auth_fields(
@@ -401,7 +421,7 @@ function vipgocs_zendesk_prepare_auth_fields(
 ) {
 	$auth_fields = array();
 
-	if ( ! isset(
+	if ( empty(
 		$options['zendesk-subdomain']
 	) ) {
 		return null;
