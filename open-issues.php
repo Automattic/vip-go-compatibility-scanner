@@ -52,6 +52,26 @@ function vipgocs_open_issues(
 		$error_msg = '';
 
 		foreach( $file_issues['messages'] as $file_issue ) {
+			/*
+			 * Construct link to file
+			 */
+			$error_msg_link =
+				$file_issue['github_commit_url'] . '/';
+
+			if ( false === $file_issue['file_is_in_submodule'] ) {
+				$error_msg_link .= $file_issue['file_path'];
+			}
+
+			else {
+				$error_msg_link .= $file_issue['file_path_without_submodule'];
+			}
+
+			$error_msg_link .=
+				'#L' . $file_issue['line'];
+
+			/*
+			 * Construct error message
+			 */
 			$error_msg .=
 				'* <b>' .
 					ucfirst ( strtolower(
@@ -60,22 +80,26 @@ function vipgocs_open_issues(
 
 			if ( 'folder' === $options['github-issue-group-by'] ) {
 				$error_msg .= ' in ' .
-				 $file_issue['file_path'];
+					$file_issue['file_path'];
 			}
 
-			$error_msg .= '</b>: ';		
+			$error_msg .= '</b>: ' .
+				$file_issue['message'];
 
-			$error_msg .= $file_issue['message'] . ' ';
+			
+			if ( false === $file_issue['file_is_in_submodule'] ) {
+				$error_msg .=
+					' ' .
+					$error_msg_link;
+			}
 
-			$error_msg .= 'https://github.com/' .
-				$options['repo-owner'] . '/' .
-				$options['repo-name'] . '/' .
-				'blob/' .
-				$options['commit'] . '/' .
-				$file_issue['file_path'] .
-				'#L' . $file_issue['line'];
+			else {
+				$error_msg .=
+					'. In submodule, <a href="' . $error_msg_link . '">here</a>.';
+			}
 
-			$error_msg .= PHP_EOL . PHP_EOL;
+			$error_msg .=
+				PHP_EOL . PHP_EOL;
 
 			$issue_statistics['issues_found']++;
 		}
