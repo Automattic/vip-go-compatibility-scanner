@@ -451,9 +451,6 @@ function vipgocs_compatibility_scanner() {
 		$options['local-git-repo']
 	);
 
-	$vipgoci_git_repo_head =
-		str_replace( '\'', '', $vipgoci_git_repo_head );
-
 	$options['commit'] = $vipgoci_git_repo_head;
 
 	/*
