@@ -202,6 +202,13 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'line' => 2,
 								'column' => 14,
 								'file_path' => 'file1.php',
+								'github_commit_url' => 
+									'https://github.com/test/test/blob/' .
+									str_replace("'","", vipgoci_gitrepo_get_head(
+										$this->options['local-git-repo']
+									) ),
+								'file_is_in_submodule' => false,
+								'file_path_without_submodule' => null,
 							)
 						)
 					),
@@ -222,6 +229,13 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'line' => 3,
 								'column' => 14,
 								'file_path' => 'file3.php',
+								'github_commit_url' => 
+									'https://github.com/test/test/blob/' .
+									str_replace("'","", vipgoci_gitrepo_get_head(
+										$this->options['local-git-repo']
+									) ),
+								'file_is_in_submodule' => false,
+								'file_path_without_submodule' => null,
 							)
 						)
 					)
@@ -258,7 +272,14 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'line' => 2,
 								'column' => 14,
 								'file_path' => 'file1.php',
-							),
+								'github_commit_url' => 
+									'https://github.com/test/test/blob/' .
+									str_replace("'","", vipgoci_gitrepo_get_head(
+										$this->options['local-git-repo']
+									) ),
+								'file_is_in_submodule' => false,
+								'file_path_without_submodule' => null,
+						),
 							array(
 								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
 								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
@@ -268,6 +289,13 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'line' => 3,
 								'column' => 14,
 								'file_path' => 'file3.php',
+								'github_commit_url' => 
+									'https://github.com/test/test/blob/' .
+									str_replace("'","", vipgoci_gitrepo_get_head(
+										$this->options['local-git-repo']
+									) ),
+								'file_is_in_submodule' => false,
+								'file_path_without_submodule' => null,
 							)
 						)
 					)
