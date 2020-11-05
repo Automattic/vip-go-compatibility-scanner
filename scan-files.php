@@ -90,8 +90,8 @@ function vipgocs_scan_files(
 
 		else {
 			$github_commit_url =
-				vipgoci_github_submodule_get_url(
-					$options,
+				vipgoci_gitrepo_submodule_get_url(
+					$options['local-git-repo'],
 					$file_is_in_submodule['submodule_path']
 				) . '/' .
 				'blob/' .
