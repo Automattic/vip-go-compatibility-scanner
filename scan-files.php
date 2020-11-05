@@ -65,6 +65,45 @@ function vipgocs_scan_files(
 
 			continue;
 		}
+		/*
+		 * Get URL to commit of
+		 * the file -- make sure to
+		 * be compatible with submodules.
+		 */
+
+		$file_is_in_submodule =
+			vipgoci_gitrepo_submodule_file_path_get(
+				$options['local-git-repo'],
+				$file_path
+			);
+
+		$file_path_without_submodule = null;
+
+		if ( null === $file_is_in_submodule ) {
+			$github_commit_url =
+				'https://github.com/' .
+				$options['repo-owner'] . '/' .
+				$options['repo-name'] . '/' .
+				'blob/' .
+				$options['commit'];
+		}
+
+		else {
+			$github_commit_url =
+				vipgoci_github_submodule_get_url(
+					$options,
+					$file_is_in_submodule['submodule_path']
+				) . '/' .
+				'blob/' .
+				$file_is_in_submodule['commit_id'];
+
+			$file_path_without_submodule = $file_path;
+
+			$file_path_without_submodule = substr(
+				$file_path_without_submodule,
+				( strlen( $file_is_in_submodule['submodule_path'] ) + 1 )
+			);
+		}
 
 		/*
 		 * Get path to file relative
@@ -90,12 +129,32 @@ function vipgocs_scan_files(
 			$file_path
 		);
 
+		/*
+		 * Check for errors.
+		 */
+		if (
+			( ! isset( $file_results['file_issues_arr_master'] ) ) ||
+			( null === $file_results['file_issues_arr_master'] )
+		) {
+			vipgoci_log(
+				'Failed parsing output from PHPCS',
+				array(
+					'repo_owner'	=> $options['repo-owner'],
+					'repo_name'	=> $options['repo-name'],
+					'commit_id'	=> $options['commit'],
+					'file_results'	=> $file_results,
+				),
+				0
+			);
+
+			continue;
+		}
+
 		$temp_file_name = $file_results['temp_file_name'];
 
 		/*
 		 * Loop through each PHPCS message, add 'file_path'
-		 * attribute with actual path to file (relative
-		 * to repository).
+		 * and other information to each item.
 		 */
 		$file_results
 			['file_issues_arr_master']
@@ -103,8 +162,18 @@ function vipgocs_scan_files(
 			[ $temp_file_name ]
 			['messages']
 		= array_map(
-			function( $msg ) use ( $file_path ) {
+			function(
+				$msg
+			) use (
+				$file_path,
+				$github_commit_url,
+				$file_is_in_submodule,
+				$file_path_without_submodule
+			) {
+				$msg['github_commit_url'] = $github_commit_url;
 				$msg['file_path'] = $file_path;
+				$msg['file_is_in_submodule'] = $file_is_in_submodule !== null;
+				$msg['file_path_without_submodule'] = $file_path_without_submodule;
 
 				return $msg;
 			},
