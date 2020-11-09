@@ -79,15 +79,30 @@ function vipgocs_zendesk_search_for_user(
 		( isset( $resp_data['results'] ) ) &&
 		( count( $resp_data['results'] ) > 0 )
 	) {
-		vipgoci_log(
-			'Zendesk user found',
-			array(
-				'email' => $email,
-				'zendesk_user_id' => $resp_data['results'][0]['id'],
-			)
-		);
+		$user = null;
+		vipgoci_log( 'Zendesk users search results', array(
+			'count' => count( $resp_data['results'] ),
+		) );
 
-		return $resp_data['results'][0];
+		foreach ( $resp_data['results'] as $search_result ) {
+
+			if ( exact_email_match( $search_result, $email ) ) {
+				$user = $search_result;
+				vipgoci_log( 'Found user with matching email', array(
+					'zd_user_id' => $user['id']
+				) );
+				break;
+			}
+
+		}
+
+		if ( is_null( $user ) ) {
+			vipgoci_log( 'No user found', array(
+					'email' => $email,
+				) );
+		}
+
+		return $user;
 	}
 
 	vipgoci_log(
@@ -98,6 +113,15 @@ function vipgocs_zendesk_search_for_user(
 	);
 
 	return null;
+}
+
+/*
+ * Check is user search returned result with matching email address
+ *
+ * @return bool
+ */
+function exact_email_match( $zd_user, $search_email ) {
+	return $zd_user['email'] === $search_email;
 }
 
 /*
