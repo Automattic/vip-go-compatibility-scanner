@@ -144,6 +144,8 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '                                       will be the first label specified in --github--label' . PHP_EOL .
 			"\t" . '                                     * %linebreak% will be replaced with \n.' . PHP_EOL .
 			"\t" . '--zendesk-ticket-tags=STRING        Tags to assign to Zendesk ticket. Comma separated. ' . PHP_EOL .
+			"\t" . '--zendesk-ticket-group-id=STRING    Zendesk group ID to assign tickets to. ' . PHP_EOL .
+			"\t" . '--zendesk-ticket-status=STRING      Status of the Zendesk ticket. Defaults to "New" ' . PHP_EOL .
 			"\t" . '--zendesk-csv-data-path=PATH        CSV data to use for Zendesk ticket creation. The ' . PHP_EOL .
 			"\t" . '                                    data is used to pair a user\'s email address to repository.' . PHP_EOL .
 			"\t" . '                                    The file should have two fields: client_email and source_repo' . PHP_EOL .
@@ -300,6 +302,11 @@ function vipgocs_compatibility_scanner() {
 			false
 		);
 	}
+
+	$valid_ticket_statuses = array( "new", "open", "pending", "hold", "solved", "closed" );
+	if ( empty( $options['zendesk-ticket-status'] ) || ! in_array( $options['zendesk-ticket-status'], $valid_ticket_statuses ) ) {
+	    $options['zendesk-ticket-status'] = 'new';
+    }
 
 	/*
 	 * Print cleaned option-values.
