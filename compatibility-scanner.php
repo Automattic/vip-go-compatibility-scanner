@@ -71,6 +71,7 @@ function vipgocs_compatibility_scanner() {
 			'zendesk-ticket-subject:',
 			'zendesk-ticket-body:',
 			'zendesk-ticket-tags:',
+			'zendesk-ticket-status:',
 			'zendesk-csv-data-path:',
 		)
 	);
@@ -303,10 +304,29 @@ function vipgocs_compatibility_scanner() {
 		);
 	}
 
-	$valid_ticket_statuses = array( "new", "open", "pending", "hold", "solved", "closed" );
-	if ( empty( $options['zendesk-ticket-status'] ) || ! in_array( $options['zendesk-ticket-status'], $valid_ticket_statuses ) ) {
-	    $options['zendesk-ticket-status'] = 'new';
-    }
+	$valid_ticket_statuses = array(
+		"new", "open", "pending", "hold", "solved", "closed"
+	);
+
+	if ( empty( $options['zendesk-ticket-status'] ) ) {
+		$options['zendesk-ticket-status'] = 'new';
+	}
+
+	else {
+		$options['zendesk-ticket-status'] = strtolower( trim(
+			$options['zendesk-ticket-status']
+		) );
+
+		if ( ! in_array(
+			$options['zendesk-ticket-status'],
+			$valid_ticket_statuses
+		) ) {
+			vipgoci_sysexit(
+				'Invalid argument provided to option --zendesk-ticket-status; should be one of: ' . 
+					join( ', ', $valid_ticket_statuses )
+			);
+		}
+	}
 
 	/*
 	 * Print cleaned option-values.
