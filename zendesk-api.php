@@ -75,53 +75,48 @@ function vipgocs_zendesk_search_for_user(
 		)
 	);
 
+	vipgoci_log(
+		'Zendesk users search results',
+		array(
+			'count' => count( @$resp_data['results'] ),
+		)
+	);
+
+	$user_found = null;
+
 	if (
 		( isset( $resp_data['results'] ) ) &&
 		( count( $resp_data['results'] ) > 0 )
 	) {
-		$user = null;
-		vipgoci_log( 'Zendesk users search results', array(
-			'count' => count( $resp_data['results'] ),
-		) );
-
 		foreach ( $resp_data['results'] as $search_result ) {
-
-			if ( exact_email_match( $search_result, $email ) ) {
-				$user = $search_result;
-				vipgoci_log( 'Found user with matching email', array(
-					'zd_user_id' => $user['id']
-				) );
+			if ( $search_result['email'] === $email ) {
+				$user_found = $search_result;
 				break;
 			}
-
 		}
-
-		if ( is_null( $user ) ) {
-			vipgoci_log( 'No user found', array(
-					'email' => $email,
-				) );
-		}
-
-		return $user;
 	}
 
-	vipgoci_log(
-		'No user found',
-		array(
-			'email'	=> $email,
-		)
-	);
+	if ( is_null( $user_found ) ) {
+		vipgoci_log(
+			'No user found',
+			array(
+				'email'	=> $email,
+			)
+		);
+	}
 
-	return null;
-}
+	else {
+		vipgoci_log(
+			'Found user',
+			array(
+				'email' => $email,
+				'zendesk_user_id' => $user_found['id'],
+				'zendesk_organization_id' => $user_found['organization_id'],
+			)
+		);
+	}
 
-/*
- * Check is user search returned result with matching email address
- *
- * @return bool
- */
-function exact_email_match( $zd_user, $search_email ) {
-	return $zd_user['email'] === $search_email;
+	return $user_found;
 }
 
 /*
