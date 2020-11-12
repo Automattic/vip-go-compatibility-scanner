@@ -305,6 +305,28 @@ function vipgocs_compatibility_scanner() {
 		);
 	}
 
+	if ( ! empty( $options['zendesk-ticket-group-id'] ) ) {
+		$options['zendesk-ticket-group-id'] = trim(
+			$options['zendesk-ticket-group-id']
+		);
+
+		if ( ! is_numeric(
+			$options['zendesk-ticket-group-id']
+		) ) {
+			vipgoci_syexit(
+				'Invalid argument provided to option --zendesk-ticket-group-id; should be an integer',
+				array(
+					'zendesk-ticket-group-id' =>
+						$options['zendesk-ticket-group-id']
+				)
+			);
+		}
+
+		$options['zendesk-ticket-group-id'] =
+			(int) $options['zendesk-ticket-group-id'];
+	}
+
+	
 	$valid_ticket_statuses = array(
 		"new", "open", "pending", "hold", "solved", "closed"
 	);
@@ -329,26 +351,6 @@ function vipgocs_compatibility_scanner() {
 		}
 	}
 
-	if ( ! empty( $options['zendesk-ticket-group-id'] ) ) {
-		$options['zendesk-ticket-group-id'] = trim(
-			$options['zendesk-ticket-group-id']
-		);
-
-		if ( ! is_numeric(
-			$options['zendesk-ticket-group-id']
-		) ) {
-			vipgoci_syexit(
-				'Invalid argument provided to option --zendesk-ticket-group-id; should be an integer',
-				array(
-					'zendesk-ticket-group-id' =>
-						$options['zendesk-ticket-group-id']
-				)
-			);
-		}
-
-		$options['zendesk-ticket-group-id'] =
-			(int) $options['zendesk-ticket-group-id'];
-	}
 
 	/*
 	 * Print cleaned option-values.
