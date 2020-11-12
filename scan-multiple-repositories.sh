@@ -41,7 +41,8 @@ if [ "" == "$GITHUB_ORGANISATION" ] || [ "" == "$GITHUB_REPOS" ] || [ "" == "$GI
 	echo "          zendesk-ticket-subject: Subject to use for new Zendesk tickets."
 	echo "          zendesk-ticket-body: Body to use for new Zendesk tickets."
 	echo "          zendesk-ticket-tags: Tags to use for new Zendesk tickets."
-	echo "          zendesk-group-id: The group ID to assign Zendesk tickets to."
+	echo "          zendesk-ticket-group-id: The group ID to assign Zendesk tickets to."
+	echo "          zendesk-ticket-status: Status of newly created ticket."
 	echo "          zendesk-csv-data-path: Path to CSV data file."
 	echo ""
 	exit 1
