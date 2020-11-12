@@ -71,6 +71,7 @@ function vipgocs_compatibility_scanner() {
 			'zendesk-ticket-subject:',
 			'zendesk-ticket-body:',
 			'zendesk-ticket-tags:',
+			'zendesk-ticket-group-id:',
 			'zendesk-ticket-status:',
 			'zendesk-csv-data-path:',
 		)
@@ -326,6 +327,27 @@ function vipgocs_compatibility_scanner() {
 					join( ', ', $valid_ticket_statuses )
 			);
 		}
+	}
+
+	if ( ! empty( $options['zendesk-ticket-group-id'] ) ) {
+		$options['zendesk-ticket-group-id'] = trim(
+			$options['zendesk-ticket-group-id']
+		);
+
+		if ( ! is_numeric(
+			$options['zendesk-ticket-group-id']
+		) ) {
+			vipgoci_syexit(
+				'Invalid argument provided to option --zendesk-ticket-group-id; should be an integer',
+				array(
+					'zendesk-ticket-group-id' =>
+						$options['zendesk-ticket-group-id']
+				)
+			);
+		}
+
+		$options['zendesk-ticket-group-id'] =
+			(int) $options['zendesk-ticket-group-id'];
 	}
 
 	/*
