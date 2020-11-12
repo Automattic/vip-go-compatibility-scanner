@@ -118,7 +118,8 @@ function vipgocs_zendesk_open_ticket(
 			'zendesk-ticket-subject'	=> $options['zendesk-ticket-subject'],
 			'zendesk-ticket-body'		=> $options['zendesk-ticket-body'],
 			'zendesk-ticket-tags'		=> $options['zendesk-ticket-tags'],
-			'zendesk-group-id'  		=> $options['zendesk-group-id'],
+			'zendesk-ticket-status'		=> $options['zendesk-ticket-status'],
+			'zendesk-ticket-group-id' 	=> $options['zendesk-ticket-group-id'],
 			'github_issues_link'		=> $github_issues_links,
 		)
 	);
