@@ -30,9 +30,10 @@ The tool itself is meant to be used on a per-repo bases. Here is an example of h
 ```
 pushd /tmp && \
 git clone git@github.com:githubuser/testing123.git && \
+pushd testing123 && \
 git submodule init && \
 git submodule update --recursive && \
-popd && \
+popd && popd && \
 ./compatibility-scanner.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/"  --repo-owner="mygithubuser" --repo-name="testing123" --token="xyz" --github-labels='PHP Compatibility' --github-issue-title="PHP Upgrade: Compatibility issues found in " --github-issue-body="The following issues were found when scanning branch <code>%branch_name%</code> for compatibility problems:  %error_msg% This is an automated report." --github-issue-assign="direct" --local-git-repo="/tmp/testing123" --phpcs-path="$HOME/vip-go-ci-tools/phpcs/bin/phpcs" --phpcs-standard="PHPCompatibilityWP" --phpcs-runtime-set='testVersion 7.3-' 
 ```
 
