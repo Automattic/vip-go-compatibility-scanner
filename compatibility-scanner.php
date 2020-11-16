@@ -71,6 +71,8 @@ function vipgocs_compatibility_scanner() {
 			'zendesk-ticket-subject:',
 			'zendesk-ticket-body:',
 			'zendesk-ticket-tags:',
+			'zendesk-ticket-group-id:',
+			'zendesk-ticket-status:',
 			'zendesk-csv-data-path:',
 		)
 	);
@@ -144,6 +146,8 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '                                       will be the first label specified in --github--label' . PHP_EOL .
 			"\t" . '                                     * %linebreak% will be replaced with \n.' . PHP_EOL .
 			"\t" . '--zendesk-ticket-tags=STRING        Tags to assign to Zendesk ticket. Comma separated. ' . PHP_EOL .
+			"\t" . '--zendesk-ticket-group-id=NUMBER    Zendesk group ID to assign tickets to. ' . PHP_EOL .
+			"\t" . '--zendesk-ticket-status=STRING      Status of the Zendesk ticket. Defaults to "New" ' . PHP_EOL .
 			"\t" . '--zendesk-csv-data-path=PATH        CSV data to use for Zendesk ticket creation. The ' . PHP_EOL .
 			"\t" . '                                    data is used to pair a user\'s email address to repository.' . PHP_EOL .
 			"\t" . '                                    The file should have two fields: client_email and source_repo' . PHP_EOL .
@@ -300,6 +304,53 @@ function vipgocs_compatibility_scanner() {
 			false
 		);
 	}
+
+	if ( ! empty( $options['zendesk-ticket-group-id'] ) ) {
+		$options['zendesk-ticket-group-id'] = trim(
+			$options['zendesk-ticket-group-id']
+		);
+
+		if ( ! is_numeric(
+			$options['zendesk-ticket-group-id']
+		) ) {
+			vipgoci_syexit(
+				'Invalid argument provided to option --zendesk-ticket-group-id; should be an integer',
+				array(
+					'zendesk-ticket-group-id' =>
+						$options['zendesk-ticket-group-id']
+				)
+			);
+		}
+
+		$options['zendesk-ticket-group-id'] =
+			(int) $options['zendesk-ticket-group-id'];
+	}
+
+	
+	$valid_ticket_statuses = array(
+		"new", "open", "pending", "hold", "solved", "closed"
+	);
+
+	if ( empty( $options['zendesk-ticket-status'] ) ) {
+		$options['zendesk-ticket-status'] = 'new';
+	}
+
+	else {
+		$options['zendesk-ticket-status'] = strtolower( trim(
+			$options['zendesk-ticket-status']
+		) );
+
+		if ( ! in_array(
+			$options['zendesk-ticket-status'],
+			$valid_ticket_statuses
+		) ) {
+			vipgoci_sysexit(
+				'Invalid argument provided to option --zendesk-ticket-status; should be one of: ' . 
+					join( ', ', $valid_ticket_statuses )
+			);
+		}
+	}
+
 
 	/*
 	 * Print cleaned option-values.

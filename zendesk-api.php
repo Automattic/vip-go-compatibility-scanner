@@ -137,6 +137,8 @@ function vipgocs_zendesk_open_ticket(
 			'zendesk-ticket-subject'	=> $options['zendesk-ticket-subject'],
 			'zendesk-ticket-body'		=> $options['zendesk-ticket-body'],
 			'zendesk-ticket-tags'		=> $options['zendesk-ticket-tags'],
+			'zendesk-ticket-group-id' 	=> $options['zendesk-ticket-group-id'],
+			'zendesk-ticket-status'		=> $options['zendesk-ticket-status'],
 			'github_issues_link'		=> $github_issues_links,
 		)
 	);
@@ -162,6 +164,14 @@ function vipgocs_zendesk_open_ticket(
 
 	if ( ! empty( $options['zendesk-ticket-tags'] ) ) {
 		$zendesk_api_postfields['ticket']['tags'] = $options['zendesk-ticket-tags'];
+	}
+
+	if ( ! empty( $options['zendesk-ticket-group-id'] ) ) {
+		$zendesk_api_postfields['ticket']['group_id'] = $options['zendesk-ticket-group-id'];
+	}
+
+	if ( ! empty( $options['zendesk-ticket-status'] ) ) {
+		$zendesk_api_postfields['ticket']['status'] = $options['zendesk-ticket-status'];
 	}
 
 	/*
