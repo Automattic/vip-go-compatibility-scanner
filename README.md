@@ -39,6 +39,15 @@ popd && popd && \
 
 Use the `--github-issue-group-by` option to switch between posting issues on a per `file` and `folder` basis.
 
+Instead of specifying the whole of GitHub issue body on the command-line, you can place it in a file and use the `--github-issue-body-file` parameter instead. The file contents should meet the same requirements as the `--github-issue-body` parameter. For example:
+
+```
+[...]
+./compatibility-scanner.php ... --github-issue-body-file=/tmp/my-github-issue-body.txt
+```
+
+The same applies to the `--zendesk-issue-body` parameter. 
+
 ### Zendesk functionality
 
 If you wish to also create Zendesk tickets to notify about the issues found, you can add parameters such as these to the command:
