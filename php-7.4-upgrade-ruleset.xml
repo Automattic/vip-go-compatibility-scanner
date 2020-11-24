@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ruleset name="php-7.4-upgrade-ruleset">
+    <description>Ruleset specifically for PHP 7.4 upgrade, with some exclusions.</description>
+
+    <rule ref="PHPCompatibilityWP">
+        <exclude name="PHPCompatibility.ParameterValues.NewIDNVariantDefault.NotSet"/>
+    </rule>
+</ruleset>
