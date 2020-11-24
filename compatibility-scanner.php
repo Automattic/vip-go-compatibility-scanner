@@ -11,6 +11,64 @@ require_once( __DIR__ . '/csv-data.php' );
 define( 'VIPGOCI_INCLUDED', true );
 
 /*
+ * Read file specified by option value
+ * if the option value is present and the
+ * file exists, place file content in complementary
+ * parameter.
+ */
+function vipgocs_file_option_process_complementary(
+	&$options,
+	$option_name
+) {
+	$option_name_with_file =
+		$option_name . '-file';
+
+	if ( ! isset(
+		$options[ $option_name_with_file ]
+	) ) {
+		return;
+	}
+
+	/*
+	 * Cannot specify both parameters.
+	 */
+	if ( isset( $options[ $option_name ] ) ) {
+		vipgoci_sysexit(
+			'Cannot specify both --' . $option_name . ' and ' .
+				'--' . $option_name_with_file
+		);
+	}
+
+	vipgoci_option_file_handle(
+		$options,
+		$option_name_with_file
+	);
+
+	$tmp_file_contents =
+		file_get_contents(
+			$options[ $option_name_with_file ]
+		);
+
+	if ( false === $tmp_file_contents ) {
+		vipgoci_sysexit(
+			'Unable to read file specified by ' .
+				'--' . $option_name_with_file,
+			array(
+				$option_name_with_file =>
+					$options[ $option_name_with_file ],
+			)
+		);
+	}
+
+	$options[ $option_name ] =
+		$tmp_file_contents;
+
+	unset(
+		$tmp_file_contents
+	);
+}
+
+/*
  * main() -- prepare to do actual work,
  * invoke functions that do the work.
  */
@@ -62,6 +120,7 @@ function vipgocs_compatibility_scanner() {
 			'github-labels:',
 			'github-issue-title:',
 			'github-issue-body:',
+			'github-issue-body-file:',
 			'github-issue-assign:',
 			'github-issue-group-by:',
 			'zendesk-subdomain:',
@@ -70,6 +129,7 @@ function vipgocs_compatibility_scanner() {
 			'zendesk-access-password:',
 			'zendesk-ticket-subject:',
 			'zendesk-ticket-body:',
+			'zendesk-ticket-body-file:',
 			'zendesk-ticket-tags:',
 			'zendesk-ticket-group-id:',
 			'zendesk-ticket-status:',
@@ -87,11 +147,20 @@ function vipgocs_compatibility_scanner() {
 			$options['repo-name'],
 			$options['token'],
 			$options['github-issue-title'],
-			$options['github-issue-body'],
 			$options['local-git-repo'],
 			$options['phpcs-path'],
 			$options['phpcs-standard']
 		) )
+		||
+		(
+			( ! isset(
+				$options['github-issue-body-file']
+			) )
+			&&
+			( ! isset(
+				$options['github-issue-body']
+			) )
+		)
 		||
 		(
 			( isset( $options['help'] ) )
@@ -106,6 +175,8 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '	--github-issue-title, --github-issue-body, --local-git-repo' . PHP_EOL .
 			"\t" . '	--phpcs-path, --phpcs-standard are mandatory parameters' . PHP_EOL .
 			PHP_EOL .
+			"\t" . "Note that some parameters have a complementary '-file' parameter (see below)." . PHP_EOL .
+			PHP_EOL .
 			"\t" . '--vipgoci-path=STRING	            Path to were vip-go-ci lives, should be folder. ' . PHP_EOL .
 			PHP_EOL .
 			"\t" . '--repo-owner=STRING	            Specify repository owner, can be an organization' . PHP_EOL .
@@ -117,6 +188,9 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '                                    The option supports tokens that will be replaced with values: ' . PHP_EOL .
 			"\t" . '				      * %error_msg%: Will be replaced with problems noted. ' . PHP_EOL .
 			"\t" . '				      * %branch_name%: Will be replaced with name of current branch. ' . PHP_EOL .
+
+			"\t" . '--github-issue-body-file=FILE       A file to read the content of --github-issue-body parameter' . PHP_EOL .
+			"\t" . '                                    instead of specifying the parameter itself.' . PHP_EOL .
 			"\t" . '--github-issue-assign=STRING        Assign specified admins as collaborators for each created issue' . PHP_EOL .
 			"\t" . '				    -- outside, direct, or all.' . PHP_EOL .
 			"\t" . '--github-issue-group-by=STRING      How to group the issues found; either by "file" or "folder".' . PHP_EOL .
@@ -145,6 +219,8 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '                                       with link to GitHub issues created; the link' . PHP_EOL .
 			"\t" . '                                       will be the first label specified in --github--label' . PHP_EOL .
 			"\t" . '                                     * %linebreak% will be replaced with \n.' . PHP_EOL .
+			"\t" . '--zendesk-ticket-body-file=FILE     A file to read the content of --zendesk-ticket-body from' . PHP_EOL .
+			"\t" . '                                    instead of specifying the parameter itself.' . PHP_EOL .
 			"\t" . '--zendesk-ticket-tags=STRING        Tags to assign to Zendesk ticket. Comma separated. ' . PHP_EOL .
 			"\t" . '--zendesk-ticket-group-id=NUMBER    Zendesk group ID to assign tickets to. ' . PHP_EOL .
 			"\t" . '--zendesk-ticket-status=STRING      Status of the Zendesk ticket. Defaults to "New" ' . PHP_EOL .
@@ -184,6 +260,22 @@ function vipgocs_compatibility_scanner() {
 	vipgoci_log(
 		'Successfully included vip-go-ci'
 	);
+
+	/*
+	 * Read the parameter's '-file' counterpart from file if
+	 * specified.
+	 */
+	foreach(
+		array(
+			'github-issue-body',
+			'zendesk-ticket-body',
+		) as $tmp_file_option
+	) {
+		vipgocs_file_option_process_complementary(
+			$options,
+			$tmp_file_option
+		);
+	}
 
 	/*
 	 * Parse rest of options
