@@ -420,7 +420,7 @@ function vipgocs_compatibility_scanner() {
 
 	
 	$valid_ticket_statuses = array(
-		"new", "open", "pending", "hold", "solved", "closed"
+		'new', 'open', 'pending', 'hold', 'solved', 'closed'
 	);
 
 	if ( empty( $options['zendesk-ticket-status'] ) ) {
