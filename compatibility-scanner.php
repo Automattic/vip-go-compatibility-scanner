@@ -6,67 +6,12 @@ require_once( __DIR__ . '/scan-files.php' );
 require_once( __DIR__ . '/open-issues.php' );
 require_once( __DIR__ . '/zendesk-api.php' );
 require_once( __DIR__ . '/csv-data.php' );
+require_once( __DIR__ . '/options.php' );
+require_once( __DIR__ . '/zendesk-db.php' );
+require_once( __DIR__ . '/utils.php' );
 
 
 define( 'VIPGOCI_INCLUDED', true );
-
-/*
- * Read file specified by option value
- * if the option value is present and the
- * file exists, place file content in complementary
- * parameter.
- */
-function vipgocs_file_option_process_complementary(
-	&$options,
-	$option_name
-) {
-	$option_name_with_file =
-		$option_name . '-file';
-
-	if ( ! isset(
-		$options[ $option_name_with_file ]
-	) ) {
-		return;
-	}
-
-	/*
-	 * Cannot specify both parameters.
-	 */
-	if ( isset( $options[ $option_name ] ) ) {
-		vipgoci_sysexit(
-			'Cannot specify both --' . $option_name . ' and ' .
-				'--' . $option_name_with_file
-		);
-	}
-
-	vipgoci_option_file_handle(
-		$options,
-		$option_name_with_file
-	);
-
-	$tmp_file_contents =
-		file_get_contents(
-			$options[ $option_name_with_file ]
-		);
-
-	if ( false === $tmp_file_contents ) {
-		vipgoci_sysexit(
-			'Unable to read file specified by ' .
-				'--' . $option_name_with_file,
-			array(
-				$option_name_with_file =>
-					$options[ $option_name_with_file ],
-			)
-		);
-	}
-
-	$options[ $option_name ] =
-		$tmp_file_contents;
-
-	unset(
-		$tmp_file_contents
-	);
-}
 
 /*
  * main() -- prepare to do actual work,
@@ -76,18 +21,15 @@ function vipgocs_file_option_process_complementary(
 function vipgocs_compatibility_scanner() {
 	global $argv;
 
+	$zendesk_db_conn = null;
+
 	echo 'Initializing...' . PHP_EOL;
 
 	/*
-	 * Check if we are running on PHP 7.3 or later.
+	 * Do some sanity checks on our
+	 * environment.
 	 */
-	if ( version_compare(
-		phpversion(),
-		'7.3.0'
-	) < 0 ) {
-		echo 'Error: PHP 7.3 is required as a minimum.' . PHP_EOL;
-		exit( 251 ); /* System problem */
-	}
+	vipgocs_env_check();
 
 	/*
 	 * Log startup time
@@ -95,12 +37,9 @@ function vipgocs_compatibility_scanner() {
 	$startup_time = time();
 
 	/*
-	 * Report any errors to the user.
+	 * Set up logging, etc.
 	 */
-	ini_set( 'error_log', '' );
-
-	error_reporting( E_ALL );
-	ini_set( 'display_errors', 'on' );
+	vipgocs_logging_setup();
 
 	/*
 	 * Get option-values
@@ -123,19 +62,18 @@ function vipgocs_compatibility_scanner() {
 			'github-issue-body-file:',
 			'github-issue-assign:',
 			'github-issue-group-by:',
-			'zendesk-subdomain:',
-			'zendesk-access-username:',
-			'zendesk-access-token:',
-			'zendesk-access-password:',
-			'zendesk-ticket-subject:',
-			'zendesk-ticket-body:',
-			'zendesk-ticket-body-file:',
-			'zendesk-ticket-tags:',
-			'zendesk-ticket-group-id:',
-			'zendesk-ticket-status:',
-			'zendesk-csv-data-path:',
+			'zendesk-db:',
+			'zendesk-access-username:', // For sanity-checking
 		)
 	);
+
+	if ( isset(
+		$options['zendesk-access-username'],
+	) ) {
+		echo 'The --zendesk-access-username, --zendesk-access-password, --zendesk-access-token, --zendesk-ticket-subject, --zendesk-ticket-body, etc. parameters are not supported by this utility anymore. You may want to start using the --zendesk-db parameter instead. See README for more information' . PHP_EOL;
+		exit( 253 );
+	}
+
 
 	/*
 	 * Check if any required options are missing.
@@ -207,58 +145,20 @@ function vipgocs_compatibility_scanner() {
 			"\t" . '--phpcs-sniffs-exclude=ARRAY        Specify which sniffs to exclude from PHPCS scanning, ' . PHP_EOL .
 			"\t" . '				    should be an array with items separated by commas. ' . PHP_EOL .
 			PHP_EOL .
-			"\t" . '--zendesk-subdomain=STRING          Subdomain to use when communicating with Zendesk. ' . PHP_EOL .
-			"\t" . '--zendesk-access-username=STRING    Username of the Zendesk user to use.' . PHP_EOL .
-			"\t" . '--zendesk-access-token=STRING       Access token to use when communicating with Zendesk REST API. ' . PHP_EOL .
-			"\t" . '--zendesk-access-password=STRING    Password to use when communicating with Zendesk REST API. ' . PHP_EOL .
-			"\t" . '                                    Use if token is not an option.' . PHP_EOL .
-			"\t" . '--zendesk-ticket-subject=STRING     Subject to use for Zendesk tickets.' . PHP_EOL .
-			"\t" . '--zendesk-ticket-body=STRING        Body of Zendesk ticket. Markdown is supported. ' . PHP_EOL .
-			"\t" . '                                    Also certain strings are replaced with other values: ' . PHP_EOL .
-			"\t" . '                                     * String %github_issues_link% will be replaced' . PHP_EOL .
-			"\t" . '                                       with link to GitHub issues created; the link' . PHP_EOL .
-			"\t" . '                                       will be the first label specified in --github--label' . PHP_EOL .
-			"\t" . '                                     * %linebreak% will be replaced with \n.' . PHP_EOL .
-			"\t" . '--zendesk-ticket-body-file=FILE     A file to read the content of --zendesk-ticket-body from' . PHP_EOL .
-			"\t" . '                                    instead of specifying the parameter itself.' . PHP_EOL .
-			"\t" . '--zendesk-ticket-tags=STRING        Tags to assign to Zendesk ticket. Comma separated. ' . PHP_EOL .
-			"\t" . '--zendesk-ticket-group-id=NUMBER    Zendesk group ID to assign tickets to. ' . PHP_EOL .
-			"\t" . '--zendesk-ticket-status=STRING      Status of the Zendesk ticket. Defaults to "New" ' . PHP_EOL .
-			"\t" . '--zendesk-csv-data-path=PATH        CSV data to use for Zendesk ticket creation. The ' . PHP_EOL .
-			"\t" . '                                    data is used to pair a user\'s email address to repository.' . PHP_EOL .
-			"\t" . '                                    The file should have two fields: client_email and source_repo' . PHP_EOL .
-			"\t" . '                                    -- first line of the file should be columns.' . PHP_EOL .
-			"\t" . '                                    Valid columns are: client_email, source_repo ' . PHP_EOL .
+			"\t" . '--zendesk-db=FILE             File to store URLs to GitHub issues for later processing ' . PHP_EOL .
+			"\t" . '                                    by the zendesk-tickets-create.php utility. ' . PHP_EOL .
 			PHP_EOL;
 
 		exit(253);
 	}
 
 	/*
-	 * Check if the --vipgoci-path parameter is
-	 * invalid, should be a folder.
+	 * Load vip-go-ci
 	 */
-	if ( ! is_dir( $options['vipgoci-path'] ) ) {
-		echo 'Path specified in --vipgoci-path is invalid, is not a directory' . PHP_EOL;
-		exit(253);
-	}
 
-	if ( ! is_file( $options['vipgoci-path'] . '/main.php' ) ) {
-		echo 'No main.php found in --vipgoci-path; is it a valid vip-go-ci installation?' . PHP_EOL;
-		exit(253);
-	}
-
-	/*
-	 * Include vip-go-ci as a library.
-	 */
-	echo 'Attempting to include vip-go-ci...' . PHP_EOL;
-
-	require_once(
-		$options['vipgoci-path'] . '/main.php'
-	);
-
-	vipgoci_log(
-		'Successfully included vip-go-ci'
+	vipgocs_vipgoci_load(
+		$options,
+		'vipgoci-path'
 	);
 
 	/*
@@ -268,7 +168,6 @@ function vipgocs_compatibility_scanner() {
 	foreach(
 		array(
 			'github-issue-body',
-			'zendesk-ticket-body',
 		) as $tmp_file_option
 	) {
 		vipgocs_file_option_process_complementary(
@@ -382,67 +281,14 @@ function vipgocs_compatibility_scanner() {
 		}
 	}
 
-	if ( empty( $options['zendesk-ticket-tags'] ) ) {
-		$options['zendesk-ticket-tags'] = array();
-	}
-
-	else {
-		vipgoci_option_array_handle(
-			$options,
-			'zendesk-ticket-tags',
-			array(),
-			null,
-			',',
-			false
+	if ( ! empty(
+		$options['zendesk-db']
+	) ) {
+		// Create/open Zendesk DB 
+		$zendesk_db_conn = vipgocs_zendesk_db_open(
+			$options['zendesk-db']
 		);
 	}
-
-	if ( ! empty( $options['zendesk-ticket-group-id'] ) ) {
-		$options['zendesk-ticket-group-id'] = trim(
-			$options['zendesk-ticket-group-id']
-		);
-
-		if ( ! is_numeric(
-			$options['zendesk-ticket-group-id']
-		) ) {
-			vipgoci_syexit(
-				'Invalid argument provided to option --zendesk-ticket-group-id; should be an integer',
-				array(
-					'zendesk-ticket-group-id' =>
-						$options['zendesk-ticket-group-id']
-				)
-			);
-		}
-
-		$options['zendesk-ticket-group-id'] =
-			(int) $options['zendesk-ticket-group-id'];
-	}
-
-	
-	$valid_ticket_statuses = array(
-		'new', 'open', 'pending', 'hold', 'solved', 'closed'
-	);
-
-	if ( empty( $options['zendesk-ticket-status'] ) ) {
-		$options['zendesk-ticket-status'] = 'new';
-	}
-
-	else {
-		$options['zendesk-ticket-status'] = strtolower( trim(
-			$options['zendesk-ticket-status']
-		) );
-
-		if ( ! in_array(
-			$options['zendesk-ticket-status'],
-			$valid_ticket_statuses
-		) ) {
-			vipgoci_sysexit(
-				'Invalid argument provided to option --zendesk-ticket-status; should be one of: ' . 
-					join( ', ', $valid_ticket_statuses )
-			);
-		}
-	}
-
 
 	/*
 	 * Print cleaned option-values.
@@ -452,9 +298,6 @@ function vipgocs_compatibility_scanner() {
 		null,
 		array(
 			'token',
-			'zendesk-access-username',
-			'zendesk-access-password',
-			'zendesk-access-token',
 		)
 	);
 
@@ -496,82 +339,6 @@ function vipgocs_compatibility_scanner() {
 	/*
 	 * Check if Zendesk auth is ok
 	 */
-
-	if ( null !== vipgocs_zendesk_prepare_auth_fields(
-		$options
-	) ) {
-		if ( true !== vipgocs_zendesk_check_auth(
-			$options
-		) ) {
-			vipgoci_sysexit(
-				'Authentication with Zendesk failed',
-				array(
-					'zendesk-access-username' =>
-						@$options['zendesk-access-username'],
-
-					'zendesk-subdomain' =>
-						@$options['zendesk-subdomain'],
-				)
-			);
-		}
-
-		else {
-			vipgoci_log(
-				'Authentication with Zendesk successful'
-			);
-		}
-	}
-
-	/*
-	 * Read in CSV data, if --zendesk-csv-data is specified
-	 */
-
-	$zendesk_csv_data = array();
-	$zendesk_requestee_email = null;
-
-	if ( isset( $options['zendesk-csv-data-path'] ) ) {
-		$zendesk_csv_data = vipgocs_csv_parse_data(
-			$options['zendesk-csv-data-path']
-		);
-
-		if ( empty( $zendesk_csv_data ) ) {
-			vipgoci_sysexit(
-				'Read CSV file, but no data seems to have been available, or data is invalid',
-				array(
-					'zendesk-csv-data-path'		=> $options['zendesk-csv-data-path'],
-					'csv-data-count'		=> count( $zendesk_csv_data ),
-				)
-			);
-		}
-
-		$zendesk_requestee_email = vipgocs_csv_get_email_for_repo(
-			$zendesk_csv_data,
-			$options['repo-owner'],
-			$options['repo-name']
-		);
-
-		$log_msg = '';
-
-		if ( ! empty( $zendesk_requestee_email ) ) {
-			$log_msg = 'Got email for Zendesk ticket creation that matches repository owner and name';
-		}
-
-		else {
-			$log_msg = 'Got no email for Zendesk ticket creation that matches repository owner and name; will not be created';
-		}
-
-		vipgoci_log(
-			$log_msg,
-			array(
-				'zendesk_requestee_email'	=> $zendesk_requestee_email,
-				'repo-owner'			=> $options['repo-owner'],
-				'repo-name'			=> $options['repo-name'],
-				'zendesk-csv-data-path'		=> $options['zendesk-csv-data-path'],
-				'csv-data-count'		=> count( $zendesk_csv_data ),
-			)
-		);
-	}
-
 
 	vipgoci_log(
 		'Starting up...',
@@ -692,50 +459,36 @@ function vipgocs_compatibility_scanner() {
 				rawurlencode( $label_name );
 	}
 
-	/*
-	 * If configured to create Zendesk
-	 * tickets and we did open issues,
-	 * do create tickets.
-	 */
-
-	$zendesk_ticket_url = null;
 
 	if (
-		( null !==
-			vipgocs_zendesk_prepare_auth_fields( $options )
-		)
-		&&
-		( ! empty(
-			$options['zendesk-subdomain']
-		) )
-		&&
-		( ! empty(
-			$options['zendesk-ticket-subject']
-		) )
-		&&
-		( ! empty(
-			$options['zendesk-ticket-body']
-		) )
-		&&
-		( ! empty(
-			$zendesk_requestee_email
-		) )
+		( ! empty( $options['zendesk-db'] ) )
 		&&
 		( $issue_statistics['issues_opened'] > 0 )
 	) {
-		$zendesk_ticket_url = vipgocs_zendesk_open_ticket(
-			$options,
-			$zendesk_requestee_email,
-			$github_issues_links
+		vipgoci_log(
+			'Logging created GitHub issues into Zendesk DB....',
+			array(
+				'zendesk-db' => $options['zendesk-db'],
+			)
+		);
+
+		/*
+		 * Write GitHub issues URL to DB
+		 */
+		vipgocs_zendesk_db_write_github_issue(
+			$zendesk_db_conn,
+			$options['repo-owner'],
+			$options['repo-name'],
+			$github_issues_links[0]
 		);
 	}
 
 	else {
 		vipgoci_log(
-			'Note: Not opening Zendesk ticket as not all requirements fulfilled'
+			'Note: Not logging GitHub ticket to Zendesk DB as not all requirements fulfilled'
 		);
 	}
-
+	
 	/*
 	 * Get API rate limit usage.
 	 */
@@ -743,6 +496,13 @@ function vipgocs_compatibility_scanner() {
 		vipgoci_github_rate_limit_usage(
 			$options['token']
 		);
+
+	/*
+	 * Close connection to DB.
+	 */
+	vipgocs_zendesk_db_close(
+		$zendesk_db_conn
+	);
 
 	/*
 	 * Collect counter-information.
@@ -785,10 +545,7 @@ function vipgocs_compatibility_scanner() {
 
 	foreach( $github_issues_links as $github_issue_link ) {
 		echo "* " . $github_issue_link . PHP_EOL;
-	}
-
-	if ( ! empty( $zendesk_ticket_url ) ) {
-		echo 'Find Zendesk ticket here: ' . $zendesk_ticket_url . PHP_EOL;
+		
 	}
 
 	return 0;
