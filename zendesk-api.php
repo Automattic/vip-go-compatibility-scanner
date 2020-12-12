@@ -143,6 +143,12 @@ function vipgocs_zendesk_open_ticket(
 		)
 	);
 
+	$tmp_github_issue_urls = "";
+
+	foreach( $github_issues_links as $github_issues_link ) {
+		$tmp_github_issue_urls .= '* ' . $github_issues_link . PHP_EOL;
+	}
+
 	$zendesk_api_postfields = array(
 		'ticket'	=> array(
 			'subject'	=> $options['zendesk-ticket-subject'],
@@ -153,7 +159,7 @@ function vipgocs_zendesk_open_ticket(
 						'%linebreak%',
 					),
 					array(
-						$github_issues_links[0],
+						$tmp_github_issue_urls,
 						PHP_EOL,
 					),
 					$options['zendesk-ticket-body']
