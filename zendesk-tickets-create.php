@@ -336,23 +336,26 @@ function vipgocs_zendesk_tickets_create() {
 		$zendesk_db_conn
 	);
 
+	$zendesk_tickets_arr = array();
+
 	/*
 	 * Loop through each repo-owner / repo-name combination
-	 * and open Zendesk ticket as needed.
+	 * and merge GitHub URLs along with other data into
+	 * an array.
 	 */
 	foreach (
 		array_keys(
 			$zendesk_db_issues
 		) as $zendesk_db_key
 	) {
-		$options['repo-owner'] = $zendesk_db_issues[ $zendesk_db_key ]['repo_owner'];
-		$options['repo-name'] = $zendesk_db_issues[ $zendesk_db_key ]['repo_name'];
+		$tmp_repo_owner = $zendesk_db_issues[ $zendesk_db_key ]['repo_owner'];
+		$tmp_repo_name = $zendesk_db_issues[ $zendesk_db_key ]['repo_name'];
 		$github_issues_links = $zendesk_db_issues[ $zendesk_db_key ]['github_issues_urls'];
 
 		$zendesk_requestee_email = vipgocs_csv_get_email_for_repo(
 			$zendesk_csv_data,
-			$options['repo-owner'],
-			$options['repo-name']
+			$tmp_repo_owner,
+			$tmp_repo_name
 		);
 
 		$log_msg = '';
@@ -370,18 +373,54 @@ function vipgocs_zendesk_tickets_create() {
 			$log_msg,
 			array(
 				'zendesk_requestee_email'	=> $zendesk_requestee_email,
-				'repo-owner'			=> $options['repo-owner'],
-				'repo-name'			=> $options['repo-name'],
+				'repo-owner'			=> $tmp_repo_owner,
+				'repo-name'			=> $tmp_repo_name,
 				'zendesk-csv-data-path'		=> $options['zendesk-csv-data-path'],
 				'csv-data-count'		=> count( $zendesk_csv_data ),
 			)
 		);
 
+		if ( ! isset(
+			$zendesk_tickets_arr[ $zendesk_requestee_email ]
+		) ) {
+			$zendesk_tickets_arr[ $zendesk_requestee_email ] = array(
+			);
+		}
+
+		$zendesk_tickets_arr[ $zendesk_requestee_email ][] = array(
+			'github_issues'		=> $github_issues_links,
+			'repo_owner'		=> $tmp_repo_owner,
+			'repo_name'		=> $tmp_repo_name,
+		);
+	}
+
+	/*
+	 * Open Zendesk tickets; one ticket per email, make
+	 * sure all URLs for the user are in the ticket.
+	 */
+	foreach(
+		array_keys(
+			$zendesk_tickets_arr
+		) as $zendesk_requestee_email
+	) {
+		$zendesk_requestee_github_links = array();
+
+		foreach(
+			$zendesk_tickets_arr[ $zendesk_requestee_email ]
+				as $tmp_item
+		) {
+			$zendesk_requestee_github_links = array_merge(
+				$zendesk_requestee_github_links,
+				$tmp_item['github_issues']
+			);
+		}
+
+		unset( $tmp_item );
 
 		$zendesk_ticket_url_item = vipgocs_zendesk_open_ticket(
 			$options,
 			$zendesk_requestee_email,
-			$github_issues_links
+			$zendesk_requestee_github_links
 		);
 
 		if ( ! empty(
@@ -391,15 +430,20 @@ function vipgocs_zendesk_tickets_create() {
 				$zendesk_ticket_url_item;
 
 			foreach(
-				$github_issues_links as $github_issues_link_item
+				$zendesk_tickets_arr[ $zendesk_requestee_email ]
+				as $tmp_item
 			) {
-				vipgocs_zendesk_db_delete_github_issue(
-					$zendesk_db_conn,
-					$options['repo-owner'],
-					$options['repo-name'],
-					$github_issues_link_item
-				);
+				foreach( $tmp_item['github_issues'] as $tmp_github_url ) {
+					vipgocs_zendesk_db_delete_github_issue(
+						$zendesk_db_conn,
+						$tmp_item['repo_owner'],
+						$tmp_item['repo_name'],
+						$tmp_github_url
+					);
+				}
 			}
+
+			unset( $tmp_item );
 		}
 	}
 
