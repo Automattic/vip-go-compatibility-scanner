@@ -245,9 +245,15 @@ function vipgocs_zendesk_tickets_create() {
 	 * Check if Zendesk auth is ok
 	 */
 
-	if ( null !== vipgocs_zendesk_prepare_auth_fields(
+	if ( null === vipgocs_zendesk_prepare_auth_fields(
 		$options
 	) ) {
+		vipgoci_sysexit(
+			'Unable to submit tickets to Zendesk, parameters missing'
+		);
+	}
+
+	else {
 		if ( true !== vipgocs_zendesk_check_auth(
 			$options
 		) ) {
@@ -307,7 +313,7 @@ function vipgocs_zendesk_tickets_create() {
 	unset( $options_clean );
 
 	/*
-	 * Read in CSV data, if --zendesk-csv-data is specified
+	 * Read in CSV data
 	 */
 
 	$zendesk_csv_data = array();
