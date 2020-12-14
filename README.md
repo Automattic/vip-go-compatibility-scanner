@@ -2,7 +2,7 @@
 
 Find issues in selected repositories using PHPCS, report to GitHub.
 
-This tool is to be used to search for any (compatibility) issues in VIP Go repositories. It will scan a given repository with PHPCS, using a specified PHPCS standard, and then post GitHub issue for each directory that has any detected issues detailing what was found. It will add labels to each issue created, if specified, and print links to the labels in its output. Note that the tool needs to have the repository cloned and ready to be used when started.
+This tool is to be used to search for any (compatibility) issues in VIP Go repositories. It will scan a given repository with PHPCS, using a specified PHPCS standard, and then post GitHub issue for each folder that has any detected issues detailing what was found. It will add labels to each issue created, if specified, and print links to the labels in its output. Note that the tool needs to have the repository cloned and ready to be used when started.
 
 This tool can be used for any GitHub repository and with any PHPCS standard. Issues can be posted on a per-file basis.
 
@@ -48,6 +48,12 @@ Instead of specifying the whole of GitHub issue body on the command-line, you ca
 ./compatibility-scanner.php [...] --github-issue-body-file=/tmp/my-github-issue-body.txt
 ```
 
+To skip reporting of certain PHPCS issues, use the `--phpcs-sniffs-exclude` parameter, like this:
+
+```
+./compatibility-scanner.php [...] --phpcs-sniffs-exclude=My.Sniff.function
+```
+
 <b>Note:</b> If you want to open up Zendesk tickets later, use the `--zendesk-db` parameter, like this:
 
 ```
@@ -60,12 +66,12 @@ You can use the `--dry-run` parameter to do a test run and see how many GitHub i
 
 ### Creating Zendesk tickets
 
-If you wish to also create Zendesk tickets to notify about the GitHub issues opened, you can use the zendesk-tickets-create.php script. This script will determine, from a CSV file specified, with what users to open up tickets. It will attempt to open up only one ticket per user, listing all the GitHub issues opened up earlier by the scanning script.
+If you wish to also create Zendesk tickets to notify about the GitHub issues opened, you can use the `zendesk-tickets-create.php` script. This script will determine, from a CSV file specified, with what users to open up tickets. It will attempt to open up only one ticket per user, listing all the GitHub issues opened up earlier by the scanning script.
 
 Usage is as follow:
 
 ```
-./zendesk-tickets-create.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/" --zendesk-subdomain="myzendesksubdomain" --zendesk-access-username="user@email" --zendesk-access-token="xyz"  --zendesk-ticket-subject="PHP Upgrade: Issues that need solving" --zendesk-ticket-body="Hi! %linebreak% Some issues were found. %linebreak% See issues here: %github_issues_link%" --zendesk-ticket-status=PENDING --zendesk-csv-data-path="file.csv --zendesk-db=/tmp/zendeskdb.sqlite"
+./zendesk-tickets-create.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/" --zendesk-subdomain="myzendesksubdomain" --zendesk-access-username="user@email" --zendesk-access-token="xyz"  --zendesk-ticket-subject="PHP Upgrade: Issues that need solving" --zendesk-ticket-body="Hi! %linebreak% Some issues were found. %linebreak% See issues here: %github_issues_link%" --zendesk-ticket-status=PENDING --zendesk-csv-data-path="file.csv" --zendesk-db="/tmp/zendeskdb.sqlite"
 ```
 
 The `--zendesk-ticket-body` parameter supports `%linebreak%` strings, which will be replaced with actual line-breaks. You can use the `--zendesk-ticket-body-file` parameter to load the ticket body from a file instead. Line breaks will be preserved.
