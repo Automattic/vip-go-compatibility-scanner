@@ -48,7 +48,7 @@ Instead of specifying the whole of GitHub issue body on the command-line, you ca
 ./compatibility-scanner.php [...] --github-issue-body-file=/tmp/my-github-issue-body.txt
 ```
 
-<b>Note: If you want to open up Zendesk tickets later, use the `--zendesk-db` parameter, like this:
+<b>Note:</b> If you want to open up Zendesk tickets later, use the `--zendesk-db` parameter, like this:
 
 ```
 ./compatibility-scanner.php [...] --zendesk-db=/tmp/zendeskdb.sqlite
