@@ -21,7 +21,7 @@ final class OptionsFileOptionProcessComplementaryTest extends TestCase {
 	protected function tearDown() :void {
 		if ( ! empty(
 			$this->text_file_path
-		) {
+		) ) {
 			unlink(
 				$this->text_file_path
 			);
