@@ -164,8 +164,8 @@ final class OpenIssuesOpenIssuesTest extends TestCase {
 
 		$this->assertEquals(
 			array(
-				'issues_found' => 3,
-				'issues_opened' => 3,
+				'phpcs_issues_found' => 3,
+				'github_issues_opened' => 3,
 			),
 			$issue_statistics,
 		);

@@ -1,8 +1,8 @@
 # vip-go-compatibility-scanner
 
-Find issues in selected repositories using PHPCS.
+Find issues in selected repositories using PHPCS, report to GitHub.
 
-This tool is to be used to search for any (compatibility) issues in VIP Go repositories. It will scan a given repository with PHPCS, using a specified PHPCS standard, and then post GitHub issue for each directory that has any detected issues detailing what was found. It will add labels to each issue created, if specified, and print links to the labels in its output. Note that the tool needs to have the repository cloned and ready to be used when started.
+This tool is to be used to search for any (compatibility) issues in VIP Go repositories. It will scan a given repository with PHPCS, using a specified PHPCS standard, and then post GitHub issue for each folder that has any detected issues detailing what was found. It will add labels to each issue created, if specified, and print links to the labels in its output. Note that the tool needs to have the repository cloned and ready to be used when started.
 
 This tool can be used for any GitHub repository and with any PHPCS standard. Issues can be posted on a per-file basis.
 
@@ -10,10 +10,13 @@ The tool will also create Zendesk tickets using the REST API if set up to do so.
 
 The tool uses [vip-go-ci](https://github.com/automattic/vip-go-ci/) as a library, and uses some of its dependencies as well. See below.
 
+Note that the tool has two parts:
+ * The `compatibility-scanner.php` script will scan using PHPCS and report to GitHub. It will also save to a local database file the information needed to create Zendesk tickets later, by the other part of this tool.
+ * The `zendesk-tickets-create.php` script will create Zendesk tickets with URLs to the GitHub issues. It utilises the local database file for this purpose.
 
 ## System requirements
 
-`vip-go-compatibility-scanner` requires PHP 7.3 or later. PHP 7.4 is preferred.
+`vip-go-compatibility-scanner` requires PHP 7.3 or later. PHP 7.4 is preferred. SQLite support is required if the Zendesk functionality is to be used.
 
 ## Installing
 
@@ -23,9 +26,9 @@ Included is a script to install `vip-go-compatibility-scanner`. You can use it l
 
 This will result in `vip-go-compatibility-scanner`, `vip-go-ci` and other dependencies being installed in your home directory under `vip-go-ci-tools`.
 
-## Usage for a single repository
+## Scanning a single repository
 
-The tool itself is meant to be used on a per-repo bases. Here is an example of how it can be run:
+The compatibility-scanner.php script is meant to be used on a per-repo bases. Here is an example of how it can be run:
 
 ```
 pushd /tmp && \
@@ -42,23 +45,40 @@ Use the `--github-issue-group-by` option to switch between posting issues on a p
 Instead of specifying the whole of GitHub issue body on the command-line, you can place it in a file and use the `--github-issue-body-file` parameter instead. The file contents should meet the same requirements as the `--github-issue-body` parameter. For example:
 
 ```
-[...]
-./compatibility-scanner.php ... --github-issue-body-file=/tmp/my-github-issue-body.txt
+./compatibility-scanner.php [...] --github-issue-body-file=/tmp/my-github-issue-body.txt
 ```
 
-The same applies to the `--zendesk-issue-body` parameter. 
-
-### Zendesk functionality
-
-If you wish to also create Zendesk tickets to notify about the issues found, you can add parameters such as these to the command:
+To skip reporting of certain PHPCS issues, use the `--phpcs-sniffs-exclude` parameter, like this:
 
 ```
---zendesk-access-username="user@email" --zendesk-access-token="xyz" --zendesk-subdomain="myzendesksubdomain" --zendesk-ticket-subject="PHP Upgrade: Issues that need solving" --zendesk-ticket-body="Hi! %linebreak% Some issues were found. %linebreak% See issues here: %github_issues_link%" --zendesk-csv-data-path="file.csv"
+./compatibility-scanner.php [...] --phpcs-sniffs-exclude=My.Sniff.function
 ```
 
-The `--zendesk-ticket-body` parameter supports `%linebreak%` strings, which will be replaced with actual line-breaks. 
+<b>Note:</b> If you want to open up Zendesk tickets later, use the `--zendesk-db` parameter, like this:
+
+```
+./compatibility-scanner.php [...] --zendesk-db=/tmp/zendeskdb.sqlite
+```
+
+You can run many scans in a sequence and then run the Zendesk script.
+
+You can use the `--dry-run` parameter to do a test run and see how many GitHub issues would be opened.
+
+### Creating Zendesk tickets
+
+If you wish to also create Zendesk tickets to notify about the GitHub issues opened, you can use the `zendesk-tickets-create.php` script. This script will determine, from a CSV file specified, with what users to open up tickets. It will attempt to open up only one ticket per user, listing all the GitHub issues opened up earlier by the scanning script.
+
+Usage is as follow:
+
+```
+./zendesk-tickets-create.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/" --zendesk-subdomain="myzendesksubdomain" --zendesk-access-username="user@email" --zendesk-access-token="xyz"  --zendesk-ticket-subject="PHP Upgrade: Issues that need solving" --zendesk-ticket-body="Hi! %linebreak% Some issues were found. %linebreak% See issues here: %github_issues_link%" --zendesk-ticket-status=PENDING --zendesk-csv-data-path="file.csv" --zendesk-db="/tmp/zendeskdb.sqlite"
+```
+
+The `--zendesk-ticket-body` parameter supports `%linebreak%` strings, which will be replaced with actual line-breaks. You can use the `--zendesk-ticket-body-file` parameter to load the ticket body from a file instead. Line breaks will be preserved.
 
 The `--zendesk-ticket-tags` parameter is optional and supports a comma separated list of tags to be added. 
+
+The `--zendesk-ticket-group-id` parameter is optional as well, and expects an integer. 
 
 The `--zendesk-csv-data-path` parameter should point to a CSV file that is used to pair together the repository and the email address used as assignee of the Zendesk ticket. The CSV should look like this:
 
@@ -68,6 +88,8 @@ email@email,repoowner/reponame
 ```
 
 The first line should always specify columns. You can specify as many repositories and emails as needed.
+
+This script also supports the `--dry-run` parameter; this will output tickets created.
 
 ## Usage for multiple repositories
 
@@ -91,5 +113,5 @@ The parameters are the following, respectively:
  * PHPCS runtime set
  * Git branch to check out
 
-There are also optional parameters for Zendesk. See help message.
+There is also optional parameter for Zendesk. See help message.
 
