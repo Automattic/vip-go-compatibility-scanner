@@ -11,8 +11,8 @@ The tool will also create Zendesk tickets using the REST API if set up to do so.
 The tool uses [vip-go-ci](https://github.com/automattic/vip-go-ci/) as a library, and uses some of its dependencies as well. See below.
 
 Note that the tool has two parts:
- * The compatibility-scanner.php script will scan using PHPCS and report to GitHub. It will also save to a local database file the information needed to create Zendesk tickets later, by the other part of this tool.
- * The zendesk-tickets-create.php script will create Zendesk tickets with URLs to the GitHub issues. It utilises the local database file for this purpose.
+ * The `compatibility-scanner.php` script will scan using PHPCS and report to GitHub. It will also save to a local database file the information needed to create Zendesk tickets later, by the other part of this tool.
+ * The `zendesk-tickets-create.php` script will create Zendesk tickets with URLs to the GitHub issues. It utilises the local database file for this purpose.
 
 ## System requirements
 
