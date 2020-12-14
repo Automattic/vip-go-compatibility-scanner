@@ -26,7 +26,7 @@ Included is a script to install `vip-go-compatibility-scanner`. You can use it l
 
 This will result in `vip-go-compatibility-scanner`, `vip-go-ci` and other dependencies being installed in your home directory under `vip-go-ci-tools`.
 
-## Usage for a single repository
+## Scanning a single repository
 
 The compatibility-scanner.php script is meant to be used on a per-repo bases. Here is an example of how it can be run:
 
@@ -45,30 +45,34 @@ Use the `--github-issue-group-by` option to switch between posting issues on a p
 Instead of specifying the whole of GitHub issue body on the command-line, you can place it in a file and use the `--github-issue-body-file` parameter instead. The file contents should meet the same requirements as the `--github-issue-body` parameter. For example:
 
 ```
-[...]
-./compatibility-scanner.php ... --github-issue-body-file=/tmp/my-github-issue-body.txt
+./compatibility-scanner.php [...] --github-issue-body-file=/tmp/my-github-issue-body.txt
 ```
 
-Note: If you want to open up Zendesk tickets later, use the `--zendesk-db` parameter, like this:
+<b>Note: If you want to open up Zendesk tickets later, use the `--zendesk-db` parameter, like this:
 
 ```
-[...]
-./compatibility-scanner.php ... --zendesk-db=/tmp/zendeskdb.sqlite
+./compatibility-scanner.php [...] --zendesk-db=/tmp/zendeskdb.sqlite
 ```
 
-### Zendesk functionality
+You can run many scans in a sequence and then run the Zendesk script.
 
-If you wish to also create Zendesk tickets to notify about the issues found, you can use the zendesk-tickets-create.php script:
+You can use the `--dry-run` parameter to do a test run and see how many GitHub issues would be opened.
+
+### Creating Zendesk tickets
+
+If you wish to also create Zendesk tickets to notify about the GitHub issues opened, you can use the zendesk-tickets-create.php script. This script will determine, from a CSV file specified, with what users to open up tickets. It will attempt to open up only one ticket per user, listing all the GitHub issues opened up earlier by the scanning script.
+
+Usage is as follow:
 
 ```
-./zendesk-tickets-create.php --zendesk-access-username="user@email" --zendesk-access-token="xyz" --zendesk-subdomain="myzendesksubdomain" --zendesk-ticket-subject="PHP Upgrade: Issues that need solving" --zendesk-ticket-body="Hi! %linebreak% Some issues were found. %linebreak% See issues here: %github_issues_link%" --zendesk-csv-data-path="file.csv --zendesk-db=/tmp/zendeskdb.sqlite"
+./zendesk-tickets-create.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/" --zendesk-subdomain="myzendesksubdomain" --zendesk-access-username="user@email" --zendesk-access-token="xyz"  --zendesk-ticket-subject="PHP Upgrade: Issues that need solving" --zendesk-ticket-body="Hi! %linebreak% Some issues were found. %linebreak% See issues here: %github_issues_link%" --zendesk-ticket-status=PENDING --zendesk-csv-data-path="file.csv --zendesk-db=/tmp/zendeskdb.sqlite"
 ```
 
-The `--zendesk-ticket-body` parameter supports `%linebreak%` strings, which will be replaced with actual line-breaks. 
-
-You can use the `--zendesk-ticket-body-file` parameter to load the ticket body from a file. Line breaks will be preserved.
+The `--zendesk-ticket-body` parameter supports `%linebreak%` strings, which will be replaced with actual line-breaks. You can use the `--zendesk-ticket-body-file` parameter to load the ticket body from a file instead. Line breaks will be preserved.
 
 The `--zendesk-ticket-tags` parameter is optional and supports a comma separated list of tags to be added. 
+
+The `--zendesk-ticket-group-id` parameter is optional as well, and expects an integer. 
 
 The `--zendesk-csv-data-path` parameter should point to a CSV file that is used to pair together the repository and the email address used as assignee of the Zendesk ticket. The CSV should look like this:
 
@@ -78,6 +82,8 @@ email@email,repoowner/reponame
 ```
 
 The first line should always specify columns. You can specify as many repositories and emails as needed.
+
+This script also supports the `--dry-run` parameter; this will output tickets created.
 
 ## Usage for multiple repositories
 
