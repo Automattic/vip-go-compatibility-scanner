@@ -9,7 +9,8 @@ function vipgocs_open_issues(
 	$all_results,
 	$git_branch,
 	$labels,
-	$assignees = array()
+	$assignees = array(),
+	$emulate_only = false
 ) {
 
 	/*
@@ -17,12 +18,12 @@ function vipgocs_open_issues(
 	 * we do.
 	 */
 	$issue_statistics = array(
-		'issues_found'	=> 0,
-		'issues_opened'	=> 0,
+		'phpcs_issues_found'	=> 0,
+		'github_issues_opened'	=> 0,
 	);
 
 	vipgoci_log(
-		'Opening up issues on GitHub for problems found',
+		( $emulate_only ? 'Emulating o' : 'O' ) . 'pening up issues on GitHub for problems found',
 		array(
 			'repo-owner'			=> $options['repo-owner'],
 			'repo-name'			=> $options['repo-name'],
@@ -30,6 +31,7 @@ function vipgocs_open_issues(
 			'github_issue_body'		=> $options['github-issue-body'],
 			'issues'			=> $all_results,
 			'assignees'			=> $assignees,
+			'emulate_only'			=> $emulate_only,
 		)
 	);
 
@@ -101,7 +103,7 @@ function vipgocs_open_issues(
 			$error_msg .=
 				PHP_EOL . PHP_EOL;
 
-			$issue_statistics['issues_found']++;
+			$issue_statistics['phpcs_issues_found']++;
 		}
 
 		$github_url =
@@ -140,14 +142,15 @@ function vipgocs_open_issues(
 			$github_req_body['assignees'] = $assignees;
 		}
 
+		if ( false === $emulate_only ) {
+			$res = vipgoci_github_post_url(
+				$github_url,
+				$github_req_body,
+				$options['token']
+			);
+		}
 
-		$res = vipgoci_github_post_url(
-			$github_url,
-			$github_req_body,
-			$options['token']
-		);
-
-		$issue_statistics['issues_opened']++;
+		$issue_statistics['github_issues_opened']++;
 
 		/*
 		 * Clean up and return.
@@ -164,7 +167,7 @@ function vipgocs_open_issues(
 	}
 
 	vipgoci_log(
-		'Finished opening up issues on GitHub',
+		( $emulate_only ? 'Emulated' : 'Finished' ) . ' opening up issues on GitHub',
 		array(
 			'issue_statistics' => $issue_statistics,
 		)

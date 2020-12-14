@@ -49,6 +49,7 @@ function vipgocs_compatibility_scanner() {
 		array(
 			'help',
 			'vipgoci-path:',
+			'dry-run:',
 			'repo-owner:',
 			'repo-name:',
 			'token:',
@@ -117,6 +118,9 @@ function vipgocs_compatibility_scanner() {
 			PHP_EOL .
 			"\t" . '--vipgoci-path=STRING	            Path to were vip-go-ci lives, should be folder. ' . PHP_EOL .
 			PHP_EOL .
+			"\t" . '--dry-run=BOOL                      If set to true, will do scanning of code and then ' . PHP_EOL .
+			"\t" . '                                    exit without submitting GitHub issues.' . PHP_EOL .
+			PHP_EOL .
 			"\t" . '--repo-owner=STRING	            Specify repository owner, can be an organization' . PHP_EOL .
 			"\t" . '--repo-name=STRING                  Specify name of the repository' . PHP_EOL .
 			"\t" . '--token=STRING		            The access-token to use to communicate with GitHub' . PHP_EOL .
@@ -159,6 +163,15 @@ function vipgocs_compatibility_scanner() {
 	vipgocs_vipgoci_load(
 		$options,
 		'vipgoci-path'
+	);
+
+	/*
+	 * Parse --dry-run parameter
+	 */
+	vipgoci_option_bool_handle(
+		$options,
+		'dry-run',
+		'false'
 	);
 
 	/*
@@ -439,9 +452,39 @@ function vipgocs_compatibility_scanner() {
 		$all_results,
 		$git_branch,
 		$options['github-labels'],
-		$assignees
+		$assignees,
+		$options['dry-run']
 	);
 
+	/*
+	 * If set to dry-run, exit here,
+	 * closing Zendesk DB connection.
+	 */
+
+	if ( true === $options['dry-run'] ) {
+		if ( ! empty(
+			$zendesk_db_conn
+		) ) {
+			vipgocs_zendesk_db_close(
+				$zendesk_db_conn
+			);
+		}
+
+		vipgoci_log(
+			sprintf(
+				'Dry-run complete. Would open GitHub %d issues, found PHPCS %d issues',
+				$issue_statistics[
+					'github_issues_opened'
+				],
+				$issue_statistics[
+					'phpcs_issues_found'
+				]
+			),
+			$issue_statistics
+		);
+
+		exit ( 0 );
+	}
 	/*
 	 * Construct links to issues,
 	 * use labels to search.
@@ -461,9 +504,9 @@ function vipgocs_compatibility_scanner() {
 
 
 	if (
-		( ! empty( $options['zendesk-db'] ) )
+		( ! empty( $zendesk_db_conn ) )
 		&&
-		( $issue_statistics['issues_opened'] > 0 )
+		( $issue_statistics['github_issues_opened'] > 0 )
 	) {
 		vipgoci_log(
 			'Logging created GitHub issues into Zendesk DB....',
@@ -500,9 +543,13 @@ function vipgocs_compatibility_scanner() {
 	/*
 	 * Close connection to DB.
 	 */
-	vipgocs_zendesk_db_close(
+	if ( ! empty(
 		$zendesk_db_conn
-	);
+	) ) {
+		vipgocs_zendesk_db_close(
+			$zendesk_db_conn
+		);
+	}
 
 	/*
 	 * Collect counter-information.
