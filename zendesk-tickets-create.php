@@ -229,6 +229,9 @@ function vipgocs_zendesk_tickets_create() {
 			(int) $options['zendesk-ticket-group-id'];
 	}
 
+	else {
+		$options['zendesk-ticket-group-id'] = null;
+	}
 	
 	$valid_ticket_statuses = array(
 		'new', 'open', 'pending', 'hold', 'solved', 'closed'

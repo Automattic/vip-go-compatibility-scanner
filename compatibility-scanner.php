@@ -57,6 +57,7 @@ function vipgocs_compatibility_scanner() {
 			'phpcs-path:',
 			'phpcs-standard:',
 			'phpcs-runtime-set:',
+			'phpcs-sniffs-exclude:',
 			'github-labels:',
 			'github-issue-title:',
 			'github-issue-body:',
