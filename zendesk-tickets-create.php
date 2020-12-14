@@ -46,6 +46,7 @@ function vipgocs_zendesk_tickets_create() {
 		null,
 		array(
 			'help',
+			'dry-run:',
 			'vipgoci-path:',
 			'zendesk-subdomain:',
 			'zendesk-access-username:',
@@ -75,25 +76,25 @@ function vipgocs_zendesk_tickets_create() {
 			$options['zendesk-db']
 		) )
 		||
-                (
-                        ( ! isset(
-                                $options['zendesk-ticket-body-file']
-                        ) )
-                        &&
-                        ( ! isset(
-                                $options['zendesk-ticket-body']
-                        ) )
-                )
+		(
+			( ! isset(
+				$options['zendesk-ticket-body-file']
+			) )
+			&&
+			( ! isset(
+				$options['zendesk-ticket-body']
+			) )
+		)
 		||
-                (
-                        ( ! isset(
-                                $options['zendesk-access-token']
-                        ) )
-                        &&
-                        ( ! isset(
-                                $options['zendesk-access-password']
-                        ) )
-                )
+		(
+			( ! isset(
+				$options['zendesk-access-token']
+			) )
+			&&
+			( ! isset(
+				$options['zendesk-access-password']
+			) )
+		)
 		||
 		(
 			( isset( $options['help'] ) )
@@ -111,6 +112,9 @@ function vipgocs_zendesk_tickets_create() {
 			"\t" . "Note that some parameters have a complementary '-file' parameter (see below)." . PHP_EOL .
 			PHP_EOL .
 			"\t" . '--vipgoci-path=STRING	            Path to were vip-go-ci lives, should be folder. ' . PHP_EOL .
+			PHP_EOL .
+			"\t" . '--dry-run=BOOL                      If set to true, will not open Zendesk tickets, ' . PHP_EOL .
+			"\t" . '                                    but report which ones would be opened. ' . PHP_EOL .
 			PHP_EOL .
 			"\t" . '--zendesk-subdomain=STRING          Subdomain to use when communicating with Zendesk. ' . PHP_EOL .
 			"\t" . '--zendesk-access-username=STRING    Username of the Zendesk user to use.' . PHP_EOL .
@@ -147,6 +151,15 @@ function vipgocs_zendesk_tickets_create() {
 	vipgocs_vipgoci_load(
 		$options,
 		'vipgoci-path'
+	);
+
+	/*
+	 * Parse --dry-run parameter
+	*/
+	vipgoci_option_bool_handle(
+		$options,
+		'dry-run',
+		'false'
 	);
 
 	/*
@@ -422,6 +435,20 @@ function vipgocs_zendesk_tickets_create() {
 		}
 
 		unset( $tmp_item );
+
+		if ( true === $options['dry-run'] ) {
+			vipgoci_log(
+				sprintf(
+					'Would open up Zendesk ticket for user %s with links',
+						$zendesk_requestee_email
+				),
+				array(
+					'github_links'	=> $zendesk_requestee_github_links,
+				)
+			);
+
+			continue;
+		}
 
 		$zendesk_ticket_url_item = vipgocs_zendesk_open_ticket(
 			$options,
