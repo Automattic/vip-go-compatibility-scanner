@@ -43,7 +43,7 @@ This will result in `vip-go-compatibility-scanner`, `vip-go-ci` and other depend
 If installation fails due to missing system requirements, once they've been installed you'll need to delete the lock file before attempting the installation again.
 
 ```
-rm .vip-go-ci-tools-init.lck
+rm -iv $HOME/.vip-go-ci-tools-init.lck
 ```
 
 ## Scanning a single repository
