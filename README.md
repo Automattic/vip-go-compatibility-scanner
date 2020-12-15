@@ -16,15 +16,35 @@ Note that the tool has two parts:
 
 ## System requirements
 
-`vip-go-compatibility-scanner` requires PHP 7.3 or later. PHP 7.4 is preferred. SQLite support is required if the Zendesk functionality is to be used.
+- PHP 7.3 or later. PHP 7.4 is preferred. 
+- SQLite support is required if the Zendesk functionality is to be used.
+
+On macOS the following requirements also need to me installed.
+
+- wget
+- md5sha1sum
+
+Use the following to install using [Homebrew](https://brew.sh/)
+
+```
+brew install wget md5sha1sum
+```
 
 ## Installing
 
 Included is a script to install `vip-go-compatibility-scanner`. You can use it like this:
 
-> wget https://raw.githubusercontent.com/Automattic/vip-go-compatibility-scanner/master/install.sh && bash ./install.sh 
+```
+wget https://raw.githubusercontent.com/Automattic/vip-go-compatibility-scanner/master/install.sh && bash ./install.sh 
+```
 
 This will result in `vip-go-compatibility-scanner`, `vip-go-ci` and other dependencies being installed in your home directory under `vip-go-ci-tools`.
+
+If installation fails due to missing system requirements, once they've been installed you'll need to delete the lock file before attempting the installation again.
+
+```
+rm .vip-go-ci-tools-init.lck
+```
 
 ## Scanning a single repository
 
