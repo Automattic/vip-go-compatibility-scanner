@@ -43,8 +43,15 @@ jobs:
     steps:
       - build-cmd
 
+  testphp80:
+    docker:
+      - image: circleci/php:8.0.1-cli
+    steps:
+      - build-cmd
+
 workflows:
   vipgocompatibilityscannertests:
     jobs:
      - testphp73
      - testphp74
+     - testphp80
