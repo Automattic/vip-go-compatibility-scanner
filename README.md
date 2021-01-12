@@ -18,13 +18,14 @@ Note that the tool has two parts:
 
 - PHP 7.3 or later. PHP 7.4 is preferred. 
 - SQLite support is required if the Zendesk functionality is to be used.
+- Linux is a preferred OS for `vip-go-compatibility-scanner`, but it should work on other platforms as well.
 
-On macOS the following requirements also need to me installed.
+On macOS the following requirements also need to be installed:
 
 - wget
 - md5sha1sum
 
-Use the following to install using [Homebrew](https://brew.sh/)
+Use the following to install using [Homebrew](https://brew.sh/):
 
 ```
 brew install wget md5sha1sum
