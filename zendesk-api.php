@@ -62,7 +62,7 @@ function vipgocs_zendesk_search_for_user(
 	);
 
 	$zendesk_api_datafields = array(
-		'query' => 'type:user "' . $email . '"'
+		'query' => 'type:user email:"' . $email . '"'
 	);
 
 	$resp_data = vipgocs_zendesk_send_request(
