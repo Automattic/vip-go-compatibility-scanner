@@ -36,8 +36,8 @@ function vipgocs_vipgoci_load(
 		exit(253);
 	}
 
-	if ( ! is_file( $options[ $option_name ] . '/main.php' ) ) {
-		echo 'No main.php found in --' . $option_name . ' ; is it a valid vip-go-ci installation?' . PHP_EOL;
+	if ( ! is_file( $options[ $option_name ] . '/requires.php' ) ) {
+		echo 'No requires.php found in --' . $option_name . ' ; is it a valid vip-go-ci installation?' . PHP_EOL;
 		exit(253);
 	}
 
@@ -47,7 +47,7 @@ function vipgocs_vipgoci_load(
 	echo 'Attempting to include vip-go-ci...' . PHP_EOL;
 
 	require_once(
-		$options[ $option_name ] . '/main.php'
+		$options[ $option_name ] . '/requires.php'
 	);
 
 	vipgoci_log(
