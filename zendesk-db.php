@@ -105,7 +105,7 @@ function vipgocs_zendesk_db_write_github_issue(
 /*
  * Fetch all GitHub issues from DB,
  * merge all that belong to the same
- * repo-owner/repo-name combination into 
+ * repo-owner/repo-name combination into
  * one group.
  */
 function vipgocs_zendesk_db_get_github_issues(

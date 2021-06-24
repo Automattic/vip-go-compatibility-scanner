@@ -295,7 +295,7 @@ function vipgocs_zendesk_send_request(
 		( defined( 'VIPGOCS_UNIT_TESTING' ) ) &&
 		( true === VIPGOCS_UNIT_TESTING )
 	) {
-		$zendesk_api_url = 
+		$zendesk_api_url =
 			VIPGOCI_GITHUB_BASE_URL;
 	}
 
@@ -445,9 +445,9 @@ function vipgocs_zendesk_send_request(
  * password authentication, and username and token
  * authentication. Here we check if required
  * fields are present for either of these,
- * and if not, we return null. 
+ * and if not, we return null.
 
- * There is also a check for existance of a subdomain 
+ * There is also a check for existance of a subdomain
  * field, resulting in returning null when not existing.
  */
 

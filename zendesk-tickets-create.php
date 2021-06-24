@@ -251,7 +251,7 @@ function vipgocs_zendesk_tickets_create() {
 			$valid_ticket_statuses
 		) ) {
 			vipgoci_sysexit(
-				'Invalid argument provided to option --zendesk-ticket-status; should be one of: ' . 
+				'Invalid argument provided to option --zendesk-ticket-status; should be one of: ' .
 					join( ', ', $valid_ticket_statuses )
 			);
 		}
