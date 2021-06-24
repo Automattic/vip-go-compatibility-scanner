@@ -55,3 +55,38 @@ function vipgocs_vipgoci_load(
 	);
 }
 
+/*
+ * Check if file only has
+ * whitespacing.
+ */
+function vipgocs_file_with_whitespacing_only(
+	string $file_path,
+	string $whitespacing_chars = " \n\r\t\v\0"
+) {
+	$file_contents = file_get_contents(
+		$file_path
+	);
+
+	/*
+	 * In case of error, return null.
+	 */
+	if ( false === $file_contents ) {
+		return null;
+	}
+
+	/*
+	 * Remove all whitespacing from the
+	 * file contents; if there is no content
+	 * left after that the file is only whitespacing.
+	 */
+	$file_contents = trim( $file_contents, $whitespacing_chars );
+
+	if ( '' === $file_contents ) {
+		return true;
+	}
+
+	/*
+	 * There is content, so return false.
+	 */
+	return false;
+}
