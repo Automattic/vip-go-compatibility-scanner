@@ -112,7 +112,7 @@ function vipgocs_csv_get_email_for_repo(
 			continue;
 		}
 
-		if ( 
+		if (
 			$csv_item['source_repo'] !==
 			$repo_owner .'/' . $repo_name
 		) {
