@@ -72,7 +72,7 @@ final class FileWithWhiteSpacingOnlyTest extends TestCase {
 		$tmp_bytes_written = file_put_contents(
 			$tmp_file_name,
 			"\n\r\n\r\n\r\n\t         " . PHP_EOL .
-			'<?php if (isset( $test ) ) { }' . PHP_EOL
+			'<?php if (isset( $test ) ) { }' . PHP_EOL .
 			"\n\r\n\r  " . PHP_EOL
 		);
 
