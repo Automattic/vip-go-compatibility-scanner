@@ -1,8 +1,12 @@
 <?php
 
+namespace Vipgocs\tests;
+
 require_once( __DIR__ . '/IncludesForTests.php' );
 
 use PHPUnit\Framework\TestCase;
+
+// phpcs:disable PSR1.Files.SideEffects
 
 final class OpenIssuesOpenIssuesTest extends TestCase {
 	var $options_php = array(
