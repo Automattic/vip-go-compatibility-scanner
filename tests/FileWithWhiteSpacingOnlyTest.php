@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 final class FileWithWhiteSpacingOnlyTest extends TestCase {
 	/**
-	 * @covers ::vipgocs_file_with_whitespacing_only
+	 * @covers ::vipgocs_file_empty_or_whitespace_only
 	 */
 	public function testFileWithWhiteSpacingOnlyTrue() {
 		$tmp_file_name = tempnam(
@@ -42,14 +42,14 @@ final class FileWithWhiteSpacingOnlyTest extends TestCase {
 		}
 
 		$this->assertTrue(
-			vipgocs_file_with_whitespacing_only( $tmp_file_name, " \n\r\t\v\0" )
+			vipgocs_file_empty_or_whitespace_only( $tmp_file_name, " \n\r\t\v\0" )
 		);
 
 		unlink( $tmp_file_name );
 	}
 
 	/**
-	 * @covers ::vipgocs_file_with_whitespacing_only
+	 * @covers ::vipgocs_file_empty_or_whitespace_only
 	 */
 	public function testFileWithWhiteSpacingOnlyFalse() {
 		$tmp_file_name = tempnam(
@@ -87,7 +87,7 @@ final class FileWithWhiteSpacingOnlyTest extends TestCase {
 		}
 
 		$this->assertFalse(
-			vipgocs_file_with_whitespacing_only( $tmp_file_name, " \n\r\t\v\0" )
+			vipgocs_file_empty_or_whitespace_only( $tmp_file_name, " \n\r\t\v\0" )
 		);
 
 		unlink( $tmp_file_name );
