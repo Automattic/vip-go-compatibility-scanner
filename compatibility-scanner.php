@@ -14,13 +14,126 @@ require_once( __DIR__ . '/utils.php' );
 define( 'VIPGOCI_INCLUDED', true );
 
 /*
- * main() -- prepare to do actual work,
- * invoke functions that do the work.
+ * Return array with options recognized.
+ *
+ * @codeCoverageIgnore
  */
+function vipgocs_options_recognized(): array {
+	return array(
+		/*
+		 * General configuration
+		 */
+		'vipgoci-path:',
+		'dry-run:',
+		'local-git-repo:',
+		'help',
 
-function vipgocs_compatibility_scanner() {
+		/*
+		 * PHPCS configuration
+		 */
+		'phpcs-path:',
+		'phpcs-standard:',
+		'phpcs-severity:',
+		'phpcs-runtime-set:',
+		'phpcs-sniffs-exclude:',
+
+		/*
+		 * GitHub reviews configuration
+		 */
+		'review-comments-ignore:',
+
+		/*
+		 * GitHub configuration
+		 */
+		'repo-owner:',
+		'repo-name:',
+		'token:',
+		'github-labels:',
+		'github-issue-title:',
+		'github-issue-body:',
+		'github-issue-body-file:',
+		'github-issue-assign:',
+		'github-issue-group-by:',
+
+		/*
+		 * Zendesk DB
+		 */
+		'zendesk-db:',
+		'zendesk-access-username:', // For sanity-checking
+	);
+}
+
+/*
+ * Print help message.
+ *
+ * @codeCoverageIgnore
+ */
+function vipgocs_help( ) :void {
 	global $argv;
 
+	print 'Usage: ' . $argv[0] . PHP_EOL .
+		"\t" . 'Options --vipgoci-path, --local-git-repo, --phpcs-path, --phpcs-standard,' . PHP_EOL .
+		"\t" . '        --repo-owner, --repo-name, --token, --github-issue-title,' . PHP_EOL .
+		"\t" . '        --github-issue-body are mandatory parameters.' . PHP_EOL .
+		PHP_EOL .
+		"\t" . "Note that some parameters have a complementary '-file' parameter (see below)." . PHP_EOL .
+		PHP_EOL .
+		"\t" . 'General configuration:' . PHP_EOL.
+		"\t" . '--help                              Prints this message.' . PHP_EOL .
+		"\t" . '--vipgoci-path=STRING	            Path to were vip-go-ci lives, should be folder.' . PHP_EOL .
+		"\t" . '--dry-run=BOOL                      If set to true, will do scanning of code and then' . PHP_EOL .
+		"\t" . '                                    exit without submitting GitHub issues.' . PHP_EOL .
+		"\t" . '--local-git-repo=FILE	            The local git repository to use for direct access to code.' . PHP_EOL .
+		"\t" . '--skip-empty-files=BOOL             Will not scan files that are empty or consist only of whitespace.' . PHP_EOL .
+		PHP_EOL .
+		"\t" . 'PHPCS configuration:' . PHP_EOL .
+		"\t" . '--phpcs-path=FILE                   Full path to PHPCS script.' . PHP_EOL .
+		"\t" . '--phpcs-standard=STRING             Specify which PHPCS standard to use.' . PHP_EOL .
+		"\t" . '--phpcs-severity=NUMBER             Specify severity for PHPCS.' . PHP_EOL .
+		"\t" . '--phpcs-runtime-set=STRING          Specify --runtime-set values passed on to PHPCS' . PHP_EOL .
+		"\t" . '				    -- expected to be a comma-separated value string of' . PHP_EOL .
+		"\t" . '				    key-value pairs.' . PHP_EOL .
+		"\t" . '				    For example: --phpcs-runtime-set="foo1 bar1, foo2,bar2"' . PHP_EOL .
+		"\t" . '--phpcs-sniffs-exclude=ARRAY        Specify which sniffs to exclude from PHPCS scanning,' . PHP_EOL .
+		"\t" . '				    should be an array with items separated by commas.' . PHP_EOL .
+		PHP_EOL .
+		"\t" . 'GitHub reviews configuration:' . PHP_EOL .
+		"\t" . '--review-comments-ignore=ARRAY      Array of issues to be filtered away before posting results to GitHub.' . PHP_EOL .
+		PHP_EOL .
+		"\t" . 'GitHub configuration:' . PHP_EOL .
+		"\t" . '--repo-owner=STRING	            Specify repository owner, can be an organization.' . PHP_EOL .
+		"\t" . '--repo-name=STRING                  Specify name of the repository.' . PHP_EOL .
+		"\t" . '--token=STRING		            The access-token to use to communicate with GitHub.' . PHP_EOL .
+		"\t" . '--github-labels=STRING	            Comma separated list of labels to attach to GitHub issues opened.' . PHP_EOL .
+		"\t" . '--github-issue-title=STRING         Title prefix to use for GitHub issues created.' . PHP_EOL .
+		"\t" . '--github-issue-body=STRING          Body for each created GitHub issue.' . PHP_EOL .
+		"\t" . '                                    The option supports tokens that will be replaced with values:' . PHP_EOL .
+		"\t" . '				      * %error_msg%: Will be replaced with problems noted.' . PHP_EOL .
+		"\t" . '				      * %branch_name%: Will be replaced with name of current branch.' . PHP_EOL .
+		"\t" . '--github-issue-body-file=FILE       A file to read the content of --github-issue-body parameter' . PHP_EOL .
+		"\t" . '                                    instead of specifying the parameter itself.' . PHP_EOL .
+		"\t" . '--github-issue-assign=STRING        Assign specified admins as collaborators for each created issue' . PHP_EOL .
+		"\t" . '				    -- outside, direct, or all.' . PHP_EOL .
+		"\t" . '--github-issue-group-by=STRING      How to group the issues found; either by "file" or "folder" --' . PHP_EOL .
+		"\t" . '                                    "folder" is default.' . PHP_EOL .
+		PHP_EOL .
+		"\t" . 'Zendesk configuration:' . PHP_EOL .
+		"\t" . '--zendesk-db=FILE                   File to store URLs to GitHub issues for later processing' . PHP_EOL .
+		"\t" . '                                    by the zendesk-tickets-create.php utility.' . PHP_EOL .
+		PHP_EOL;
+}
+
+
+/*
+ * Prepare to do actual work.
+ *
+ * @codeCoverageIgnore
+ */
+function vipgocs_compatibility_scanner_init(
+	array &$options,
+	int &$startup_time,
+	&$zendesk_db_conn
+) :void {
 	$zendesk_db_conn = null;
 
 	echo 'Initializing...' . PHP_EOL;
@@ -46,27 +159,7 @@ function vipgocs_compatibility_scanner() {
 	 */
 	$options = getopt(
 		null,
-		array(
-			'help',
-			'vipgoci-path:',
-			'dry-run:',
-			'repo-owner:',
-			'repo-name:',
-			'token:',
-			'local-git-repo:',
-			'phpcs-path:',
-			'phpcs-standard:',
-			'phpcs-runtime-set:',
-			'phpcs-sniffs-exclude:',
-			'github-labels:',
-			'github-issue-title:',
-			'github-issue-body:',
-			'github-issue-body-file:',
-			'github-issue-assign:',
-			'github-issue-group-by:',
-			'zendesk-db:',
-			'zendesk-access-username:', // For sanity-checking
-		)
+		vipgocs_options_recognized()
 	);
 
 	if ( isset(
@@ -110,49 +203,8 @@ function vipgocs_compatibility_scanner() {
 			echo 'Error: Essential parameter missing.' . PHP_EOL;
 		}
 
-		print 'Usage: ' . $argv[0] . PHP_EOL .
-			"\t" . 'Options --vipgoci-path, --repo-owner, --repo-name, --token, ' . PHP_EOL .
-			"\t" . '	--github-issue-title, --github-issue-body, --local-git-repo' . PHP_EOL .
-			"\t" . '	--phpcs-path, --phpcs-standard are mandatory parameters' . PHP_EOL .
-			PHP_EOL .
-			"\t" . "Note that some parameters have a complementary '-file' parameter (see below)." . PHP_EOL .
-			PHP_EOL .
-			"\t" . '--vipgoci-path=STRING	            Path to were vip-go-ci lives, should be folder. ' . PHP_EOL .
-			PHP_EOL .
-			"\t" . '--dry-run=BOOL                      If set to true, will do scanning of code and then ' . PHP_EOL .
-			"\t" . '                                    exit without submitting GitHub issues.' . PHP_EOL .
-			PHP_EOL .
-			"\t" . '--repo-owner=STRING	            Specify repository owner, can be an organization' . PHP_EOL .
-			"\t" . '--repo-name=STRING                  Specify name of the repository' . PHP_EOL .
-			"\t" . '--token=STRING		            The access-token to use to communicate with GitHub' . PHP_EOL .
-			"\t" . '--github-labels=STRING	            Comma separated list of labels to attach to GitHub issues opened.' . PHP_EOL .
-			"\t" . '--github-issue-title=STRING         Title to use for GitHub issues created.' . PHP_EOL .
-			"\t" . '--github-issue-body=STRING          Body for each created GitHub issue. ' . PHP_EOL .
-			"\t" . '                                    The option supports tokens that will be replaced with values: ' . PHP_EOL .
-			"\t" . '				      * %error_msg%: Will be replaced with problems noted. ' . PHP_EOL .
-			"\t" . '				      * %branch_name%: Will be replaced with name of current branch. ' . PHP_EOL .
-
-			"\t" . '--github-issue-body-file=FILE       A file to read the content of --github-issue-body parameter' . PHP_EOL .
-			"\t" . '                                    instead of specifying the parameter itself.' . PHP_EOL .
-			"\t" . '--github-issue-assign=STRING        Assign specified admins as collaborators for each created issue' . PHP_EOL .
-			"\t" . '				    -- outside, direct, or all.' . PHP_EOL .
-			"\t" . '--github-issue-group-by=STRING      How to group the issues found; either by "file" or "folder".' . PHP_EOL .
-			"\t" . '                                    "folder" is default.' . PHP_EOL .
-			PHP_EOL .
-			"\t" . '--local-git-repo=FILE	            The local git repository to use for direct access to code' . PHP_EOL .
-			PHP_EOL .
-			"\t" . '--phpcs-path=FILE                   Full path to PHPCS script' . PHP_EOL .
-			"\t" . '--phpcs-standard=STRING             Specify which PHPCS standard to use' . PHP_EOL .
-			"\t" . '--phpcs-runtime-set=STRING          Specify --runtime-set values passed on to PHPCS' . PHP_EOL .
-			"\t" . '				    -- expected to be a comma-separated value string of ' . PHP_EOL .
-			"\t" . '				    key-value pairs.' . PHP_EOL .
-			"\t" . '				    For example: --phpcs-runtime-set="foo1 bar1, foo2,bar2"' . PHP_EOL .
-			"\t" . '--phpcs-sniffs-exclude=ARRAY        Specify which sniffs to exclude from PHPCS scanning, ' . PHP_EOL .
-			"\t" . '				    should be an array with items separated by commas. ' . PHP_EOL .
-			PHP_EOL .
-			"\t" . '--zendesk-db=FILE             File to store URLs to GitHub issues for later processing ' . PHP_EOL .
-			"\t" . '                                    by the zendesk-tickets-create.php utility. ' . PHP_EOL .
-			PHP_EOL;
+		// Print help.
+		vipgocs_help( );
 
 		exit(253);
 	}
@@ -176,6 +228,15 @@ function vipgocs_compatibility_scanner() {
 	);
 
 	/*
+	 * Parse --skip-empty-files
+	 */
+	vipgoci_option_bool_handle(
+		$options,
+		'skip-empty-files',
+		'true'
+	);
+
+	/*
 	 * Read the parameter's '-file' counterpart from file if
 	 * specified.
 	 */
@@ -193,6 +254,7 @@ function vipgocs_compatibility_scanner() {
 	/*
 	 * Parse rest of options
 	 */
+
 	vipgoci_option_file_handle(
 		$options,
 		'phpcs-path',
@@ -228,7 +290,21 @@ function vipgocs_compatibility_scanner() {
 		);
 	}
 
-	$options['phpcs-severity'] = 1;
+	vipgoci_option_integer_handle(
+		$options,
+		'phpcs-severity',
+		1,
+		array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 )
+	);
+
+	vipgoci_option_array_handle(
+		$options,
+		'review-comments-ignore',
+		array(),
+		array(),
+		',',
+		false
+	);
 
 	if ( strpos(
 		$options['github-issue-body'],
@@ -298,25 +374,20 @@ function vipgocs_compatibility_scanner() {
 	if ( ! empty(
 		$options['zendesk-db']
 	) ) {
-		// Create/open Zendesk DB 
+		// Create/open Zendesk DB
 		$zendesk_db_conn = vipgocs_zendesk_db_open(
 			$options['zendesk-db']
 		);
 	}
 
 	/*
-	 * Print cleaned option-values.
+	 * Add token to sensitive options list
 	 */
-
-	$options_clean = vipgoci_options_sensitive_clean(
+	vipgoci_options_sensitive_clean(
 		null,
 		array(
 			'token',
 		)
-	);
-
-	$options_clean = vipgoci_options_sensitive_clean(
-		$options
 	);
 
 	/*
@@ -348,12 +419,28 @@ function vipgocs_compatibility_scanner() {
 			)
 		);
 	}
+}
 
+/*
+ * Main invocation function.
+ *
+ * @codeCoverageIgnore
+ */
+function vipgocs_compatibility_scanner_run(
+	array &$options,
+	int &$startup_time,
+	&$zendesk_db_conn
+) :int {
+	/*
+	 * Get options with sensitive items cleaned.
+	 */
+	$options_clean = vipgoci_options_sensitive_clean(
+		$options
+	);
 
 	/*
-	 * Check if Zendesk auth is ok
+	 * Log our startup along with clean options.
 	 */
-
 	vipgoci_log(
 		'Starting up...',
 		$options_clean
@@ -376,6 +463,19 @@ function vipgocs_compatibility_scanner() {
 	);
 
 	$options['commit'] = $vipgoci_git_repo_head;
+
+	/*
+	 * Check if commit-ID matches in length to the
+	 * valid ones, exit if not.
+	 */
+	if ( strlen( $options['commit'] ) !== 40 ) {
+		vipgoci_sysexit(
+			'Invalid commit-ID from git repository',
+			array(
+				'commit'	=> $options['commit'],
+			)
+		);
+	}
 
 	/*
 	 * Verify if we can find this commit
@@ -532,7 +632,7 @@ function vipgocs_compatibility_scanner() {
 			'Note: Not logging GitHub ticket to Zendesk DB as not all requirements fulfilled'
 		);
 	}
-	
+
 	/*
 	 * Get API rate limit usage.
 	 */
@@ -593,7 +693,7 @@ function vipgocs_compatibility_scanner() {
 
 	foreach( $github_issues_links as $github_issue_link ) {
 		echo "* " . $github_issue_link . PHP_EOL;
-		
+
 	}
 
 	return 0;
@@ -601,9 +701,31 @@ function vipgocs_compatibility_scanner() {
 
 if ( ( ! defined( 'VIPGOCS_UNIT_TESTING' ) ) || ( false === VIPGOCS_UNIT_TESTING ) ) {
 	/*
+	 * Initialize variables used across
+	 * the two main functions.
+	 */
+	$options = array();
+	$startup_time = 0;
+	$zendesk_db_conn = null;
+
+	/*
+	 * Initialize, get options, sanitize
+	 * input, etc.
+	 */
+	vipgocs_compatibility_scanner_init(
+		$options,
+		$startup_time,
+		$zendesk_db_conn
+	);
+
+	/*
 	 * Main invocation function.
 	 */
-	$status = vipgocs_compatibility_scanner();
+	$status = vipgocs_compatibility_scanner_run(
+		$options,
+		$startup_time,
+		$zendesk_db_conn
+	);
 
 	exit( $status );
 }
