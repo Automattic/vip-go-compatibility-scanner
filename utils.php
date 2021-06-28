@@ -56,7 +56,7 @@ function vipgocs_vipgoci_load(
 }
 
 /*
- * Check if file only has
+ * Check if file is empty or only has
  * whitespacing.
  */
 function vipgocs_file_empty_or_whitespace_only(
