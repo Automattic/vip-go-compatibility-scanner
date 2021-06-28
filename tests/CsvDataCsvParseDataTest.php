@@ -4,7 +4,7 @@ require_once( __DIR__ . '/IncludesForTests.php' );
 
 use PHPUnit\Framework\TestCase;
 
-final class CsvDataCsvParseData extends TestCase {
+final class CsvDataCsvParseDataTest extends TestCase {
 	/**
 	 * @covers ::vipgocs_csv_parse_data
 	 */
