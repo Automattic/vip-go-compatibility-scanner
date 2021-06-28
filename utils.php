@@ -59,7 +59,7 @@ function vipgocs_vipgoci_load(
  * Check if file only has
  * whitespacing.
  */
-function vipgocs_file_with_whitespacing_only(
+function vipgocs_file_empty_or_whitespace_only(
 	string $file_path,
 	string $whitespacing_chars = " \n\r\t\v\0"
 ) {
