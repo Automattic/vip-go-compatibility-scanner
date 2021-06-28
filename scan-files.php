@@ -134,7 +134,7 @@ function vipgocs_scan_files(
 			vipgoci_log(
 				'Skipping file, as it is empty',
 				array(
-					'file_name'	=> $file_name,
+					'file_path'	=> $file_path,
 				)
 			);
 
