@@ -206,7 +206,7 @@ function vipgocs_scan_files(
 		);
 
 		$file_results_master = $file_results['file_issues_arr_master'];
-		
+
 		/*
 		 * Figure out how to group
 		 * issues, either by file or folder.
