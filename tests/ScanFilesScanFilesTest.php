@@ -134,12 +134,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 			'git',
 			$this->options_git
 		);
-		
+
 		vipgoci_unittests_get_config_values(
 			'phpcs-scan',
 			$this->options_phpcs_scan
 		);
-	
+
 		$this->options = array_merge(
 			$this->options_git,
 			$this->options_phpcs_scan,
@@ -150,6 +150,7 @@ final class ScanFilesScanFilesTest extends TestCase {
  				'phpcs-sniffs-exclude'		=> array(),
        				'phpcs-sniffs-include'		=> array(),
 				'phpcs-runtime-set'		=> array(),
+				'skip-empty-files'		=> false,
 			)
 		);
 
