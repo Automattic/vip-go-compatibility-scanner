@@ -85,6 +85,10 @@ final class OpenIssuesOpenIssuesTest extends TestCase {
 	 * @covers ::vipgocs_open_issues
 	 */
 	public function testOpenIssue1() {
+		$this->options['review-comments-ignore'] = array(
+			'Test message 40',
+			'Test message 50',
+		);
 
 		$issue_statistics = vipgocs_open_issues(
 			$this->options,
@@ -145,14 +149,25 @@ final class OpenIssuesOpenIssuesTest extends TestCase {
 								'github_commit_url' => 'https://github.com/yetanothertestaccount1x900/testrepo39999/blob/18900',
 								'file_is_in_submodule' => true,
 								'file_path_without_submodule' => 'file4.php',
-							)
+							),
+							array(
+								'message' => "Test message 40", // Should be ignored, see review-comments-ignore config above
+								'source' => 'TestSource.Source1',
+								'severity' => 5,
+								'fixable' => false,
+								'type' => 'WARNING',
+								'line' => 40,
+								'column' => 20,
+								'file_path' => 'sub-module-folder/file4.php',
+								'github_commit_url' => 'https://github.com/yetanothertestaccount1x900/testrepo39999/blob/18900',
+								'file_is_in_submodule' => true,
+								'file_path_without_submodule' => 'file4.php',
+							),
 						)
 					),
-
-
 				),
-				'warnings' => 0,
-				'errors' => 2,
+				'warnings' => 1,
+				'errors' => 3,
 				'fixable' => 0,
 			),
 			'main-branch',
