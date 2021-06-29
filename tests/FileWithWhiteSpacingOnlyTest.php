@@ -26,10 +26,6 @@ final class FileWithWhiteSpacingOnlyTest extends TestCase {
 			return;
 		}
 
-		/*
-		 * Only whitespacing, should assert
-		 * as true.
-		 */
 		$tmp_bytes_written = file_put_contents(
 			$tmp_file_name,
 			"\n\r\n\r\n\r\n\t    \n\r\n\t     "
@@ -45,8 +41,15 @@ final class FileWithWhiteSpacingOnlyTest extends TestCase {
 			return;
 		}
 
+		/*
+		 * Only whitespacing in file, should assert
+		 * as true.
+		 */
 		$this->assertTrue(
-			vipgocs_file_empty_or_whitespace_only( $tmp_file_name, " \n\r\t\v\0" )
+			vipgocs_file_empty_or_whitespace_only(
+				$tmp_file_name,
+				" \n\r\t\v\0"
+			)
 		);
 
 		unlink( $tmp_file_name );
