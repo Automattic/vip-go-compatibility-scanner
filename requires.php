@@ -11,5 +11,5 @@ require_once( __DIR__ . '/csv-data.php' );
 require_once( __DIR__ . '/options.php' );
 require_once( __DIR__ . '/zendesk-db.php' );
 require_once( __DIR__ . '/utils.php' );
-require_once( __DIR__ . '/compatibility-scanner.php' );
+require_once( __DIR__ . '/main.php' );
 
