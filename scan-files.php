@@ -150,12 +150,18 @@ function vipgocs_scan_files(
 			$file_path
 		);
 
+		$temp_file_name = @$file_results['temp_file_name'];
+
 		/*
 		 * Check for errors.
 		 */
 		if (
 			( ! isset( $file_results['file_issues_arr_master'] ) ) ||
-			( null === $file_results['file_issues_arr_master'] )
+			( null === $file_results['file_issues_arr_master'] ) ||
+			( ! isset( $file_results['temp_file_name'] ) ) ||
+			( null === $file_results['temp_file_name'] ) ||
+			( empty( $temp_file_name ) ) ||
+			( ! isset( $file_results['file_issues_arr_master']['files'][ $temp_file_name ]['messages'] ) )
 		) {
 			vipgoci_log(
 				'Failed parsing output from PHPCS',
@@ -171,7 +177,6 @@ function vipgocs_scan_files(
 			continue;
 		}
 
-		$temp_file_name = $file_results['temp_file_name'];
 
 		/*
 		 * Loop through each PHPCS message, add 'file_path'
