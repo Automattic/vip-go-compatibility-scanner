@@ -1,15 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-require_once( __DIR__ . '/github-api.php' );
-require_once( __DIR__ . '/scan-files.php' );
-require_once( __DIR__ . '/open-issues.php' );
-require_once( __DIR__ . '/zendesk-api.php' );
-require_once( __DIR__ . '/csv-data.php' );
-require_once( __DIR__ . '/options.php' );
-require_once( __DIR__ . '/zendesk-db.php' );
-require_once( __DIR__ . '/utils.php' );
-
+require_once( __DIR__ . '/requires.php' );
 
 define( 'VIPGOCI_INCLUDED', true );
 
@@ -78,7 +70,7 @@ function vipgocs_help( ) :void {
 		PHP_EOL .
 		"\t" . "Note that some parameters have a complementary '-file' parameter (see below)." . PHP_EOL .
 		PHP_EOL .
-		"\t" . 'General configuration:' . PHP_EOL.
+		"\t" . 'General configuration:' . PHP_EOL .
 		"\t" . '--help                              Prints this message.' . PHP_EOL .
 		"\t" . '--vipgoci-path=STRING	            Path to were vip-go-ci lives, should be folder.' . PHP_EOL .
 		"\t" . '--dry-run=BOOL                      If set to true, will do scanning of code and then' . PHP_EOL .
@@ -123,52 +115,17 @@ function vipgocs_help( ) :void {
 		PHP_EOL;
 }
 
-
 /*
- * Prepare to do actual work.
+ * Check if required options are in place,
+ * exit if not and display help message.
+ *
+ * Do the same if --help is specified.
  *
  * @codeCoverageIgnore
  */
-function vipgocs_compatibility_scanner_init(
-	array &$options,
-	int &$startup_time,
-	&$zendesk_db_conn
+function vipgocs_compatibility_scanner_check_required_options(
+	&$options // $options is a pointer
 ) :void {
-	$zendesk_db_conn = null;
-
-	echo 'Initializing...' . PHP_EOL;
-
-	/*
-	 * Do some sanity checks on our
-	 * environment.
-	 */
-	vipgocs_env_check();
-
-	/*
-	 * Log startup time
-	 */
-	$startup_time = time();
-
-	/*
-	 * Set up logging, etc.
-	 */
-	vipgocs_logging_setup();
-
-	/*
-	 * Get option-values
-	 */
-	$options = getopt(
-		null,
-		vipgocs_options_recognized()
-	);
-
-	if ( isset(
-		$options['zendesk-access-username'],
-	) ) {
-		echo 'The --zendesk-access-username, --zendesk-access-password, --zendesk-access-token, --zendesk-ticket-subject, --zendesk-ticket-body, etc. parameters are not supported by this utility anymore. You may want to start using the --zendesk-db parameter instead. See README for more information' . PHP_EOL;
-		exit( 253 );
-	}
-
 
 	/*
 	 * Check if any required options are missing.
@@ -208,11 +165,20 @@ function vipgocs_compatibility_scanner_init(
 
 		exit(253);
 	}
+}
 
+/*
+ * Initialize general options, related
+ * to vip-go-ci etc.
+ *
+ * @codeCoverageIgnore
+ */
+function vipgocs_compatibility_scanner_init_general(
+	&$options // $options is a pointer
+) :void {
 	/*
 	 * Load vip-go-ci
 	 */
-
 	vipgocs_vipgoci_load(
 		$options,
 		'vipgoci-path'
@@ -237,24 +203,44 @@ function vipgocs_compatibility_scanner_init(
 	);
 
 	/*
-	 * Read the parameter's '-file' counterpart from file if
-	 * specified.
+	 * Get the HEAD commit
+	 * from the local repository -- this
+	 * would be the latest commit. Used
+	 * by the PHPCS scanning function
+	 * and elsewhere.
 	 */
-	foreach(
-		array(
-			'github-issue-body',
-		) as $tmp_file_option
-	) {
-		vipgocs_file_option_process_complementary(
-			$options,
-			$tmp_file_option
+
+	$vipgoci_git_repo_head = vipgoci_gitrepo_get_head(
+		$options['local-git-repo']
+	);
+
+	$options['commit'] = $vipgoci_git_repo_head;
+
+	/*
+	 * Check if commit-ID matches in length to the
+	 * valid ones, exit if not.
+	 */
+	if ( strlen( $options['commit'] ) !== 40 ) {
+		vipgoci_sysexit(
+			'Invalid commit-ID from git repository',
+			array(
+				'commit'	=> $options['commit'],
+			)
 		);
 	}
+}
 
+/*
+ * Initialize PHPCS related options.
+ *
+ * @codeCoverageIgnore
+ */
+function vipgocs_compatibility_scanner_init_phpcs(
+	&$options // $options is a pointer
+) :void {
 	/*
 	 * Parse rest of options
 	 */
-
 	vipgoci_option_file_handle(
 		$options,
 		'phpcs-path',
@@ -296,14 +282,23 @@ function vipgocs_compatibility_scanner_init(
 		1,
 		array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 )
 	);
+}
 
-	vipgoci_option_array_handle(
+/*
+ * Initialize GitHub related options.
+ *
+ * @codeCoverageIgnore
+ */
+function vipgocs_compatibility_scanner_init_github(
+	&$options // $options is a pointer
+) :void {
+	/*
+	 * Read the parameter's '-file' counterpart from file if
+	 * specified.
+	 */
+	vipgocs_file_option_process_complementary(
 		$options,
-		'review-comments-ignore',
-		array(),
-		array(),
-		',',
-		false
+		'github-issue-body'
 	);
 
 	if ( strpos(
@@ -371,14 +366,6 @@ function vipgocs_compatibility_scanner_init(
 		}
 	}
 
-	if ( ! empty(
-		$options['zendesk-db']
-	) ) {
-		// Create/open Zendesk DB
-		$zendesk_db_conn = vipgocs_zendesk_db_open(
-			$options['zendesk-db']
-		);
-	}
 
 	/*
 	 * Add token to sensitive options list
@@ -422,14 +409,120 @@ function vipgocs_compatibility_scanner_init(
 }
 
 /*
+ * Initialize Zendesk options.
+ *
+ * @codeCoverageIgnore
+ */
+function vipgocs_compatibility_scanner_init_zendesk(
+	&$options, // $options is a pointer
+	&$zendesk_db_conn // $zendesk_db_conn is a pointer
+) {
+	if ( isset(
+		$options['zendesk-access-username'],
+	) ) {
+		echo 'The --zendesk-access-username, --zendesk-access-password, --zendesk-access-token, --zendesk-ticket-subject, --zendesk-ticket-body, etc. parameters are not supported by this utility anymore. You may want to start using the --zendesk-db parameter instead. See README.md for more information' . PHP_EOL;
+		exit( 253 );
+	}
+
+	if ( ! empty(
+		$options['zendesk-db']
+	) ) {
+		// Create/open Zendesk DB
+		$zendesk_db_conn = vipgocs_zendesk_db_open(
+			$options['zendesk-db']
+		);
+	}
+}
+
+/*
+ * Prepare to do actual work.
+ *
+ * @codeCoverageIgnore
+ */
+function vipgocs_compatibility_scanner_init(
+	array &$options, // $options is a pointer
+	int &$startup_time, // $startup_time is a pointer
+	&$zendesk_db_conn // $zendesk_db_conn is a pointer
+) :void {
+	$zendesk_db_conn = null;
+
+	echo 'Initializing...' . PHP_EOL;
+
+	/*
+	 * Do some sanity checks on our
+	 * environment.
+	 */
+	vipgocs_env_check();
+
+	/*
+	 * Log startup time
+	 */
+	$startup_time = time();
+
+	/*
+	 * Set up logging, etc.
+	 */
+	vipgocs_logging_setup();
+
+	/*
+	 * Get option-values
+	 */
+	$options = getopt(
+		null,
+		vipgocs_options_recognized()
+	);
+
+	/*
+	 * Check if all required options are specified.
+	 */
+	vipgocs_compatibility_scanner_check_required_options( $options );
+
+	/*
+	 * Intialize general options,
+	 * --dry-run, etc.
+	 */
+	vipgocs_compatibility_scanner_init_general( $options );
+
+	/*
+	 * Initialize PHPCS options
+	 */
+	vipgocs_compatibility_scanner_init_phpcs( $options );
+
+	/*
+	 * Initialize GitHub options.
+	 */
+	vipgocs_compatibility_scanner_init_github( $options );
+
+	/*
+	 * GitHub reviews options
+	 */
+	vipgoci_option_array_handle(
+		$options,
+		'review-comments-ignore',
+		array(),
+		array(),
+		',',
+		false
+	);
+
+	/*
+	 * Intialize Zendesk options.
+	 */
+	vipgocs_compatibility_scanner_init_zendesk(
+		$options,
+		$zendesk_db_conn
+	);
+}
+
+/*
  * Main invocation function.
  *
  * @codeCoverageIgnore
  */
 function vipgocs_compatibility_scanner_run(
-	array &$options,
-	int &$startup_time,
-	&$zendesk_db_conn
+	array &$options, // $options is a pointer
+	int &$startup_time, // $startup_time is a pointer
+	&$zendesk_db_conn // zendesk_db_conn is a pointer
 ) :int {
 	/*
 	 * Get options with sensitive items cleaned.
@@ -450,32 +543,6 @@ function vipgocs_compatibility_scanner_run(
 
 	sleep( 5 );
 
-	/*
-	 * Get the HEAD commit
-	 * from the local repository -- this
-	 * would be the latest commit. Used
-	 * by the PHPCS scanning function
-	 * and elsewhere.
-	 */
-
-	$vipgoci_git_repo_head = vipgoci_gitrepo_get_head(
-		$options['local-git-repo']
-	);
-
-	$options['commit'] = $vipgoci_git_repo_head;
-
-	/*
-	 * Check if commit-ID matches in length to the
-	 * valid ones, exit if not.
-	 */
-	if ( strlen( $options['commit'] ) !== 40 ) {
-		vipgoci_sysexit(
-			'Invalid commit-ID from git repository',
-			array(
-				'commit'	=> $options['commit'],
-			)
-		);
-	}
 
 	/*
 	 * Verify if we can find this commit
