@@ -121,7 +121,7 @@ function vipgocs_help( ) :void {
  * @codeCoverageIgnore
  */
 function vipgocs_compatibility_scanner_check_required_options(
-	&$options // $options is a pointer
+	array &$options // $options is a pointer
 ) :void {
 
 	/*
@@ -171,7 +171,7 @@ function vipgocs_compatibility_scanner_check_required_options(
  * @codeCoverageIgnore
  */
 function vipgocs_compatibility_scanner_init_general(
-	&$options // $options is a pointer
+	array &$options // $options is a pointer
 ) :void {
 	/*
 	 * Load vip-go-ci
@@ -233,7 +233,7 @@ function vipgocs_compatibility_scanner_init_general(
  * @codeCoverageIgnore
  */
 function vipgocs_compatibility_scanner_init_phpcs(
-	&$options // $options is a pointer
+	array &$options // $options is a pointer
 ) :void {
 	/*
 	 * Parse rest of options
@@ -287,7 +287,7 @@ function vipgocs_compatibility_scanner_init_phpcs(
  * @codeCoverageIgnore
  */
 function vipgocs_compatibility_scanner_init_github(
-	&$options // $options is a pointer
+	array &$options // $options is a pointer
 ) :void {
 	/*
 	 * Read the parameter's '-file' counterpart from file if
@@ -411,9 +411,9 @@ function vipgocs_compatibility_scanner_init_github(
  * @codeCoverageIgnore
  */
 function vipgocs_compatibility_scanner_init_zendesk(
-	&$options, // $options is a pointer
-	&$zendesk_db_conn // $zendesk_db_conn is a pointer
-) {
+	array &$options, // $options is a pointer
+	object &$zendesk_db_conn // $zendesk_db_conn is a pointer
+) :void {
 	if ( isset(
 		$options['zendesk-access-username'],
 	) ) {
@@ -439,7 +439,7 @@ function vipgocs_compatibility_scanner_init_zendesk(
 function vipgocs_compatibility_scanner_init(
 	array &$options, // $options is a pointer
 	int &$startup_time, // $startup_time is a pointer
-	&$zendesk_db_conn // $zendesk_db_conn is a pointer
+	object &$zendesk_db_conn // $zendesk_db_conn is a pointer
 ) :void {
 	$zendesk_db_conn = null;
 
@@ -519,7 +519,7 @@ function vipgocs_compatibility_scanner_init(
 function vipgocs_compatibility_scanner_run(
 	array &$options, // $options is a pointer
 	int &$startup_time, // $startup_time is a pointer
-	&$zendesk_db_conn // zendesk_db_conn is a pointer
+	object &$zendesk_db_conn // zendesk_db_conn is a pointer
 ) :int {
 	/*
 	 * Get options with sensitive items cleaned.
