@@ -69,13 +69,13 @@ function vipgocs_filter_ignorable_issues(
  * problem we found when scanning.
  */
 function vipgocs_open_issues(
-	$options,
-	$all_results,
-	$git_branch,
-	$labels,
-	$assignees = array(),
-	$emulate_only = false
-) {
+	array $options,
+	array $all_results,
+	string $git_branch,
+	array $labels,
+	array $assignees = array(),
+	bool $emulate_only = false
+) :array {
 
 	/*
 	 * Keep some statistics on what
