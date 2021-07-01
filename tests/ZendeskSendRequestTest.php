@@ -77,7 +77,10 @@ final class ZendeskSendRequestTest extends TestCase {
 			array(
 				'data' => 12345678,
 			),
-			'user:pass'
+			array(
+				'zendesk-access-username'	=> 'username',
+				'zendesk-access-token'		=> 'token'
+			)
 		);
 
 		$this->assertEquals(
