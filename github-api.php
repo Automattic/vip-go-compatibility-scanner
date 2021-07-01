@@ -5,8 +5,8 @@
  * the repository.
  */
 function vipgocs_get_repo_collaborators_admins(
-	$options
-) {
+	array $options
+) :array {
 	$repo_outside_collaborators_admins =
 		vipgoci_github_repo_collaborators_get(
 			$options['repo-owner'],
