@@ -5,8 +5,8 @@
  * should be columns.
  */
 function vipgocs_csv_parse_data(
-	$zendesk_csv_file_path
-) {
+	string $zendesk_csv_file_path
+): array {
 	vipgoci_log(
 		'Parsing CSV data file',
 		array(
@@ -90,10 +90,10 @@ function vipgocs_csv_parse_data(
  * Try to match email address with repository.
  */
 function vipgocs_csv_get_email_for_repo(
-	$csv_data_arr,
-	$repo_owner,
-	$repo_name
-) {
+	array $csv_data_arr,
+	string $repo_owner,
+	string $repo_name
+): ?string {
 	$repo_owner = strtolower(
 		$repo_owner
 	);
