@@ -19,7 +19,7 @@ define( 'VIPGOCI_INCLUDED', true );
  * invoke functions that do the work.
  */
 
-function vipgocs_zendesk_tickets_create() {
+function vipgocs_zendesk_tickets_create() :int {
 	global $argv;
 
 	echo 'Initializing...' . PHP_EOL;
