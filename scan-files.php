@@ -7,8 +7,8 @@
  * in one array.
  */
 function vipgocs_scan_files(
-	$options
-) {
+	array $options
+) :array {
 	vipgoci_log(
 		'Fetching tree of files in the repository',
 		array(
