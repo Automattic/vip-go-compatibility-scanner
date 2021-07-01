@@ -6,8 +6,8 @@
  */
 
 function vipgocs_zendesk_db_open(
-	$path
-) {
+	string $path
+) :object {
 	vipgoci_counter_report(
 		VIPGOCI_COUNTERS_DO,
 		'zendesk_db_open',
@@ -61,8 +61,8 @@ function vipgocs_zendesk_db_open(
  * Close database handle.
  */
 function vipgocs_zendesk_db_close(
-	$db_conn
-) {
+	object $db_conn
+) :bool {
 	vipgoci_counter_report(
 		VIPGOCI_COUNTERS_DO,
 		'zendesk_db_close',
@@ -77,11 +77,11 @@ function vipgocs_zendesk_db_close(
  * with repo-owner and repo-name.
  */
 function vipgocs_zendesk_db_write_github_issue(
-	$db_conn,
-	$repo_owner,
-	$repo_name,
-	$github_url
-) {
+	object $db_conn,
+	string $repo_owner,
+	string $repo_name,
+	string $github_url
+) :?object {
 	vipgoci_counter_report(
 		VIPGOCI_COUNTERS_DO,
 		'zendesk_db_write_github_issue',
@@ -109,8 +109,8 @@ function vipgocs_zendesk_db_write_github_issue(
  * one group.
  */
 function vipgocs_zendesk_db_get_github_issues(
-	$db_conn
-) {
+	object $db_conn
+) :array {
 	vipgoci_counter_report(
 		VIPGOCI_COUNTERS_DO,
 		'zendesk_db_get_github_issues',
@@ -149,11 +149,11 @@ function vipgocs_zendesk_db_get_github_issues(
  * and repo-name.
  */
 function vipgocs_zendesk_db_delete_github_issue(
-	$db_conn,
-	$repo_owner,
-	$repo_name,
-	$github_url
-) {
+	object $db_conn,
+	string $repo_owner,
+	string $repo_name,
+	string $github_url
+) :object {
 	vipgoci_counter_report(
 		VIPGOCI_COUNTERS_DO,
 		'zendesk_db_delete_github_issue',
