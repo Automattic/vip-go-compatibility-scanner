@@ -7,9 +7,9 @@
  * parameter.
  */
 function vipgocs_file_option_process_complementary(
-	&$options,
-	$option_name
-) {
+	array &$options,
+	string $option_name
+) :void {
 	$option_name_with_file =
 		$option_name . '-file';
 
