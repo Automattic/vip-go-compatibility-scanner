@@ -412,7 +412,7 @@ function vipgocs_compatibility_scanner_init_github(
  */
 function vipgocs_compatibility_scanner_init_zendesk(
 	array &$options, // $options is a pointer
-	object &$zendesk_db_conn // $zendesk_db_conn is a pointer
+	&$zendesk_db_conn // $zendesk_db_conn is a pointer
 ) :void {
 	if ( isset(
 		$options['zendesk-access-username'],
@@ -439,7 +439,7 @@ function vipgocs_compatibility_scanner_init_zendesk(
 function vipgocs_compatibility_scanner_init(
 	array &$options, // $options is a pointer
 	int &$startup_time, // $startup_time is a pointer
-	object &$zendesk_db_conn // $zendesk_db_conn is a pointer
+	&$zendesk_db_conn // $zendesk_db_conn is a pointer
 ) :void {
 	$zendesk_db_conn = null;
 
@@ -519,7 +519,7 @@ function vipgocs_compatibility_scanner_init(
 function vipgocs_compatibility_scanner_run(
 	array &$options, // $options is a pointer
 	int &$startup_time, // $startup_time is a pointer
-	object &$zendesk_db_conn // zendesk_db_conn is a pointer
+	&$zendesk_db_conn // zendesk_db_conn is a pointer
 ) :int {
 	/*
 	 * Get options with sensitive items cleaned.
