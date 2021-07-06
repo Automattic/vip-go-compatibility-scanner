@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 // phpcs:disable PSR1.Files.SideEffects
 
-final class FileWithWhiteSpacingOnlyTest extends TestCase {
+final class UtilsFileEmptyOrWhiteSpaceOnlyTest extends TestCase {
 	/**
 	 * @covers ::vipgocs_file_empty_or_whitespace_only
 	 */
