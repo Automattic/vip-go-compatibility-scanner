@@ -573,7 +573,7 @@ function vipgocs_compatibility_scanner_run(
 	);
 
 	/*
-	 * Scan all files in the Git repository,
+	 * Scan all relevant files in the Git repository,
 	 * get results.
 	 */
 	$all_results = vipgocs_scan_files(
