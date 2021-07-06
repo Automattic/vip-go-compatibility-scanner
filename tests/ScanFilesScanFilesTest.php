@@ -345,6 +345,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 							)
 						)
 					)
+					// No file4.php
 				),
 				'warnings' => 0,
 				'errors' => 2,
@@ -482,6 +483,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
+							// No file4.php
 						)
 					)
 				),
