@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 // phpcs:disable PSR1.Files.SideEffects
 
-final class FilterIgnorableIssuesTest extends TestCase {
+final class OpenIssuesFilterIgnorableIssuesTest extends TestCase {
 	/**
 	 * @covers ::vipgocs_filter_ignorable_issues
 	 */
