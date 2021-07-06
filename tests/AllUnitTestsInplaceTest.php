@@ -1,8 +1,12 @@
 <?php
 
+namespace Vipgocs\tests;
+
 require_once( __DIR__ . '/IncludesForTests.php' );
 
 use PHPUnit\Framework\TestCase;
+
+// phpcs:disable PSR1.Files.SideEffects
 
 final class AllUnitTestsInplaceTest extends TestCase {
 	public function testAllUnitTestsInPlace() {
@@ -59,7 +63,7 @@ final class AllUnitTestsInplaceTest extends TestCase {
 		/*
 		 * We should end with an empty array.
 		 */
-		$this->assertEquals(
+		$this->assertSame(
 			0,
 			count( $files_arr )
 		);

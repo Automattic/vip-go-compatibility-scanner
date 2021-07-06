@@ -7,8 +7,8 @@
  * if everything is okay, false otherwise.
  */
 function vipgocs_zendesk_check_auth(
-	$options
-) {
+	array $options
+) :bool {
 	vipgoci_log(
 		'Checking authentication credentials with Zendesk...'
 	);
@@ -51,9 +51,9 @@ function vipgocs_zendesk_check_auth(
  * address, try to link up with user ID.
  */
 function vipgocs_zendesk_search_for_user(
-	$options,
-	$email
-) {
+	array $options,
+	string $email
+) :?string {
 	vipgoci_log(
 		'Searching for user on Zendesk...',
 		array(
@@ -125,10 +125,10 @@ function vipgocs_zendesk_search_for_user(
  * See documentation: https://developer.zendesk.com/rest_api/docs/support/tickets
  */
 function vipgocs_zendesk_open_ticket(
-	$options,
-	$zendesk_requestee_email,
-	$github_issues_links
-) {
+	array $options,
+	string $zendesk_requestee_email,
+	array $github_issues_links
+) :?string {
 	vipgoci_log(
 		'Opening Zendesk ticket via REST API',
 		array(
@@ -196,7 +196,7 @@ function vipgocs_zendesk_open_ticket(
 			)
 		);
 
-		return;
+		return null;
 	}
 
 	$zendesk_api_postfields['ticket']['requester_id'] =
@@ -221,7 +221,7 @@ function vipgocs_zendesk_open_ticket(
 			)
 		);
 
-		return;
+		return null;
 	}
 	$zendesk_api_postfields['ticket']['submitter_id'] =
 		$zendesk_submitter_id['id'];
@@ -277,12 +277,12 @@ function vipgocs_zendesk_open_ticket(
  * to Zendesk API.
  */
 function vipgocs_zendesk_send_request(
-	$type,
-	$zendesk_api_subdomain,
-	$zendesk_api_endpoint,
-	$zendesk_api_datafields,
-	$zendesk_api_auth
-) {
+	string $type,
+	string $zendesk_api_subdomain,
+	string $zendesk_api_endpoint,
+	array $zendesk_api_datafields,
+	array $zendesk_api_auth
+) :?array {
 	$type = strtoupper(
 		$type
 	);
@@ -295,7 +295,7 @@ function vipgocs_zendesk_send_request(
 		( defined( 'VIPGOCS_UNIT_TESTING' ) ) &&
 		( true === VIPGOCS_UNIT_TESTING )
 	) {
-		$zendesk_api_url = 
+		$zendesk_api_url =
 			VIPGOCI_GITHUB_BASE_URL;
 	}
 
@@ -445,15 +445,15 @@ function vipgocs_zendesk_send_request(
  * password authentication, and username and token
  * authentication. Here we check if required
  * fields are present for either of these,
- * and if not, we return null. 
+ * and if not, we return null.
 
- * There is also a check for existance of a subdomain 
+ * There is also a check for existance of a subdomain
  * field, resulting in returning null when not existing.
  */
 
 function vipgocs_zendesk_prepare_auth_fields(
-	$options
-) {
+	array $options
+) :?array {
 	$auth_fields = array();
 
 	if ( empty(

@@ -1,17 +1,81 @@
 <?php
 
 /*
+ * Remove issues to be filtered away.
+ *
+ * If there are any periods or spaces at the beginning
+ * or end of issue messages, ignore those when doing comparison.
+ * Do the same with $ignorable_issues.
+ */
+function vipgocs_filter_ignorable_issues(
+	array $ignorable_issues,
+	array $all_results
+) :array {
+	$ignorable_issues = array_map(
+		function( $item ) {
+			return trim(
+				$item,
+				' .'
+			);
+		},
+		$ignorable_issues
+	);
+
+	foreach(
+		$all_results['files'] as
+			$file_path => &$file_issues // $file_issues is a pointer
+	) {
+		foreach(
+			$file_issues['messages'] as
+				$file_issue_key => $file_issue_item
+		) {
+			/*
+			 * Remove possible period or space
+			 */
+			$file_issue_item['message'] = trim(
+				$file_issue_item['message'],
+				' .'
+			);
+
+			/*
+			 * Check if message is there, remove if so.
+			 */
+			if ( in_array(
+				$file_issue_item['message'],
+				$ignorable_issues
+			) ) {
+				unset(
+					$file_issues['messages']
+						[ $file_issue_key ]
+				);
+
+				continue;
+			}
+		}
+
+		/*
+		 * Recreate messages to avoid gaps in index.
+		 */
+		$file_issues['messages'] = array_values(
+			$file_issues['messages']
+		);
+	}
+
+	return $all_results;
+}
+
+/*
  * Open up issues on GitHub for each
  * problem we found when scanning.
  */
 function vipgocs_open_issues(
-	$options,
-	$all_results,
-	$git_branch,
-	$labels,
-	$assignees = array(),
-	$emulate_only = false
-) {
+	array $options,
+	array $all_results,
+	string $git_branch,
+	array $labels,
+	array $assignees = array(),
+	bool $emulate_only = false
+) :array {
 
 	/*
 	 * Keep some statistics on what
@@ -35,6 +99,16 @@ function vipgocs_open_issues(
 		)
 	);
 
+	/*
+	 * Remove irrellevant results
+	 */
+	if ( ! empty( $options['review-comments-ignore'] ) ) {
+		$all_results = vipgocs_filter_ignorable_issues(
+			$options['review-comments-ignore'],
+			$all_results
+		);
+	}
+
 	foreach(
 		$all_results['files'] as
 			$file_path => $file_issues
@@ -46,7 +120,6 @@ function vipgocs_open_issues(
 		if ( empty( $file_issues['messages'] ) ) {
 			continue;
 		}
-
 
 		/*
 		 * Compose string to post as body of an issue.
@@ -88,7 +161,7 @@ function vipgocs_open_issues(
 			$error_msg .= '</b>: ' .
 				$file_issue['message'];
 
-			
+
 			if ( false === $file_issue['file_is_in_submodule'] ) {
 				$error_msg .=
 					' ' .
@@ -160,7 +233,7 @@ function vipgocs_open_issues(
 		unset( $file_path );
 		unset( $file_issues );
 		unset( $error_msg );
-		
+
 		gc_collect_cycles();
 
 		sleep( 2 + rand( 0, 3 ));

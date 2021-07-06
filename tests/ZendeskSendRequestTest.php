@@ -1,8 +1,12 @@
 <?php
 
+namespace Vipgocs\tests;
+
 require_once( __DIR__ . '/IncludesForTests.php' );
 
 use PHPUnit\Framework\TestCase;
+
+// phpcs:disable PSR1.Files.SideEffects
 
 final class ZendeskSendRequestTest extends TestCase {
 	var $options = array(
@@ -73,10 +77,13 @@ final class ZendeskSendRequestTest extends TestCase {
 			array(
 				'data' => 12345678,
 			),
-			'user:pass'
+			array(
+				'zendesk-access-username'	=> 'username',
+				'zendesk-access-token'		=> 'token'
+			)
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			'{"_POST":[],"_GET":{"data":"12345678"}}',
 			file_get_contents(
 				$this->output_file

@@ -1,8 +1,12 @@
 <?php
 
+namespace Vipgocs\tests;
+
 require_once( __DIR__ . '/IncludesForTests.php' );
 
 use PHPUnit\Framework\TestCase;
+
+// phpcs:disable PSR1.Files.SideEffects
 
 final class CsvGetEmailForRepoTest extends TestCase {
 	/**
@@ -44,7 +48,7 @@ final class CsvGetEmailForRepoTest extends TestCase {
 			'myrepo0'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			null,
 			$email
 		);
@@ -58,7 +62,7 @@ final class CsvGetEmailForRepoTest extends TestCase {
 			'myrepo1'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			null,
 			$email
 		);
@@ -72,7 +76,7 @@ final class CsvGetEmailForRepoTest extends TestCase {
 			'myrepo1'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			'myemail1@myemail.com',
 			$email
 		);
@@ -86,7 +90,7 @@ final class CsvGetEmailForRepoTest extends TestCase {
 			'myrepo3'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			'myemail3@myemailc.com',
 			$email
 		);

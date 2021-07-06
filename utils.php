@@ -3,7 +3,7 @@
 /*
  * Check if we are running on PHP 7.3 or later.
  */
-function vipgocs_env_check() {
+function vipgocs_env_check() :void {
 	if ( version_compare(
 		phpversion(),
 		'7.3.0'
@@ -16,7 +16,7 @@ function vipgocs_env_check() {
 /*
  * Report any errors to the user.
  */
-function vipgocs_logging_setup() {
+function vipgocs_logging_setup() :void {
 	ini_set( 'error_log', '' );
 
 	error_reporting( E_ALL );
@@ -28,9 +28,9 @@ function vipgocs_logging_setup() {
  * Attempt to load vip-go-ci
  */
 function vipgocs_vipgoci_load(
-	$options,
-	$option_name
-) {
+	array $options,
+	string $option_name
+) :void {
 	if ( ! is_dir( $options[ $option_name ] ) ) {
 		echo 'Path specified in --' . $option_name . ' is invalid, is not a directory' . PHP_EOL;
 		exit(253);
@@ -55,3 +55,38 @@ function vipgocs_vipgoci_load(
 	);
 }
 
+/*
+ * Check if file is empty or only has
+ * whitespacing.
+ */
+function vipgocs_file_empty_or_whitespace_only(
+	string $file_path,
+	string $whitespacing_chars = " \n\r\t\v\0"
+) :?bool {
+	$file_contents = file_get_contents(
+		$file_path
+	);
+
+	/*
+	 * In case of error, return null.
+	 */
+	if ( false === $file_contents ) {
+		return null;
+	}
+
+	/*
+	 * Remove all whitespacing from the
+	 * file contents; if there is no content
+	 * left after that the file is only whitespacing.
+	 */
+	$file_contents = trim( $file_contents, $whitespacing_chars );
+
+	if ( '' === $file_contents ) {
+		return true;
+	}
+
+	/*
+	 * There is content, so return false.
+	 */
+	return false;
+}

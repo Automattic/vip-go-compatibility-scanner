@@ -1,10 +1,14 @@
 <?php
 
+namespace Vipgocs\tests;
+
 require_once( __DIR__ . '/IncludesForTests.php' );
 
 use PHPUnit\Framework\TestCase;
 
-final class extends TestCase {
+// phpcs:disable PSR1.Files.SideEffects
+
+final class Skeleton extends TestCase {
 	/**
 	 * @covers ::
 	 */

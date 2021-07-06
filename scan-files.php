@@ -7,8 +7,8 @@
  * in one array.
  */
 function vipgocs_scan_files(
-	$options
-) {
+	array $options
+) :array {
 	vipgoci_log(
 		'Fetching tree of files in the repository',
 		array(
@@ -107,7 +107,7 @@ function vipgocs_scan_files(
 
 		/*
 		 * Get path to file relative
-		 * to repository. 
+		 * to repository.
 		 *
 		 * Replace '.'/ with '/'.
 		 */
@@ -119,6 +119,27 @@ function vipgocs_scan_files(
 			$file_path_dir = '/';
 		}
 
+		/*
+		 * If file empty or only has whitespacing, skip it.
+		 */
+
+		if (
+			( true === $options['skip-empty-files'] )
+			&&
+			( true === vipgocs_file_empty_or_whitespace_only(
+				$options['local-git-repo'] . DIRECTORY_SEPARATOR .
+				$file_path
+			) )
+		) {
+			vipgoci_log(
+				'Skipping file, as it is empty',
+				array(
+					'file_path'	=> $file_path,
+				)
+			);
+
+			continue;
+		}
 
 		/*
 		 * Scan a single PHP file, and process the results
@@ -129,12 +150,18 @@ function vipgocs_scan_files(
 			$file_path
 		);
 
+		$temp_file_name = @$file_results['temp_file_name'];
+
 		/*
 		 * Check for errors.
 		 */
 		if (
 			( ! isset( $file_results['file_issues_arr_master'] ) ) ||
-			( null === $file_results['file_issues_arr_master'] )
+			( null === $file_results['file_issues_arr_master'] ) ||
+			( ! isset( $file_results['temp_file_name'] ) ) ||
+			( null === $file_results['temp_file_name'] ) ||
+			( empty( $temp_file_name ) ) ||
+			( ! isset( $file_results['file_issues_arr_master']['files'][ $temp_file_name ]['messages'] ) )
 		) {
 			vipgoci_log(
 				'Failed parsing output from PHPCS',
@@ -150,7 +177,6 @@ function vipgocs_scan_files(
 			continue;
 		}
 
-		$temp_file_name = $file_results['temp_file_name'];
 
 		/*
 		 * Loop through each PHPCS message, add 'file_path'
@@ -196,15 +222,6 @@ function vipgocs_scan_files(
 
 		else if ( 'folder' === $options['github-issue-group-by'] ) {
 			$group_issues_by = $file_path_dir;
-		}
-
-		else {
-			vipgoci_sysexit(
-				'Unexpected value for option --github-issue-group-by',
-				array(
-					'github-issue-group-by' => $options['github-issue-group-by'],
-				)
-			);
 		}
 
 		if ( ! isset( $all_results['files'][ $group_issues_by ]['messages'] ) ) {

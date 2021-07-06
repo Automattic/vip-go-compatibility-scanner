@@ -1,8 +1,12 @@
 <?php
 
+namespace Vipgocs\tests;
+
 require_once( __DIR__ . '/IncludesForTests.php' );
 
 use PHPUnit\Framework\TestCase;
+
+// phpcs:disable PSR1.Files.SideEffects
 
 final class ScanFilesScanFilesTest extends TestCase {
 	var $options_git = array(
@@ -88,11 +92,18 @@ final class ScanFilesScanFilesTest extends TestCase {
 			'echo "foo" . time() . PHP_EOL;'  . PHP_EOL
 		);
 
+		file_put_contents(
+			$this->local_git_repo . '/file4.php',
+			PHP_EOL .
+			"\t\n\t\n" .
+			PHP_EOL
+		);
+
 		/*
 		 * Commit the data.
 		 */
 		$cmd = sprintf(
-			'%s -C %s add file1.php file2.php file3.php && %s -C %s commit -m test .',
+			'%s -C %s add file1.php file2.php file3.php file4.php && %s -C %s commit -m test .',
 			escapeshellcmd( $this->options['git-path'] ),
 			escapeshellarg( $this->local_git_repo ),
 			escapeshellcmd( $this->options['git-path'] ),
@@ -134,12 +145,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 			'git',
 			$this->options_git
 		);
-		
+
 		vipgoci_unittests_get_config_values(
 			'phpcs-scan',
 			$this->options_phpcs_scan
 		);
-	
+
 		$this->options = array_merge(
 			$this->options_git,
 			$this->options_phpcs_scan,
@@ -150,6 +161,7 @@ final class ScanFilesScanFilesTest extends TestCase {
  				'phpcs-sniffs-exclude'		=> array(),
        				'phpcs-sniffs-include'		=> array(),
 				'phpcs-runtime-set'		=> array(),
+				'phpcs-severity'		=> 1,
 			)
 		);
 
@@ -181,14 +193,15 @@ final class ScanFilesScanFilesTest extends TestCase {
 	/**
 	 * @covers ::vipgocs_scan_files
 	 */
-	public function testScanFilesGroupByFile() {
+	public function testScanFilesGroupByFileWithEmptyFiles() {
 		$this->options['github-issue-group-by'] = 'file';
+		$this->options['skip-empty-files'] = false;
 
 		$scan_results = vipgocs_scan_files(
 			$this->options
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'files'	=> array(
 					'file1.php' => array(
@@ -201,12 +214,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 2,
 								'column' => 14,
-								'file_path' => 'file1.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file1.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -228,17 +241,111 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 3,
 								'column' => 14,
-								'file_path' => 'file3.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file3.php',
+								'file_is_in_submodule' => false,
+								'file_path_without_submodule' => null,
+							)
+						)
+					),
+
+					'file4.php' => array(
+						'messages' => array(
+							array(
+								'message' => "No PHP code was found in this file and short open tags are not allowed by this install of PHP. This file may be using short open tags but PHP does not allow them.",
+								'source' => 'Internal.NoCodeFound',
+								'severity' => 5,
+								'fixable' => false,
+								'type' => 'WARNING',
+								'line' => 1,
+								'column' => 1,
+								'github_commit_url' => 
+									'https://github.com/test/test/blob/' .
+									str_replace("'","", vipgoci_gitrepo_get_head(
+										$this->options['local-git-repo']
+									) ),
+								'file_path' => 'file4.php',
+								'file_is_in_submodule' => false,
+								'file_path_without_submodule' => null,
+							)
+						)
+					),
+				),
+				'warnings' => 1,
+				'errors' => 2,
+				'fixable' => 0,
+			),
+			$scan_results
+		);
+	}
+
+	/**
+	 * @covers ::vipgocs_scan_files
+	 */
+	public function testScanFilesGroupByFileWithoutEmptyFiles() {
+		$this->options['github-issue-group-by'] = 'file';
+		$this->options['skip-empty-files'] = true;
+
+		$scan_results = vipgocs_scan_files(
+			$this->options
+		);
+
+		$this->assertSame(
+			array(
+				'files'	=> array(
+					'file1.php' => array(
+						'messages' => array(
+							array(
+								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+								'severity' => 5,
+								'fixable' => false,
+								'type' => 'ERROR',
+								'line' => 2,
+								'column' => 14,
+								'github_commit_url' => 
+									'https://github.com/test/test/blob/' .
+									str_replace("'","", vipgoci_gitrepo_get_head(
+										$this->options['local-git-repo']
+									) ),
+								'file_path' => 'file1.php',
+								'file_is_in_submodule' => false,
+								'file_path_without_submodule' => null,
+							)
+						)
+					),
+
+					'file2.php' => array(
+						'messages' => array(
+						)
+					),
+
+					'file3.php' => array(
+						'messages' => array(
+							array(
+								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+								'severity' => 5,
+								'fixable' => false,
+								'type' => 'ERROR',
+								'line' => 3,
+								'column' => 14,
+								'github_commit_url' => 
+									'https://github.com/test/test/blob/' .
+									str_replace("'","", vipgoci_gitrepo_get_head(
+										$this->options['local-git-repo']
+									) ),
+								'file_path' => 'file3.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
 						)
 					)
+					// No file4.php
 				),
 				'warnings' => 0,
 				'errors' => 2,
@@ -251,14 +358,15 @@ final class ScanFilesScanFilesTest extends TestCase {
 	/**
 	 * @covers ::vipgocs_scan_files
 	 */
-	public function testScanFilesGroupByFolder() {
+	public function testScanFilesGroupByFolderWithEmptyFiles() {
 		$this->options['github-issue-group-by'] = 'folder';
+		$this->options['skip-empty-files'] = false;
 
 		$scan_results = vipgocs_scan_files(
 			$this->options
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'files'	=> array(
 					'/' => array(
@@ -271,15 +379,15 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 2,
 								'column' => 14,
-								'file_path' => 'file1.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file1.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
-						),
+							),
 							array(
 								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
 								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
@@ -288,15 +396,94 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 3,
 								'column' => 14,
-								'file_path' => 'file3.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file3.php',
+								'file_is_in_submodule' => false,
+								'file_path_without_submodule' => null,
+							),
+							array(
+								'message' => "No PHP code was found in this file and short open tags are not allowed by this install of PHP. This file may be using short open tags but PHP does not allow them.",
+								'source' => 'Internal.NoCodeFound',
+								'severity' => 5,
+								'fixable' => false,
+								'type' => 'WARNING',
+								'line' => 1,
+								'column' => 1,
+								'github_commit_url' => 
+									'https://github.com/test/test/blob/' .
+									str_replace("'","", vipgoci_gitrepo_get_head(
+										$this->options['local-git-repo']
+									) ),
+								'file_path' => 'file4.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
+						)
+					)
+				),
+				'warnings' => 1,
+				'errors' => 2,
+				'fixable' => 0,
+			),
+			$scan_results
+		);
+	}
+
+	/**
+	 * @covers ::vipgocs_scan_files
+	 */
+	public function testScanFilesGroupByFolderWithoutEmptyFiles() {
+		$this->options['github-issue-group-by'] = 'folder';
+		$this->options['skip-empty-files'] = true;
+
+		$scan_results = vipgocs_scan_files(
+			$this->options
+		);
+
+		$this->assertSame(
+			array(
+				'files'	=> array(
+					'/' => array(
+						'messages' => array(
+							array(
+								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+								'severity' => 5,
+								'fixable' => false,
+								'type' => 'ERROR',
+								'line' => 2,
+								'column' => 14,
+								'github_commit_url' => 
+									'https://github.com/test/test/blob/' .
+									str_replace("'","", vipgoci_gitrepo_get_head(
+										$this->options['local-git-repo']
+									) ),
+								'file_path' => 'file1.php',
+								'file_is_in_submodule' => false,
+								'file_path_without_submodule' => null,
+							),
+							array(
+								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+								'severity' => 5,
+								'fixable' => false,
+								'type' => 'ERROR',
+								'line' => 3,
+								'column' => 14,
+								'github_commit_url' => 
+									'https://github.com/test/test/blob/' .
+									str_replace("'","", vipgoci_gitrepo_get_head(
+										$this->options['local-git-repo']
+									) ),
+								'file_path' => 'file3.php',
+								'file_is_in_submodule' => false,
+								'file_path_without_submodule' => null,
+							)
+							// No file4.php
 						)
 					)
 				),

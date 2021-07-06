@@ -19,7 +19,7 @@ define( 'VIPGOCI_INCLUDED', true );
  * invoke functions that do the work.
  */
 
-function vipgocs_zendesk_tickets_create() {
+function vipgocs_zendesk_tickets_create() :int {
 	global $argv;
 
 	echo 'Initializing...' . PHP_EOL;
@@ -232,7 +232,7 @@ function vipgocs_zendesk_tickets_create() {
 	else {
 		$options['zendesk-ticket-group-id'] = null;
 	}
-	
+
 	$valid_ticket_statuses = array(
 		'new', 'open', 'pending', 'hold', 'solved', 'closed'
 	);
@@ -251,7 +251,7 @@ function vipgocs_zendesk_tickets_create() {
 			$valid_ticket_statuses
 		) ) {
 			vipgoci_sysexit(
-				'Invalid argument provided to option --zendesk-ticket-status; should be one of: ' . 
+				'Invalid argument provided to option --zendesk-ticket-status; should be one of: ' .
 					join( ', ', $valid_ticket_statuses )
 			);
 		}

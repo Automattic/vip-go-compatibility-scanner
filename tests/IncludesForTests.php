@@ -52,7 +52,7 @@ function vipgoci_unittests_http_server_start( $php_path, $listen_address, $exec_
 	}
 
 	$cmd = sprintf(
-		'cd %s && VIPGOCI_UNITTESTS_PID_FILE=%s VIPGOCI_UNITTESTS_OUTPUT_FILE=%s %s -S %s',
+		'cd %s && VIPGOCI_UNITTESTS_PID_FILE=%s VIPGOCI_UNITTESTS_OUTPUT_FILE=%s %s -S %s 2>&1 >/dev/null',
 		escapeshellcmd( $exec_folder ),
 		escapeshellarg( $pid_file ),
 		escapeshellarg( $output_file ),

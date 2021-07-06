@@ -1,8 +1,12 @@
 <?php
 
+namespace Vipgocs\tests;
+
 require_once( __DIR__ . '/IncludesForTests.php' );
 
 use PHPUnit\Framework\TestCase;
+
+// phpcs:disable PSR1.Files.SideEffects
 
 final class OptionsFileOptionProcessComplementaryTest extends TestCase {
 	var $options = array(
@@ -40,7 +44,7 @@ final class OptionsFileOptionProcessComplementaryTest extends TestCase {
 			'my-text'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'my-text-file'	=> $this->text_file_path,
 				'my-text'	=> 'My Text File Contents',
@@ -61,7 +65,7 @@ final class OptionsFileOptionProcessComplementaryTest extends TestCase {
 			'my-text'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'my-text'	=> 'MyText',
 			),

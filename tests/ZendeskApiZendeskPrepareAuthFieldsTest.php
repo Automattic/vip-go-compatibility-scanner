@@ -1,8 +1,12 @@
 <?php
 
+namespace Vipgocs\tests;
+
 require_once( __DIR__ . '/IncludesForTests.php' );
 
 use PHPUnit\Framework\TestCase;
+
+// phpcs:disable PSR1.Files.SideEffects
 
 final class ZendeskApiZendeskPrepareAuthFieldsTest extends TestCase {
 	/**
@@ -67,7 +71,7 @@ final class ZendeskApiZendeskPrepareAuthFieldsTest extends TestCase {
 		 * All set, should not return null.
 		 */
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'zendesk-access-username'	=> 'testuser1',
 				'zendesk-access-password'	=> 'testpass1',
@@ -92,7 +96,7 @@ final class ZendeskApiZendeskPrepareAuthFieldsTest extends TestCase {
 		 * All set, should not return null.
 		 */
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'zendesk-access-username'	=> 'testuser1',
 				'zendesk-access-token'		=> 'testtoken1',
