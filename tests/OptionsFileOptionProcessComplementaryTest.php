@@ -44,7 +44,7 @@ final class OptionsFileOptionProcessComplementaryTest extends TestCase {
 			'my-text'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'my-text-file'	=> $this->text_file_path,
 				'my-text'	=> 'My Text File Contents',
@@ -65,7 +65,7 @@ final class OptionsFileOptionProcessComplementaryTest extends TestCase {
 			'my-text'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'my-text'	=> 'MyText',
 			),

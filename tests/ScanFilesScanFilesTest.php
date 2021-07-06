@@ -201,7 +201,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 			$this->options
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'files'	=> array(
 					'file1.php' => array(
@@ -214,12 +214,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 2,
 								'column' => 14,
-								'file_path' => 'file1.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file1.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -241,12 +241,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 3,
 								'column' => 14,
-								'file_path' => 'file3.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file3.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -263,12 +263,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'WARNING',
 								'line' => 1,
 								'column' => 1,
-								'file_path' => 'file4.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file4.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -294,7 +294,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 			$this->options
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'files'	=> array(
 					'file1.php' => array(
@@ -307,12 +307,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 2,
 								'column' => 14,
-								'file_path' => 'file1.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file1.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -334,12 +334,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 3,
 								'column' => 14,
-								'file_path' => 'file3.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file3.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -366,7 +366,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 			$this->options
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'files'	=> array(
 					'/' => array(
@@ -379,12 +379,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 2,
 								'column' => 14,
-								'file_path' => 'file1.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file1.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							),
@@ -396,12 +396,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 3,
 								'column' => 14,
-								'file_path' => 'file3.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file3.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							),
@@ -413,12 +413,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'WARNING',
 								'line' => 1,
 								'column' => 1,
-								'file_path' => 'file4.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file4.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -444,7 +444,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 			$this->options
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'files'	=> array(
 					'/' => array(
@@ -457,12 +457,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 2,
 								'column' => 14,
-								'file_path' => 'file1.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file1.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							),
@@ -474,12 +474,12 @@ final class ScanFilesScanFilesTest extends TestCase {
 								'type' => 'ERROR',
 								'line' => 3,
 								'column' => 14,
-								'file_path' => 'file3.php',
 								'github_commit_url' => 
 									'https://github.com/test/test/blob/' .
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
+								'file_path' => 'file3.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)

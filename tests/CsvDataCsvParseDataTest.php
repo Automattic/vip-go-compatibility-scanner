@@ -35,19 +35,19 @@ final class CsvDataCsvParseDataTest extends TestCase {
 
 		vipgoci_unittests_output_unsuppress();
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				array(
-					'source_repo'	=> 'myorg1/myrepo1',
 					'client_email'	=> 'myemail1@myemail.com',
+					'source_repo'	=> 'myorg1/myrepo1',
 				),
 				array(
-					'source_repo'	=> 'myorg2/myrepo2',
 					'client_email'	=> 'myemail2@myemailb.com',
+					'source_repo'	=> 'myorg2/myrepo2',
 				),
 				array(
-					'source_repo'	=> 'myorg3/myrepo3',
 					'client_email'	=> 'myemail3@myemailc.com',
+					'source_repo'	=> 'myorg3/myrepo3',
 				),
 			),
 			$csv_data

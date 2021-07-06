@@ -48,7 +48,7 @@ final class CsvGetEmailForRepoTest extends TestCase {
 			'myrepo0'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			null,
 			$email
 		);
@@ -62,7 +62,7 @@ final class CsvGetEmailForRepoTest extends TestCase {
 			'myrepo1'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			null,
 			$email
 		);
@@ -76,7 +76,7 @@ final class CsvGetEmailForRepoTest extends TestCase {
 			'myrepo1'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			'myemail1@myemail.com',
 			$email
 		);
@@ -90,7 +90,7 @@ final class CsvGetEmailForRepoTest extends TestCase {
 			'myrepo3'
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			'myemail3@myemailc.com',
 			$email
 		);

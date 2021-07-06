@@ -41,7 +41,7 @@ final class ZendeskDbTest extends TestCase {
 			$db_conn
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(),
 			$gh_issues
 		);
@@ -93,7 +93,7 @@ final class ZendeskDbTest extends TestCase {
 			$db_conn
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'r-owner1/r-name1' => array(
 					'repo_owner' => 'r-owner1',
@@ -136,7 +136,7 @@ final class ZendeskDbTest extends TestCase {
 			$db_conn
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'r-owner1/r-name1' => array(
 					'repo_owner' => 'r-owner1',
@@ -178,7 +178,7 @@ final class ZendeskDbTest extends TestCase {
 			$db_conn
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'r-owner1/r-name1' => array(
 					'repo_owner' => 'r-owner1',

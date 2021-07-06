@@ -83,7 +83,7 @@ final class ZendeskSendRequestTest extends TestCase {
 			)
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			'{"_POST":[],"_GET":{"data":"12345678"}}',
 			file_get_contents(
 				$this->output_file

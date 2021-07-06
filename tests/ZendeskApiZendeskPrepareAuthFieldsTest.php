@@ -71,7 +71,7 @@ final class ZendeskApiZendeskPrepareAuthFieldsTest extends TestCase {
 		 * All set, should not return null.
 		 */
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'zendesk-access-username'	=> 'testuser1',
 				'zendesk-access-password'	=> 'testpass1',
@@ -96,7 +96,7 @@ final class ZendeskApiZendeskPrepareAuthFieldsTest extends TestCase {
 		 * All set, should not return null.
 		 */
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'zendesk-access-username'	=> 'testuser1',
 				'zendesk-access-token'		=> 'testtoken1',

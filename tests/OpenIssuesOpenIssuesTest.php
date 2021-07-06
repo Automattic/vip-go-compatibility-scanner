@@ -181,7 +181,7 @@ final class OpenIssuesOpenIssuesTest extends TestCase {
 			)
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			array(
 				'phpcs_issues_found' => 3,
 				'github_issues_opened' => 3,
@@ -189,7 +189,7 @@ final class OpenIssuesOpenIssuesTest extends TestCase {
 			$issue_statistics,
 		);
 
-		$this->assertEquals(
+		$this->assertSame(
 			'{"_POST":{"{\"title\":\"my-issue-title1file1_php\",\"body\":\"my-issue-body1,_\\\\n*_<b>Error<\\\\\\/b>:_All_output_should_be_run_through_an_escaping_function_(see_the_Security_sections_in_the_WordPress_Developer_Handbooks),_found_\'time\'__https:\\\\\/\\\\\/github_com\\\\\\/mytestuseraccount0x900\\\\\\/testrepo18736\\\\\\/blob\\\\\\/8171\\\\\\/file1_php#L2\\\\n\\\\n\\\\n\\\\n,_main-branch\\\\n\",\"assignees\":":{"\"my-username1\",\"my-username2\"":""}},"_GET":[]}' .
 				'{"_POST":{"{\"title\":\"my-issue-title1file3_php\",\"body\":\"my-issue-body1,_\\\\n*_<b>Error<\\\\\\/b>:_All_output_should_be_run_through_an_escaping_function_(see_the_Security_sections_in_the_WordPress_Developer_Handbooks),_found_\'time\'__https:\\\\\\/\\\\\\/github_com\\\\\\/mytestuseraccount1x900\\\\\\/testrepo19936\\\\\\/blob\\\\\\/9300\\\\\\/file3_php#L3\\\\n\\\\n\\\\n\\\\n,_main-branch\\\\n\",\"assignees\":":{"\"my-username1\",\"my-username2\"":""}},"_GET":[]}' .
 				'{"_POST":{"{\"title\":\"my-issue-title1file4_php\",\"body\":\"my-issue-body1,_\\\\n*_<b>Error<\\\\\\/b>:_All_output_should_be_run_through_an_escaping_function_(see_the_Security_sections_in_the_WordPress_Developer_Handbooks),_found_\'time\'___In_submodule,_<a_href":"\\\\\\"https:\\\\\\/\\\\\\/github.com\\\\\\/yetanothertestaccount1x900\\\\\\/testrepo39999\\\\\\/blob\\\\\\/18900\\\\\\/file4.php#L30\\\\\\">here<\\\\\\/a>.\\\\n\\\\n\\\\n\\\\n, main-branch\\\\n\",\"assignees\":[\"my-username1\",\"my-username2\"]}"},"_GET":[]}',
