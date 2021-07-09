@@ -25,6 +25,7 @@ function vipgocs_options_recognized(): array {
 		'phpcs-severity:',
 		'phpcs-runtime-set:',
 		'phpcs-sniffs-exclude:',
+		'phpcs-cachedb:', // PHPCS CacheDB
 
 		/*
 		 * GitHub reviews configuration
@@ -85,6 +86,11 @@ function vipgocs_help( ) :void {
 		"\t" . '				    For example: --phpcs-runtime-set="foo1 bar1, foo2,bar2"' . PHP_EOL .
 		"\t" . '--phpcs-sniffs-exclude=ARRAY        Specify which sniffs to exclude from PHPCS scanning,' . PHP_EOL .
 		"\t" . '				    should be an array with items separated by commas.' . PHP_EOL .
+		"\t" . '--phpcs-cachedb=FILE                File to cache PHPCS results. In this DB file results' . PHP_EOL .
+		"\t" . '                                    are cached for all files scanned in case an identical' . PHP_EOL .
+		"\t" . '                                    file is later to be scanned; the cached results can then' . PHP_EOL .
+		"\t" . '                                    be re-used and the scanning itself skipped which can save' . PHP_EOL .
+		"\t" . '                                    time. Use with caution, see README.md.' . PHP_EOL .
 		PHP_EOL .
 		"\t" . 'GitHub reviews configuration:' . PHP_EOL .
 		"\t" . '--review-comments-ignore=ARRAY      Array of issues to be filtered away before posting results to GitHub.' . PHP_EOL .
@@ -233,7 +239,8 @@ function vipgocs_compatibility_scanner_init_general(
  * @codeCoverageIgnore
  */
 function vipgocs_compatibility_scanner_init_phpcs(
-	array &$options // $options is a pointer
+	array &$options, // $options is a pointer
+	&$phpcscachedb_conn // $phpcscachedb_conn is a pointer
 ) :void {
 	/*
 	 * Parse rest of options
@@ -279,6 +286,12 @@ function vipgocs_compatibility_scanner_init_phpcs(
 		1,
 		array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 )
 	);
+
+	if ( ! empty( $options['phpcs-cachedb'] ) ) {
+		$phpcscachedb_conn = vipgocs_phpcs_cachedb_db_open(
+			$options['phpcs-cachedb']
+		);
+	}
 }
 
 /*
@@ -439,7 +452,8 @@ function vipgocs_compatibility_scanner_init_zendesk(
 function vipgocs_compatibility_scanner_init(
 	array &$options, // $options is a pointer
 	int &$startup_time, // $startup_time is a pointer
-	&$zendesk_db_conn // $zendesk_db_conn is a pointer
+	&$zendesk_db_conn, // $zendesk_db_conn is a pointer
+	&$phpcscachedb_conn // $phpcscachedb_conn is a pointer
 ) :void {
 	$zendesk_db_conn = null;
 
@@ -483,7 +497,7 @@ function vipgocs_compatibility_scanner_init(
 	/*
 	 * Initialize PHPCS options
 	 */
-	vipgocs_compatibility_scanner_init_phpcs( $options );
+	vipgocs_compatibility_scanner_init_phpcs( $options, $phpcscachedb_conn );
 
 	/*
 	 * Initialize GitHub options.
@@ -519,7 +533,8 @@ function vipgocs_compatibility_scanner_init(
 function vipgocs_compatibility_scanner_run(
 	array &$options, // $options is a pointer
 	int &$startup_time, // $startup_time is a pointer
-	&$zendesk_db_conn // zendesk_db_conn is a pointer
+	&$zendesk_db_conn, // zendesk_db_conn is a pointer
+	&$phpcscachedb_conn // $phpcscachedb_conn is a pointer
 ) :int {
 	/*
 	 * Get options with sensitive items cleaned.
@@ -577,7 +592,8 @@ function vipgocs_compatibility_scanner_run(
 	 * get results.
 	 */
 	$all_results = vipgocs_scan_files(
-		$options
+		$options,
+		$phpcscachedb_conn
 	);
 
 	/*
@@ -632,6 +648,12 @@ function vipgocs_compatibility_scanner_run(
 		) ) {
 			vipgocs_zendesk_db_close(
 				$zendesk_db_conn
+			);
+		}
+
+		if ( ! empty( $phpcscachedb_conn ) ) {
+			vipgocs_phpcs_cachedb_db_close(
+				$phpcscachedb_conn
 			);
 		}
 
@@ -706,6 +728,15 @@ function vipgocs_compatibility_scanner_run(
 		);
 
 	/*
+	 * Close PHPCacheDB connection.
+	 */
+	if ( ! empty( $phpcscachedb_conn ) ) {
+		vipgocs_phpcs_cachedb_db_close(
+			$phpcscachedb_conn
+		);
+	}
+
+	/*
 	 * Close connection to DB.
 	 */
 	if ( ! empty(
@@ -771,6 +802,7 @@ if ( ( ! defined( 'VIPGOCS_UNIT_TESTING' ) ) || ( false === VIPGOCS_UNIT_TESTING
 	$options = array();
 	$startup_time = 0;
 	$zendesk_db_conn = null;
+	$phpcscachedb_conn = null;
 
 	/*
 	 * Initialize, get options, sanitize
@@ -779,7 +811,8 @@ if ( ( ! defined( 'VIPGOCS_UNIT_TESTING' ) ) || ( false === VIPGOCS_UNIT_TESTING
 	vipgocs_compatibility_scanner_init(
 		$options,
 		$startup_time,
-		$zendesk_db_conn
+		$zendesk_db_conn,
+		$phpcscachedb_conn
 	);
 
 	/*
@@ -788,7 +821,8 @@ if ( ( ! defined( 'VIPGOCS_UNIT_TESTING' ) ) || ( false === VIPGOCS_UNIT_TESTING
 	$status = vipgocs_compatibility_scanner_run(
 		$options,
 		$startup_time,
-		$zendesk_db_conn
+		$zendesk_db_conn,
+		$phpcscachedb_conn
 	);
 
 	exit( $status );
