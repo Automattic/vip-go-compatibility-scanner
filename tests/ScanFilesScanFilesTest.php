@@ -117,25 +117,9 @@ final class ScanFilesScanFilesTest extends TestCase {
 	 * Remove temporary git repository.
 	 */
 	protected function _git_repo_teardown() {
-		if (
-			( ! empty(
-				$this->local_git_repo
-			) )
-			&&
-			( strlen(
-				$this->local_git_repo
-			) > 0 )
-			&&
-			( strpos(
-				$this->local_git_repo,
-				sys_get_temp_dir()
-			) !== false )
-		) {
-			$cmd = sprintf(
-				'rm -rf %s',
-				escapeshellarg( $this->local_git_repo )
-			);
-		}
+		vipgoci_unittests_remove_temporary_folder_safely(
+			$this->local_git_repo
+		);
 
 		unset( $this->local_git_repo );
 	}
@@ -197,8 +181,11 @@ final class ScanFilesScanFilesTest extends TestCase {
 		$this->options['github-issue-group-by'] = 'file';
 		$this->options['skip-empty-files'] = false;
 
+		$phpcscachedb_conn = null;
+
 		$scan_results = vipgocs_scan_files(
-			$this->options
+			$this->options,
+			$phpcscachedb_conn
 		);
 
 		$this->assertSame(
@@ -219,7 +206,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
-								'file_path' => 'file1.php',
+								'file_relative_path' => 'file1.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -246,7 +233,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
-								'file_path' => 'file3.php',
+								'file_relative_path' => 'file3.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -268,7 +255,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
-								'file_path' => 'file4.php',
+								'file_relative_path' => 'file4.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -290,8 +277,11 @@ final class ScanFilesScanFilesTest extends TestCase {
 		$this->options['github-issue-group-by'] = 'file';
 		$this->options['skip-empty-files'] = true;
 
+		$phpcscachedb_conn = null;
+
 		$scan_results = vipgocs_scan_files(
-			$this->options
+			$this->options,
+			$phpcscachedb_conn
 		);
 
 		$this->assertSame(
@@ -312,7 +302,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
-								'file_path' => 'file1.php',
+								'file_relative_path' => 'file1.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -339,7 +329,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
-								'file_path' => 'file3.php',
+								'file_relative_path' => 'file3.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -362,8 +352,11 @@ final class ScanFilesScanFilesTest extends TestCase {
 		$this->options['github-issue-group-by'] = 'folder';
 		$this->options['skip-empty-files'] = false;
 
+		$phpcscachedb_conn = null;
+
 		$scan_results = vipgocs_scan_files(
-			$this->options
+			$this->options,
+			$phpcscachedb_conn
 		);
 
 		$this->assertSame(
@@ -384,7 +377,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
-								'file_path' => 'file1.php',
+								'file_relative_path' => 'file1.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							),
@@ -401,7 +394,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
-								'file_path' => 'file3.php',
+								'file_relative_path' => 'file3.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							),
@@ -418,7 +411,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
-								'file_path' => 'file4.php',
+								'file_relative_path' => 'file4.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
@@ -440,8 +433,11 @@ final class ScanFilesScanFilesTest extends TestCase {
 		$this->options['github-issue-group-by'] = 'folder';
 		$this->options['skip-empty-files'] = true;
 
+		$phpcscachedb_conn = null;
+
 		$scan_results = vipgocs_scan_files(
-			$this->options
+			$this->options,
+			$phpcscachedb_conn
 		);
 
 		$this->assertSame(
@@ -462,7 +458,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
-								'file_path' => 'file1.php',
+								'file_relative_path' => 'file1.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							),
@@ -479,7 +475,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 									str_replace("'","", vipgoci_gitrepo_get_head(
 										$this->options['local-git-repo']
 									) ),
-								'file_path' => 'file3.php',
+								'file_relative_path' => 'file3.php',
 								'file_is_in_submodule' => false,
 								'file_path_without_submodule' => null,
 							)
