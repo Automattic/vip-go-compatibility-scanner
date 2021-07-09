@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 // phpcs:disable PSR1.Files.SideEffects
 
-final class ScanFilesScanFileAddInfoToitemTest extends TestCase {
+final class ScanFilesScanFileAddInfoToItemTest extends TestCase {
 	/**
 	 * @covers ::vipgocs_scan_file_add_info_to_item
 	 */
