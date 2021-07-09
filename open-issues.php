@@ -134,7 +134,7 @@ function vipgocs_open_issues(
 				$file_issue['github_commit_url'] . '/';
 
 			if ( false === $file_issue['file_is_in_submodule'] ) {
-				$error_msg_link .= $file_issue['file_path'];
+				$error_msg_link .= $file_issue['file_relative_path'];
 			}
 
 			else {
@@ -155,7 +155,7 @@ function vipgocs_open_issues(
 
 			if ( 'folder' === $options['github-issue-group-by'] ) {
 				$error_msg .= ' in ' .
-					$file_issue['file_path'];
+					$file_issue['file_relative_path'];
 			}
 
 			$error_msg .= '</b>: ' .
