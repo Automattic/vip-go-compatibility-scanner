@@ -109,9 +109,7 @@ function vipgocs_phpcs_cachedb_db_close(
 	object &$db_conn
 ) :bool {
 	vipgoci_log(
-		'Closing connection to PHPCS caching database (PHPCSCacheDB)',
-		array(
-		)
+		'Closing connection to PHPCS caching database (PHPCSCacheDB)'
 	);
 
 	vipgoci_counter_report(
@@ -121,6 +119,28 @@ function vipgocs_phpcs_cachedb_db_close(
 	);
 
 	return $db_conn->close();
+}
+
+/**
+ * Clean the PHPCS CacheDB using the
+ * VACUUM query.
+ */
+function vipgocs_phpcs_cachedb_db_vacuum(
+	object &$db_conn
+) :bool {
+	vipgoci_log(
+		'Vacuuming PHPCS caching database (PHPCSCacheDB)'
+	);
+
+	$res = $db_conn->query(
+		'VACUUM'
+	);
+
+	if ( false === $res ) {
+		return false;
+	}
+
+	return true;
 }
 
 /**
