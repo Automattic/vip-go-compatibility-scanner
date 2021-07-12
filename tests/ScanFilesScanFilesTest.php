@@ -23,7 +23,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 	 * Set up a temporary git repository with
 	 * some data.
 	 */
-	protected function _git_repo_setup() {
+	private function _local_git_repo_setup() {
 		$this->local_git_repo = null;
 
 		/*
@@ -113,15 +113,55 @@ final class ScanFilesScanFilesTest extends TestCase {
 		$result = shell_exec( $cmd );
 	}
 
+	private function _local_git_commit_url_get() {
+		return 'https://github.com/test/test/blob/' .
+			str_replace("'","", vipgoci_gitrepo_get_head(
+				$this->options['local-git-repo']
+			) );
+	}
+
 	/*
 	 * Remove temporary git repository.
 	 */
-	protected function _git_repo_teardown() {
+	private function _local_git_repo_teardown() {
 		vipgoci_unittests_remove_temporary_folder_safely(
 			$this->local_git_repo
 		);
 
 		unset( $this->local_git_repo );
+	}
+
+	/*
+	 * Set up temporary PHPCSCacheDB
+	 */
+	private function _local_setup_phpcs_cachedb_conn() {
+		$this->options['phpcs-cachedb-path'] = tempnam(
+			sys_get_temp_dir(),
+			'vipgocs_phpcs_cachedb_'
+		);
+
+		$this->options['phpcs-cachedb'] = vipgocs_phpcs_cachedb_db_open(
+			$this->options['phpcs-cachedb-path']
+		);
+	}
+
+	/*
+	 * Remove temporary PHPCSCacheDB
+	 */
+	private function _local_remove_phpcs_cachedb_conn() {
+		if ( ! empty( $this->options['phpcs-cachedb'] ) ) {
+			vipgocs_phpcs_cachedb_db_close(
+				$this->options['phpcs-cachedb']
+			);
+
+			$this->options['phpcs-cachedb'] = null;
+		}
+
+		if ( ! empty( $this->options['phpcs-cachedb-path'] ) ) {
+			unlink( $this->options['phpcs-cachedb-path']  );
+
+			$this->options['phpcs-cachedb-path']  = null;
+		}
 	}
 
 	protected function setUp() :void {
@@ -146,10 +186,12 @@ final class ScanFilesScanFilesTest extends TestCase {
        				'phpcs-sniffs-include'		=> array(),
 				'phpcs-runtime-set'		=> array(),
 				'phpcs-severity'		=> 1,
+				'phpcs-cachedb'			=> null,
+				'phpcs-cachedb-path'		=> null,
 			)
 		);
 
-		$this->_git_repo_setup();
+		$this->_local_git_repo_setup();
 
 		$this->options['local-git-repo'] = $this->local_git_repo;
 
@@ -161,10 +203,17 @@ final class ScanFilesScanFilesTest extends TestCase {
 			str_replace( '\'', '', $vipgoci_git_repo_head );
 
 		$this->options['commit'] = $vipgoci_git_repo_head;
+
+		/*
+		 * Note: Do not set up PHPCSCacheDB here, is done
+		 * in the tests that need it.
+		 */
 	}
 
 	protected function tearDown() :void {
-		$this->_git_repo_teardown();
+		$this->_local_git_repo_teardown();
+
+		$this->_local_remove_phpcs_cachedb_conn();
 
 		unset(
 			$this->local_git_repo,
@@ -174,98 +223,88 @@ final class ScanFilesScanFilesTest extends TestCase {
 		);
 	}
 
+	private function getScanFilesGroupByFileWithEmptyFilesExpectedResults() {
+		return array(
+			'files'	=> array(
+				'file1.php' => array(
+					'messages' => array(
+						array(
+							'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+							'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+							'severity' => 5,
+							'fixable' => false,
+							'type' => 'ERROR',
+							'line' => 2,
+							'column' => 14,
+							'github_commit_url' => $this->_local_git_commit_url_get(),
+							'file_relative_path' => 'file1.php',
+							'file_is_in_submodule' => false,
+							'file_path_without_submodule' => null,
+						)
+					)
+				),
+
+				'file2.php' => array(
+					'messages' => array(
+					)
+				),
+
+				'file3.php' => array(
+					'messages' => array(
+						array(
+							'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+							'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+							'severity' => 5,
+							'fixable' => false,
+							'type' => 'ERROR',
+							'line' => 3,
+							'column' => 14,
+							'github_commit_url' => $this->_local_git_commit_url_get(),
+							'file_relative_path' => 'file3.php',
+							'file_is_in_submodule' => false,
+							'file_path_without_submodule' => null,
+						)
+					)
+				),
+
+				'file4.php' => array(
+					'messages' => array(
+						array(
+							'message' => "No PHP code was found in this file and short open tags are not allowed by this install of PHP. This file may be using short open tags but PHP does not allow them.",
+							'source' => 'Internal.NoCodeFound',
+							'severity' => 5,
+							'fixable' => false,
+							'type' => 'WARNING',
+							'line' => 1,
+							'column' => 1,
+							'github_commit_url' => $this->_local_git_commit_url_get(),
+							'file_relative_path' => 'file4.php',
+							'file_is_in_submodule' => false,
+							'file_path_without_submodule' => null,
+						)
+					)
+				),
+			),
+			'warnings' => 1,
+			'errors' => 2,
+			'fixable' => 0,
+		);
+	}
+
 	/**
 	 * @covers ::vipgocs_scan_files
 	 */
-	public function testScanFilesGroupByFileWithEmptyFiles() {
+	public function testScanFilesGroupByFileWithEmptyFilesSkipPhpcsCache() {
 		$this->options['github-issue-group-by'] = 'file';
 		$this->options['skip-empty-files'] = false;
 
-		$phpcscachedb_conn = null;
-
 		$scan_results = vipgocs_scan_files(
 			$this->options,
-			$phpcscachedb_conn
+			$this->options['phpcs-cachedb']
 		);
 
 		$this->assertSame(
-			array(
-				'files'	=> array(
-					'file1.php' => array(
-						'messages' => array(
-							array(
-								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
-								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
-								'severity' => 5,
-								'fixable' => false,
-								'type' => 'ERROR',
-								'line' => 2,
-								'column' => 14,
-								'github_commit_url' => 
-									'https://github.com/test/test/blob/' .
-									str_replace("'","", vipgoci_gitrepo_get_head(
-										$this->options['local-git-repo']
-									) ),
-								'file_relative_path' => 'file1.php',
-								'file_is_in_submodule' => false,
-								'file_path_without_submodule' => null,
-							)
-						)
-					),
-
-					'file2.php' => array(
-						'messages' => array(
-						)
-					),
-
-					'file3.php' => array(
-						'messages' => array(
-							array(
-								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
-								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
-								'severity' => 5,
-								'fixable' => false,
-								'type' => 'ERROR',
-								'line' => 3,
-								'column' => 14,
-								'github_commit_url' => 
-									'https://github.com/test/test/blob/' .
-									str_replace("'","", vipgoci_gitrepo_get_head(
-										$this->options['local-git-repo']
-									) ),
-								'file_relative_path' => 'file3.php',
-								'file_is_in_submodule' => false,
-								'file_path_without_submodule' => null,
-							)
-						)
-					),
-
-					'file4.php' => array(
-						'messages' => array(
-							array(
-								'message' => "No PHP code was found in this file and short open tags are not allowed by this install of PHP. This file may be using short open tags but PHP does not allow them.",
-								'source' => 'Internal.NoCodeFound',
-								'severity' => 5,
-								'fixable' => false,
-								'type' => 'WARNING',
-								'line' => 1,
-								'column' => 1,
-								'github_commit_url' => 
-									'https://github.com/test/test/blob/' .
-									str_replace("'","", vipgoci_gitrepo_get_head(
-										$this->options['local-git-repo']
-									) ),
-								'file_relative_path' => 'file4.php',
-								'file_is_in_submodule' => false,
-								'file_path_without_submodule' => null,
-							)
-						)
-					),
-				),
-				'warnings' => 1,
-				'errors' => 2,
-				'fixable' => 0,
-			),
+			$this->getScanFilesGroupByFileWithEmptyFilesExpectedResults(),
 			$scan_results
 		);
 	}
@@ -273,74 +312,98 @@ final class ScanFilesScanFilesTest extends TestCase {
 	/**
 	 * @covers ::vipgocs_scan_files
 	 */
-	public function testScanFilesGroupByFileWithoutEmptyFiles() {
+	public function testScanFilesGroupByFileWithEmptyFilesUsePhpcsCache() {
+		$this->options['github-issue-group-by'] = 'file';
+		$this->options['skip-empty-files'] = false;
+
+		$this->_local_setup_phpcs_cachedb_conn();
+
+		$scan_results1 = vipgocs_scan_files(
+			$this->options,
+			$this->options['phpcs-cachedb']
+		);
+
+		$this->assertSame(
+			$this->getScanFilesGroupByFileWithEmptyFilesExpectedResults(),
+			$scan_results1
+		);
+
+		$scan_results2 = vipgocs_scan_files(
+			$this->options,
+			$this->options['phpcs-cachedb']
+		);
+
+		$this->assertSame(
+			$scan_results1,
+			$scan_results2
+		);
+	}
+
+	private function getScanFilesGroupByFileWithoutEmptyFilesExpectedResults() {
+		return array(
+			'files'	=> array(
+				'file1.php' => array(
+					'messages' => array(
+						array(
+							'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+							'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+							'severity' => 5,
+							'fixable' => false,
+							'type' => 'ERROR',
+							'line' => 2,
+							'column' => 14,
+							'github_commit_url' => $this->_local_git_commit_url_get(),
+							'file_relative_path' => 'file1.php',
+							'file_is_in_submodule' => false,
+							'file_path_without_submodule' => null,
+						)
+					)
+				),
+
+				'file2.php' => array(
+					'messages' => array(
+					)
+				),
+
+				'file3.php' => array(
+					'messages' => array(
+						array(
+							'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+							'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+							'severity' => 5,
+							'fixable' => false,
+							'type' => 'ERROR',
+							'line' => 3,
+							'column' => 14,
+							'github_commit_url' => $this->_local_git_commit_url_get(),
+							'file_relative_path' => 'file3.php',
+							'file_is_in_submodule' => false,
+							'file_path_without_submodule' => null,
+						)
+					)
+				)
+				// No file4.php
+			),
+			'warnings' => 0,
+			'errors' => 2,
+			'fixable' => 0,
+		);
+	}
+
+	/**
+	 * @covers ::vipgocs_scan_files
+	 */
+	public function testScanFilesGroupByFileWithoutEmptyFilesSkipPhpcsCache() {
 		$this->options['github-issue-group-by'] = 'file';
 		$this->options['skip-empty-files'] = true;
 
-		$phpcscachedb_conn = null;
-
 		$scan_results = vipgocs_scan_files(
 			$this->options,
-			$phpcscachedb_conn
+			$this->options['phpcs-cachedb']
 		);
 
 		$this->assertSame(
-			array(
-				'files'	=> array(
-					'file1.php' => array(
-						'messages' => array(
-							array(
-								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
-								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
-								'severity' => 5,
-								'fixable' => false,
-								'type' => 'ERROR',
-								'line' => 2,
-								'column' => 14,
-								'github_commit_url' => 
-									'https://github.com/test/test/blob/' .
-									str_replace("'","", vipgoci_gitrepo_get_head(
-										$this->options['local-git-repo']
-									) ),
-								'file_relative_path' => 'file1.php',
-								'file_is_in_submodule' => false,
-								'file_path_without_submodule' => null,
-							)
-						)
-					),
-
-					'file2.php' => array(
-						'messages' => array(
-						)
-					),
-
-					'file3.php' => array(
-						'messages' => array(
-							array(
-								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
-								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
-								'severity' => 5,
-								'fixable' => false,
-								'type' => 'ERROR',
-								'line' => 3,
-								'column' => 14,
-								'github_commit_url' => 
-									'https://github.com/test/test/blob/' .
-									str_replace("'","", vipgoci_gitrepo_get_head(
-										$this->options['local-git-repo']
-									) ),
-								'file_relative_path' => 'file3.php',
-								'file_is_in_submodule' => false,
-								'file_path_without_submodule' => null,
-							)
-						)
-					)
-					// No file4.php
-				),
-				'warnings' => 0,
-				'errors' => 2,
-				'fixable' => 0,
-			),
+			$this->getScanFilesGroupByFileWithoutEmptyFilesExpectedResults(),
 			$scan_results
 		);
 	}
@@ -348,80 +411,100 @@ final class ScanFilesScanFilesTest extends TestCase {
 	/**
 	 * @covers ::vipgocs_scan_files
 	 */
-	public function testScanFilesGroupByFolderWithEmptyFiles() {
+	public function testScanFilesGroupByFileWithoutEmptyFilesUsePhpcsCache() {
+		$this->options['github-issue-group-by'] = 'file';
+		$this->options['skip-empty-files'] = true;
+
+		$this->_local_setup_phpcs_cachedb_conn();
+
+		$scan_results1 = vipgocs_scan_files(
+			$this->options,
+			$this->options['phpcs-cachedb']
+		);
+
+		$this->assertSame(
+			$this->getScanFilesGroupByFileWithoutEmptyFilesExpectedResults(),
+			$scan_results1
+		);
+	
+		$scan_results2 = vipgocs_scan_files(
+			$this->options,
+			$this->options['phpcs-cachedb']
+		);
+
+		$this->assertSame(
+			$scan_results1,
+			$scan_results2
+		);
+	}
+
+	private function getScanFilesGroupByFolderWithEmptyFilesExpectedResults() {
+		return array(
+			'files'	=> array(
+				'/' => array(
+					'messages' => array(
+						array(
+							'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+							'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+							'severity' => 5,
+							'fixable' => false,
+							'type' => 'ERROR',
+							'line' => 2,
+							'column' => 14,
+							'github_commit_url' => $this->_local_git_commit_url_get(),
+							'file_relative_path' => 'file1.php',
+							'file_is_in_submodule' => false,
+							'file_path_without_submodule' => null,
+						),
+						array(
+							'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+							'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+							'severity' => 5,
+							'fixable' => false,
+							'type' => 'ERROR',
+							'line' => 3,
+							'column' => 14,
+							'github_commit_url' => $this->_local_git_commit_url_get(),
+							'file_relative_path' => 'file3.php',
+							'file_is_in_submodule' => false,
+							'file_path_without_submodule' => null,
+						),
+						array(
+							'message' => "No PHP code was found in this file and short open tags are not allowed by this install of PHP. This file may be using short open tags but PHP does not allow them.",
+							'source' => 'Internal.NoCodeFound',
+							'severity' => 5,
+							'fixable' => false,
+							'type' => 'WARNING',
+							'line' => 1,
+							'column' => 1,
+							'github_commit_url' => $this->_local_git_commit_url_get(),
+							'file_relative_path' => 'file4.php',
+							'file_is_in_submodule' => false,
+							'file_path_without_submodule' => null,
+						)
+					)
+				)
+			),
+			'warnings' => 1,
+			'errors' => 2,
+			'fixable' => 0,
+		);
+	}
+
+	/**
+	 * @covers ::vipgocs_scan_files
+	 */
+	public function testScanFilesGroupByFolderWithEmptyFilesSkipPhpcsCache() {
 		$this->options['github-issue-group-by'] = 'folder';
 		$this->options['skip-empty-files'] = false;
 
-		$phpcscachedb_conn = null;
-
 		$scan_results = vipgocs_scan_files(
 			$this->options,
-			$phpcscachedb_conn
+			$this->options['phpcs-cachedb']
 		);
 
 		$this->assertSame(
-			array(
-				'files'	=> array(
-					'/' => array(
-						'messages' => array(
-							array(
-								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
-								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
-								'severity' => 5,
-								'fixable' => false,
-								'type' => 'ERROR',
-								'line' => 2,
-								'column' => 14,
-								'github_commit_url' => 
-									'https://github.com/test/test/blob/' .
-									str_replace("'","", vipgoci_gitrepo_get_head(
-										$this->options['local-git-repo']
-									) ),
-								'file_relative_path' => 'file1.php',
-								'file_is_in_submodule' => false,
-								'file_path_without_submodule' => null,
-							),
-							array(
-								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
-								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
-								'severity' => 5,
-								'fixable' => false,
-								'type' => 'ERROR',
-								'line' => 3,
-								'column' => 14,
-								'github_commit_url' => 
-									'https://github.com/test/test/blob/' .
-									str_replace("'","", vipgoci_gitrepo_get_head(
-										$this->options['local-git-repo']
-									) ),
-								'file_relative_path' => 'file3.php',
-								'file_is_in_submodule' => false,
-								'file_path_without_submodule' => null,
-							),
-							array(
-								'message' => "No PHP code was found in this file and short open tags are not allowed by this install of PHP. This file may be using short open tags but PHP does not allow them.",
-								'source' => 'Internal.NoCodeFound',
-								'severity' => 5,
-								'fixable' => false,
-								'type' => 'WARNING',
-								'line' => 1,
-								'column' => 1,
-								'github_commit_url' => 
-									'https://github.com/test/test/blob/' .
-									str_replace("'","", vipgoci_gitrepo_get_head(
-										$this->options['local-git-repo']
-									) ),
-								'file_relative_path' => 'file4.php',
-								'file_is_in_submodule' => false,
-								'file_path_without_submodule' => null,
-							)
-						)
-					)
-				),
-				'warnings' => 1,
-				'errors' => 2,
-				'fixable' => 0,
-			),
+			$this->getScanFilesGroupByFolderWithEmptyFilesExpectedResults(),
 			$scan_results
 		);
 	}
@@ -429,65 +512,121 @@ final class ScanFilesScanFilesTest extends TestCase {
 	/**
 	 * @covers ::vipgocs_scan_files
 	 */
-	public function testScanFilesGroupByFolderWithoutEmptyFiles() {
+	public function testScanFilesGroupByFolderWithEmptyFilesUsePhpcsCache() {
 		$this->options['github-issue-group-by'] = 'folder';
-		$this->options['skip-empty-files'] = true;
+		$this->options['skip-empty-files'] = false;
 
-		$phpcscachedb_conn = null;
+		$this->_local_setup_phpcs_cachedb_conn();
 
-		$scan_results = vipgocs_scan_files(
+		$scan_results1 = vipgocs_scan_files(
 			$this->options,
-			$phpcscachedb_conn
+			$this->options['phpcs-cachedb']
 		);
 
 		$this->assertSame(
-			array(
-				'files'	=> array(
-					'/' => array(
-						'messages' => array(
-							array(
-								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
-								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
-								'severity' => 5,
-								'fixable' => false,
-								'type' => 'ERROR',
-								'line' => 2,
-								'column' => 14,
-								'github_commit_url' => 
-									'https://github.com/test/test/blob/' .
-									str_replace("'","", vipgoci_gitrepo_get_head(
-										$this->options['local-git-repo']
-									) ),
-								'file_relative_path' => 'file1.php',
-								'file_is_in_submodule' => false,
-								'file_path_without_submodule' => null,
-							),
-							array(
-								'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
-								'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
-								'severity' => 5,
-								'fixable' => false,
-								'type' => 'ERROR',
-								'line' => 3,
-								'column' => 14,
-								'github_commit_url' => 
-									'https://github.com/test/test/blob/' .
-									str_replace("'","", vipgoci_gitrepo_get_head(
-										$this->options['local-git-repo']
-									) ),
-								'file_relative_path' => 'file3.php',
-								'file_is_in_submodule' => false,
-								'file_path_without_submodule' => null,
-							)
-							// No file4.php
+			$this->getScanFilesGroupByFolderWithEmptyFilesExpectedResults(),
+			$scan_results1
+		);
+
+		$scan_results2 = vipgocs_scan_files(
+			$this->options,
+			$this->options['phpcs-cachedb']
+		);
+
+
+		$this->assertSame(
+			$scan_results1,
+			$scan_results2
+		);
+	}
+
+	private function getScanFilesGroupByFolderWithoutEmptyFilesExpectedResults() {
+		return array(
+			'files'	=> array(
+				'/' => array(
+					'messages' => array(
+						array(
+							'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+							'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+							'severity' => 5,
+							'fixable' => false,
+							'type' => 'ERROR',
+							'line' => 2,
+							'column' => 14,
+							'github_commit_url' => $this->_local_git_commit_url_get(),
+							'file_relative_path' => 'file1.php',
+							'file_is_in_submodule' => false,
+							'file_path_without_submodule' => null,
+						),
+						array(
+							'message' => "All output should be run through an escaping function (see the Security sections in the WordPress Developer Handbooks), found 'time'.",
+							'source' => 'WordPress.Security.EscapeOutput.OutputNotEscaped',
+							'severity' => 5,
+							'fixable' => false,
+							'type' => 'ERROR',
+							'line' => 3,
+							'column' => 14,
+							'github_commit_url' => $this->_local_git_commit_url_get(),
+							'file_relative_path' => 'file3.php',
+							'file_is_in_submodule' => false,
+							'file_path_without_submodule' => null,
 						)
+						// No file4.php
 					)
-				),
-				'warnings' => 0,
-				'errors' => 2,
-				'fixable' => 0,
+				)
 			),
+			'warnings' => 0,
+			'errors' => 2,
+			'fixable' => 0,
+		);
+	}
+
+	/**
+	 * @covers ::vipgocs_scan_files
+	 */
+	public function testScanFilesGroupByFolderWithoutEmptyFilesSkipPhpcsCache() {
+		$this->options['github-issue-group-by'] = 'folder';
+		$this->options['skip-empty-files'] = true;
+
+		$scan_results = vipgocs_scan_files(
+			$this->options,
+			$this->options['phpcs-cachedb']
+		);
+
+		$this->assertSame(
+			$this->getScanFilesGroupByFolderWithoutEmptyFilesExpectedResults(),
 			$scan_results
+		);
+	}
+
+
+	/**
+	 * @covers ::vipgocs_scan_files
+	 */
+	public function testScanFilesGroupByFolderWithoutEmptyFilesUsePhpcsCache() {
+		$this->options['github-issue-group-by'] = 'folder';
+		$this->options['skip-empty-files'] = true;
+
+		$this->_local_setup_phpcs_cachedb_conn();
+
+		$scan_results1 = vipgocs_scan_files(
+			$this->options,
+			$this->options['phpcs-cachedb']
+		);
+
+		$this->assertSame(
+			$this->getScanFilesGroupByFolderWithoutEmptyFilesExpectedResults(),
+			$scan_results1
+		);
+	
+		$scan_results2 = vipgocs_scan_files(
+			$this->options,
+			$this->options['phpcs-cachedb']
+		);
+
+		$this->assertSame(
+			$scan_results1,
+			$scan_results2
 		);
 	}
 }
