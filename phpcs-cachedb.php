@@ -179,6 +179,16 @@ function vipgocs_phpcs_cachedb_add(
 	);
 
 	/*
+	 * In case of data existing, remove it first
+	 * just in case.
+	 */
+	vipgocs_phpcs_cachedb_remove(
+		$db_conn,
+		$file_path,
+		$phpcs_options
+	);
+
+	/*
 	 * Get file contents and
 	 * calculate SHA sum for the
 	 * file.
@@ -207,16 +217,6 @@ function vipgocs_phpcs_cachedb_add(
 	 */
 	$phpcs_options_shasum = vipgocs_phpcs_cachedb_hash_calc(
 		json_encode( $phpcs_options )
-	);
-
-	/*
-	 * In case of data existing, remove it first
-	 * just in case.
-	 */
-	vipgocs_phpcs_cachedb_remove(
-		$db_conn,
-		$file_path,
-		$phpcs_options
 	);
 
 	/*
