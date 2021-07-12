@@ -132,6 +132,13 @@ function vipgocs_phpcs_cachedb_db_vacuum(
 		'Vacuuming PHPCS caching database (PHPCSCacheDB)'
 	);
 
+	vipgoci_counter_report(
+		VIPGOCI_COUNTERS_DO,
+		'vipgocs_phpcs_cachedb_db_vacuum',
+		1
+	);
+
+
 	$res = $db_conn->query(
 		'VACUUM'
 	);
