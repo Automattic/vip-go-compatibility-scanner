@@ -17,19 +17,10 @@ Note that the tool has two parts:
 ## System requirements
 
 - PHP 7.3 or later. PHP 7.4 is preferred. 
-- SQLite support is required if the Zendesk functionality is to be used.
-- Linux is a preferred OS for `vip-go-compatibility-scanner`, but it should work on other platforms as well.
+- SQLite support is required if the Zendesk functionality is to be used. Same if PHPCSCacheDB functionality is to be used.
+- Linux is a preferred OS for `vip-go-compatibility-scanner`, but it should work on other platforms as well. 
+- See instructions for macOS below.
 
-On macOS the following requirements also need to be installed:
-
-- wget
-- md5sha1sum
-
-Use the following to install using [Homebrew](https://brew.sh/):
-
-```
-brew install wget md5sha1sum
-```
 
 ## Installing
 
@@ -45,6 +36,19 @@ If installation fails due to missing system requirements, once they've been inst
 
 ```
 rm -iv $HOME/.vip-go-ci-tools-init.lck
+```
+
+### Note on macOS
+
+On macOS the following requirements also need to be installed:
+
+- wget
+- md5sha1sum
+
+Use the following to install using [Homebrew](https://brew.sh/):
+
+```
+brew install wget md5sha1sum
 ```
 
 ## Scanning a single repository
@@ -111,6 +115,22 @@ email@email,repoowner/reponame
 The first line should always specify columns. You can specify as many repositories and emails as needed.
 
 This script also supports the `--dry-run` parameter; this will output tickets created.
+
+### PHPCSCacheDB support
+
+`vip-go-compatibility-scanner` supports caching PHPCS results for individual files. With this feature enabled, any PHPCS results are cached so that the PHPCS scanner does not have to be run in case a file is encountered that has been scanned before and results have been cached for it. To identify files, SHA hashing is used and stored. PHPCS options specified are stored as SHA hashes as well. Only if SHA hashes for both files and specified PHPCS options match for individual files, the results for the file are used.
+
+PHPCS results are cached in a SQLite database and it will grow as more files are scanned. The database uses indexing. It is recommended to use the cached database only while scanning a set of repositories and then remove the cached database when scanning of all repositories is complete. Old databases should not be re-used, as the cached results are likely to get obsolete. 
+
+While SHA is used for PHPCS options, the SHA will _not_ incorporate version numbers for either PHPCS or versions for PHPCS standards used. If you upgrade or change versions, the database should be removed, otherwise you may encounter obsolete results.
+
+Note that this feature is experimental.
+
+Usage:
+
+```
+./compatibility-scanner.php ... --phpcs-cachedb="/tmp/vip-go-compatibility-scanner-phpcs-cachedb.sqlite"
+```
 
 ## Usage for multiple repositories
 
