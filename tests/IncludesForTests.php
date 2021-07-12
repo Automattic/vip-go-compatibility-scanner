@@ -96,6 +96,33 @@ function vipgoci_unittests_pcntl_supported() {
 }
 
 /*
+ * Safely remove temporary folder
+ */
+function vipgoci_unittests_remove_temporary_folder_safely( $path ) {
+	if (
+		( ! empty(
+			$path
+		) )
+		&&
+		( strlen(
+			$path
+		) > 0 )
+		&&
+		( strpos(
+			$path,
+			sys_get_temp_dir()
+		) !== false )
+	) {
+		$cmd = sprintf(
+			'rm -rf %s',
+			escapeshellarg( $path )
+		);
+
+		shell_exec( $cmd );
+	}
+}
+
+/*
  * Require files needed for testing.
  */
 require_once( __DIR__ . '/../compatibility-scanner.php' );
