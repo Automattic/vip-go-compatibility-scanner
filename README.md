@@ -118,7 +118,7 @@ This script also supports the `--dry-run` parameter; this will output tickets cr
 
 ### PHPCSCacheDB support
 
-`vip-go-compatibility-scanner` supports caching PHPCS results for individual files. With this feature enabled, any PHPCS results are cached in a database so that the PHPCS scanner does not have to be run in case a file is encountered that has been scanned before and results have been cached for it. To identify files, SHA hashing is used and stored. PHPCS options used to scan a file are stored as SHA hashes as well. Only if both SHA hashes for a file and specified PHPCS options match for a file, the results for the file are re-used.
+`vip-go-compatibility-scanner` supports caching PHPCS results for individual files. With this feature enabled, any PHPCS results are cached in a database so that the PHPCS scanner does not have to be run in case a file is encountered that has been scanned before and results have been cached for it. To identify files, SHA hashing is used and stored. PHPCS options used to scan a file are stored as SHA hashes as well. Only if both SHA hash for a file and PHPCS options SHA hash match for a file, the results for the file are re-used.
 
 PHPCS results are cached in a SQLite database and it will grow as more files are scanned. The database uses indexing. 
 
