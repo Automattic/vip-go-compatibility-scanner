@@ -17,6 +17,17 @@ if [ "" == "$HOME" ] ; then
 fi
 
 #
+# Install macOS tools if on macOS,
+# alias sha1sum command
+#
+if [ "darwin" == "$OSTYPE" ] ; then
+	echo "Running on macOS, installing support tools via Homebrew if needed..."
+	brew install wget
+
+	alias sha1sum='shasum -a 1'
+fi
+
+#
 # Create temporary directory for scripts
 # that will be used.
 #
