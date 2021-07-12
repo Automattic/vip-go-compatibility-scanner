@@ -118,11 +118,13 @@ function vipgocs_scan_single_file(
 			vipgocs_phpcs_cachedb_add(
 				$phpcscachedb_conn,
 				$options['local-git-repo'] . DIRECTORY_SEPARATOR . $file_relative_path,
-				array(
-					'phpcs-severity'	=> $options['phpcs-severity'],
-					'phpcs-standard'	=> $options['phpcs-standard'],
-					'phpcs-runtime-set'	=> $options['phpcs-runtime-set'],
-					'phpcs-sniffs-exclude'	=> $options['phpcs-sniffs-exclude'],
+				vipgoci_options_get_starting_with(
+					$options,
+					'phpcs-',
+					array(
+						'phpcs-path',
+						'phpcs-cachedb',
+					)
 				),
 				$file_results
 					['file_issues_arr_master']
