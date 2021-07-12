@@ -1,8 +1,5 @@
 <?php
 
-define( 'VIPGOCS_PHPCS_CACHEDB_TABLE_NAME', 'vipgocs_phpcs_cachedb' );
-define( 'VIPGOCS_PHPCS_CACHEDB_INDEX_NAME', 'vipgocs_phpcs_cachedb_index' );
-
 /**
  * Shorthand function to calculate SHA hash.
  */
@@ -237,7 +234,7 @@ function vipgocs_phpcs_cachedb_add(
 	if ( count( $results ) === 0 ) {
 		$res_item = array(
 			'message'	=> '--CACHE-ENTRY--',
-			'source'	=> 'Vipgocs.Internal',
+			'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 			'severity'	=> 0,
 			'fixable'	=> false,
 			'type'		=> 'info',
@@ -419,7 +416,7 @@ function vipgocs_phpcs_cachedb_get(
 		if (
 			( false !== $db_row ) &&
 			( $db_row['message'] === '--CACHE-ENTRY--' ) &&
-			( $db_row['source'] === 'Vipgocs.Internal' ) &&
+			( $db_row['source'] === VIPGOCS_PHPCS_SOURCE_INTERNAL ) &&
 			( $db_row['severity'] === 0 ) &&
 			( $db_row['fixable'] === false ) &&
 			( $db_row['type'] === 'info' ) &&

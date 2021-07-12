@@ -3,6 +3,7 @@
 /*
  * Require all code needed.
  */
+require_once( __DIR__ . '/defines.php' );
 require_once( __DIR__ . '/scan-files.php' );
 require_once( __DIR__ . '/open-issues.php' );
 require_once( __DIR__ . '/github-api.php' );

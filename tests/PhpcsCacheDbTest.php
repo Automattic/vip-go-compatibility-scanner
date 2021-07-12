@@ -75,7 +75,7 @@ final class PhpcsCacheDbTest extends TestCase {
 		);
 
 		$this->options['phpcs-severity'] = 5;
-		$this->options['phpcs-standard'] = 'Vipgocs.Internal';
+		$this->options['phpcs-standard'] = VIPGOCS_PHPCS_SOURCE_INTERNAL;
 
 		$this->_temp_code_files_setup();
 	}
@@ -121,7 +121,7 @@ final class PhpcsCacheDbTest extends TestCase {
 		$results_tmp_file1_original = array(
 			array(
 				'message'	=> 'Msg 1',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 5,
 				'fixable'	=> false,
 				'type'		=> 'WARNING',
@@ -130,7 +130,7 @@ final class PhpcsCacheDbTest extends TestCase {
 			),
 			array(
 				'message'	=> 'Msg 2',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 7,
 				'fixable'	=> true,
 				'type'		=> 'ERROR',
@@ -152,7 +152,7 @@ final class PhpcsCacheDbTest extends TestCase {
 		$results_tmp_file2_original = array(
 			array(
 				'message'	=> 'Msg 5',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 10,
 				'fixable'	=> true,
 				'type'		=> 'ERROR',
@@ -271,7 +271,7 @@ final class PhpcsCacheDbTest extends TestCase {
 		$results_tmp_file1_original = array(
 			array(
 				'message'	=> 'Msg 1',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 5,
 				'fixable'	=> false,
 				'type'		=> 'WARNING',
@@ -280,7 +280,7 @@ final class PhpcsCacheDbTest extends TestCase {
 			),
 			array(
 				'message'	=> 'Msg 2',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 7,
 				'fixable'	=> true,
 				'type'		=> 'ERROR',
@@ -303,7 +303,7 @@ final class PhpcsCacheDbTest extends TestCase {
 		$results_tmp_file2_original = array(
 			array(
 				'message'	=> 'Msg 9',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 9,
 				'fixable'	=> false,
 				'type'		=> 'WARNING',
@@ -402,7 +402,7 @@ final class PhpcsCacheDbTest extends TestCase {
 		$results_tmp_file1_original = array(
 			array(
 				'message'	=> 'Msg 1',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 1,
 				'fixable'	=> false,
 				'type'		=> 'WARNING',
@@ -491,7 +491,7 @@ final class PhpcsCacheDbTest extends TestCase {
 		$results_tmp_file1_original = array(
 			array(
 				'message'	=> 'Msg 1',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 1,
 				'fixable'	=> false,
 				'type'		=> 'WARNING',

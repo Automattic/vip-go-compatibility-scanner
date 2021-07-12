@@ -19,7 +19,7 @@ final class ScanFilesScanFileAddInfoToItemTest extends TestCase {
 		$file1_messages = array(
 			array(
 				'message'	=> 'Message 1',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 1,
 				'fixable'	=> false,
 				'type'		=> 'ERROR',
@@ -29,7 +29,7 @@ final class ScanFilesScanFileAddInfoToItemTest extends TestCase {
 
 			array(
 				'message'	=> 'Message 2',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 1,
 				'fixable'	=> false,
 				'type'		=> 'ERROR',
@@ -41,7 +41,7 @@ final class ScanFilesScanFileAddInfoToItemTest extends TestCase {
 		$file2_messages = array(
 			array(
 				'message'	=> 'Message 2',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 3,
 				'fixable'	=> true,
 				'type'		=> 'WARNING',
@@ -82,7 +82,7 @@ final class ScanFilesScanFileAddInfoToItemTest extends TestCase {
 		$file1_results_expected = array(
 			array(
 				'message'			=> 'Message 1',
-				'source'			=> 'Vipgocs.Internal',
+				'source'			=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'			=> 1,
 				'fixable'			=> false,
 				'type'				=> 'ERROR',
@@ -96,7 +96,7 @@ final class ScanFilesScanFileAddInfoToItemTest extends TestCase {
 
 			array(
 				'message'			=> 'Message 2',
-				'source'			=> 'Vipgocs.Internal',
+				'source'			=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'			=> 1,
 				'fixable'			=> false,
 				'type'				=> 'ERROR',
@@ -112,7 +112,7 @@ final class ScanFilesScanFileAddInfoToItemTest extends TestCase {
 		$file2_results_expected = array(
 			array(
 				'message'	=> 'Message 2',
-				'source'	=> 'Vipgocs.Internal',
+				'source'	=> VIPGOCS_PHPCS_SOURCE_INTERNAL,
 				'severity'	=> 3,
 				'fixable'	=> true,
 				'type'		=> 'WARNING',
