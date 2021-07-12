@@ -469,5 +469,73 @@ final class PhpcsCacheDbTest extends TestCase {
 			$cached_zero_results
 		);
 	}
-}
 
+	/**
+	 * Test cleaning of database.
+	 *
+	 * @covers ::vipgocs_phpcs_cachedb_db_vacuum
+	 */
+	public function testCacheAddThenClean() {
+		$phpcs_options = array(
+			'phpcs-severity' => $this->options['phpcs-severity'],
+			'phpcs-standard' => $this->options['phpcs-standard']
+		);
+
+		$db_conn = vipgocs_phpcs_cachedb_db_open(
+			$this->options['phpcs-cachedb']
+		);
+
+		/*
+		 * Handle file1 - add results.
+		 */
+		$results_tmp_file1_original = array(
+			array(
+				'message'	=> 'Msg 1',
+				'source'	=> 'Vipgocs.Internal',
+				'severity'	=> 1,
+				'fixable'	=> false,
+				'type'		=> 'WARNING',
+				'line'		=> 1,
+				'column'	=> 2,
+			),
+		);
+
+		/*
+		 * Add results for file.
+		 */
+		vipgocs_phpcs_cachedb_add(
+			$db_conn,
+			$this->temp_files['tmp_file1'],
+			$phpcs_options,
+			$results_tmp_file1_original
+		);
+
+		/*
+		 * Clean DB
+		 */
+		vipgocs_phpcs_cachedb_db_vacuum(
+			$db_conn
+		);
+
+		/*
+		 * Check if successful.
+		 */
+		$cached_zero_results = false;
+
+		$results_tmp_file1_cached = vipgocs_phpcs_cachedb_get(
+			$db_conn,
+			$this->temp_files['tmp_file1'],
+			$phpcs_options,
+			$cached_zero_results
+		);
+
+		$this->assertSame(
+			$results_tmp_file1_original,
+			$results_tmp_file1_cached
+		);
+
+		$this->assertFalse(
+			$cached_zero_results
+		);
+	}
+}
