@@ -639,9 +639,10 @@ function vipgocs_compatibility_scanner_run(
 
 	/*
 	 * If set to dry-run, exit here,
-	 * closing Zendesk DB connection.
+	 * closing Zendesk DB connection
+	 * and PHPCS caching database connection.
+	 * Clean the PHPCS database first.
 	 */
-
 	if ( true === $options['dry-run'] ) {
 		if ( ! empty(
 			$zendesk_db_conn
@@ -652,6 +653,10 @@ function vipgocs_compatibility_scanner_run(
 		}
 
 		if ( ! empty( $phpcscachedb_conn ) ) {
+			vipgocs_phpcs_cachedb_db_vacuum(
+				$phpcscachedb_conn
+			);
+
 			vipgocs_phpcs_cachedb_db_close(
 				$phpcscachedb_conn
 			);
@@ -728,9 +733,14 @@ function vipgocs_compatibility_scanner_run(
 		);
 
 	/*
-	 * Close PHPCacheDB connection.
+	 * Close PHPCacheDB connection if open.
+	 * Clean the database first.
 	 */
 	if ( ! empty( $phpcscachedb_conn ) ) {
+		vipgocs_phpcs_cachedb_db_vacuum(
+			$phpcscachedb_conn
+		);
+
 		vipgocs_phpcs_cachedb_db_close(
 			$phpcscachedb_conn
 		);
