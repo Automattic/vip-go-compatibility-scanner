@@ -118,13 +118,15 @@ This script also supports the `--dry-run` parameter; this will output tickets cr
 
 ### PHPCSCacheDB support
 
-`vip-go-compatibility-scanner` supports caching PHPCS results for individual files. With this feature enabled, any PHPCS results are cached so that the PHPCS scanner does not have to be run in case a file is encountered that has been scanned before and results have been cached for it. To identify files, SHA hashing is used and stored. PHPCS options specified are stored as SHA hashes as well. Only if SHA hashes for both files and specified PHPCS options match for individual files, the results for the file are used.
+`vip-go-compatibility-scanner` supports caching PHPCS results for individual files. With this feature enabled, any PHPCS results are cached in a database so that the PHPCS scanner does not have to be run in case a file is encountered that has been scanned before and results have been cached for it. To identify files, SHA hashing is used and stored. PHPCS options used to scan a file are stored as SHA hashes as well. Only if both SHA hashes for a file and specified PHPCS options match for a file, the results for the file are re-used.
 
-PHPCS results are cached in a SQLite database and it will grow as more files are scanned. The database uses indexing. It is recommended to use the cached database only while scanning a set of repositories and then remove the cached database when scanning of all repositories is complete. Old databases should not be re-used, as the cached results are likely to get obsolete. 
+PHPCS results are cached in a SQLite database and it will grow as more files are scanned. The database uses indexing. 
+
+It is recommended to use the cached database only while scanning a set of repositories and then remove the cached database when scanning of all repositories is complete. Old databases should not be re-used, as the cached results are likely to get obsolete. 
 
 While SHA is used for PHPCS options, the SHA will _not_ incorporate version numbers for either PHPCS or versions for PHPCS standards used. If you upgrade or change versions, the database should be removed, otherwise you may encounter obsolete results.
 
-Note that this feature is experimental.
+Note that this feature is experimental and is distinct from the built-in support for caching in PHPCS.
 
 Usage:
 
