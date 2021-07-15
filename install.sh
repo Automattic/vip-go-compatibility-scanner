@@ -1,6 +1,19 @@
 #!/bin/bash
 
 #
+# Support function to check for utilities
+#
+function check_utility() {
+	TMP_CMD="$1"
+	$TMP_CMD --help >/dev/null 2>/dev/null
+
+	if [ "$?" != "0" ] ; then
+		echo "$0: Missing utility $TMP_CMD, needs to be installed"
+		exit 1
+	fi
+}
+
+#
 # Exit if running as root
 #
 if [ "$USERNAME" == "root" ] ; then
@@ -17,15 +30,40 @@ if [ "" == "$HOME" ] ; then
 fi
 
 #
-# Install macOS tools if on macOS,
-# alias sha1sum command
+# If needed and on macOS, install utilities.
 #
-if [ "darwin" == "$OSTYPE" ] ; then
-	echo "Running on macOS, installing support tools via Homebrew if needed..."
-	brew install wget
+if [[ "$OSTYPE" =~ "darwin" ]] ; then
+	TMP_INSTALL=""
+
+	wget --help >/dev/null 2>/dev/null
+
+	if [ "$?" != "0" ] ; then
+		TMP_INSTALL="$TMP_INSTALL wget"
+	fi
 
 	alias sha1sum='shasum -a 1'
+
+	sha1sum --help >/dev/null 2>/dev/null
+
+	if [ "$?" != "0" ] ; then
+		TMP_INSTALL="$TMP_INSTALL md5sha1sum"
+	fi
+
+	if [ "$TMP_INSTALL" != "" ] ; then
+		echo "Running on macOS, installing support tools via Homebrew ($TMP_INSTALL)"
+		sleep 10
+		brew install "$TMP_INSTALL"
+	fi
 fi
+
+#
+# Exit if we don't have all the utilities
+#
+
+check_utility "wget"
+check_utility "sha1sum"
+check_utility "mktemp"
+check_utility "unzip"
 
 #
 # Create temporary directory for scripts
