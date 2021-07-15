@@ -188,6 +188,7 @@ final class ScanFilesScanFilesTest extends TestCase {
 				'phpcs-severity'		=> 1,
 				'phpcs-cachedb'			=> null,
 				'phpcs-cachedb-path'		=> null,
+				'skip-large-files'		=> false,
 			)
 		);
 

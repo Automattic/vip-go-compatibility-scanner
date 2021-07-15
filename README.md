@@ -45,11 +45,13 @@ On macOS the following requirements also need to be installed:
 - wget
 - md5sha1sum
 
-Use the following to install using [Homebrew](https://brew.sh/):
+You can use the following to install using [Homebrew](https://brew.sh/):
 
 ```
 brew install wget md5sha1sum
 ```
+
+If not installed, the installation script will attempt to install these utilities.
 
 ## Scanning a single repository
 
