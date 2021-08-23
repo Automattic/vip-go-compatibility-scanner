@@ -27,7 +27,7 @@ Note that the tool has two parts:
 Included is a script to install `vip-go-compatibility-scanner`. You can use it like this:
 
 ```
-wget https://raw.githubusercontent.com/Automattic/vip-go-compatibility-scanner/master/install.sh && bash ./install.sh 
+wget https://raw.githubusercontent.com/Automattic/vip-go-compatibility-scanner/main/install.sh && bash ./install.sh 
 ```
 
 This will result in `vip-go-compatibility-scanner`, `vip-go-ci` and other dependencies being installed in your home directory under `vip-go-ci-tools`.
@@ -143,7 +143,7 @@ Included is a script to run the `vip-go-compatibility-scanner` for multiple repo
 Here is how the script can be run:
 
 ```
-./scan-multiple-repositories.sh mygithubuser testing123,testing999 mytokenxyz "Compatibility-Issue,PHP Compatibility" "PHP Upgrade: Compatibility issues found in " "The following issues were found when scanning for compatibility issues: %error_msg% Note that this is an automated report." direct PHPCompatibilityWP 'testVersion 7.3-' master
+./scan-multiple-repositories.sh mygithubuser testing123,testing999 mytokenxyz "Compatibility-Issue,PHP Compatibility" "PHP Upgrade: Compatibility issues found in " "The following issues were found when scanning for compatibility issues: %error_msg% Note that this is an automated report." direct PHPCompatibilityWP 'testVersion 7.3-' main
 ```
 
 The parameters are the following, respectively:

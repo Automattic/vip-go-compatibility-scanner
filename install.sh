@@ -83,7 +83,7 @@ if [ ! -d "$HOME/vip-go-ci-tools" ] ; then
 	echo "$0: vip-go-ci-tools is not installed, installing"
 
 	cd "$TMP_DIR" && \
-	wget https://raw.githubusercontent.com/Automattic/vip-go-ci/master/tools-init.sh && \
+	wget https://raw.githubusercontent.com/Automattic/vip-go-ci/main/tools-init.sh && \
 	bash tools-init.sh
 fi
 
@@ -106,12 +106,12 @@ fi
 # Install vip-go-compatibility-scanner
 #
 cd "$TMP_DIR" && \
-wget https://github.com/Automattic/vip-go-compatibility-scanner/archive/master.zip && \
-mv master.zip vip-go-compatibility-scanner.zip && \
+wget https://github.com/Automattic/vip-go-compatibility-scanner/archive/main.zip && \
+mv main.zip vip-go-compatibility-scanner.zip && \
 unzip vip-go-compatibility-scanner.zip && \
 cd "$HOME/vip-go-ci-tools/" && \
 rm -rf "$HOME/vip-go-ci-tools/vip-go-compatibility-scanner/" && \
-mv "$TMP_DIR/vip-go-compatibility-scanner-master" "$HOME/vip-go-ci-tools/vip-go-compatibility-scanner/" && \
+mv "$TMP_DIR/vip-go-compatibility-scanner-main" "$HOME/vip-go-ci-tools/vip-go-compatibility-scanner/" && \
 echo "$0: vip-go-compatibility-scanner and dependencies installed" && \
 exit 0
 
