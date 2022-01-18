@@ -2,9 +2,9 @@
 
 namespace Vipgocs\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
-
 require_once( __DIR__ . './../../open-issues.php' );
+
+use PHPUnit\Framework\TestCase;
 
 // phpcs:disable PSR1.Files.SideEffects
 
