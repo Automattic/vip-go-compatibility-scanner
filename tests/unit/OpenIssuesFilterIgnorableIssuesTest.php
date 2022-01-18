@@ -2,7 +2,7 @@
 
 namespace Vipgocs\Tests\Unit;
 
-require_once( __DIR__ . './../../open-issues.php' );
+require_once( __DIR__ . '/../../open-issues.php' );
 
 use PHPUnit\Framework\TestCase;
 
