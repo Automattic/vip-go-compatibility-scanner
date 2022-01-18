@@ -128,6 +128,6 @@ function vipgoci_unittests_remove_temporary_folder_safely( $path ) {
 require_once( __DIR__ . '/../compatibility-scanner.php' );
 
 
-require_once( $vipgoci_include_path . '/tests/IncludesForTests.php' );
+require_once( $vipgoci_include_path . '/tests/integration/IncludesForTests.php' );
 
 
