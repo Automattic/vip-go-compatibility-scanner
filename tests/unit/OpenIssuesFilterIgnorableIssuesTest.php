@@ -1,10 +1,10 @@
 <?php
 
-namespace Vipgocs\tests;
-
-require_once( __DIR__ . '/IncludesForTests.php' );
+namespace Vipgocs\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+
+require_once( __DIR__ . './../../open-issues.php' );
 
 // phpcs:disable PSR1.Files.SideEffects
 
