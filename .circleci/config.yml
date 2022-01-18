@@ -29,10 +29,10 @@ commands:
       - run: sed 's/HOME_DIR/\/home\/circleci\//' < ~/project/unittests.ini.dist > ~/project/unittests.ini
       # Prepare phpunit configuration file
       - run: sed 's/PROJECT_DIR/\/home\/circleci\/project/g' < ~/project/phpunit.xml.dist > ~/project/phpunit.xml
-      # Run integration tests
-      - run: VIPGOCI_PATH="$HOME/vip-go-ci-tools/vip-go-ci" ./vendor/bin/phpunit --testsuite=integration-tests -vv
       # Run unit tests
       - run: VIPGOCI_PATH="$HOME/vip-go-ci-tools/vip-go-ci" ./vendor/bin/phpunit --testsuite=unit-tests -vv
+      # Run integration tests
+      - run: VIPGOCI_PATH="$HOME/vip-go-ci-tools/vip-go-ci" ./vendor/bin/phpunit --testsuite=integration-tests -vv
 
 # List of images at: https://circleci.com/docs/2.0/circleci-images/
 jobs:
