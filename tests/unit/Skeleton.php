@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Vipgocs\Tests\Unit;
 
-require_once( __DIR__ . './../../FILE-TO-BE-TESTED' );
+require_once( __DIR__ . '/../../FILE-TO-BE-TESTED' );
 
 use PHPUnit\Framework\TestCase;
 
