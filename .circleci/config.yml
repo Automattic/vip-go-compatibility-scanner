@@ -28,7 +28,7 @@ commands:
       # Change path to vital tools needed
       - run: sed 's/HOME_DIR/\/home\/circleci\//' < ~/project/unittests.ini.dist > ~/project/unittests.ini
       # Prepare phpunit configuration file
-      - run: sed 's/PROJECT_DIR/\/home\/circleci\/project/g' ~/project/phpunit.xml.dist > ~/project/phpunit.xml
+      - run: sed 's/PROJECT_DIR/\/home\/circleci\/project/g' < ~/project/phpunit.xml.dist > ~/project/phpunit.xml
       # Run integration tests
       - run: VIPGOCI_PATH="$HOME/vip-go-ci-tools/vip-go-ci" ./vendor/bin/phpunit --testsuite=integration-tests -vv
       # Run unit tests
