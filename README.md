@@ -187,9 +187,7 @@ By running this command, you will run tests that do not make external calls nor 
 
 ### Integration test suite
 
-First adjust the `unittests.ini` file:
-
-Run:
+First create and adjust the `unittests.ini` file:
 
 > cp unittests.ini.dist unittests.ini
 
@@ -200,5 +198,5 @@ Run the integration tests using the following command:
 
 > phpunit --testsuite=integration-tests -vv
 
-These tests may create temporary files, depend external scanners, external APIs and forth. 
+These tests may create temporary files, and may depend on external scanners, external APIs and so forth. 
 
