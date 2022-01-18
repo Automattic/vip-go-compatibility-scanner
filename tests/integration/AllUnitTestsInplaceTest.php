@@ -1,6 +1,6 @@
 <?php
 
-namespace Vipgocs\tests;
+namespace Vipgocs\Tests\Integration;
 
 require_once( __DIR__ . '/IncludesForTests.php' );
 
@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 final class AllUnitTestsInplaceTest extends TestCase {
 	public function testAllUnitTestsInPlace() {
-		$files_arr = scandir("tests/");
+		$files_arr = scandir("tests/integration");
 
 		/*
 		 * Filter away any files that

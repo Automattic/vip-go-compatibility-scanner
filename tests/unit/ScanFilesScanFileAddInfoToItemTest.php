@@ -1,8 +1,9 @@
 <?php
 
-namespace Vipgocs\tests;
+namespace Vipgocs\Tests\Unit;
 
-require_once( __DIR__ . '/IncludesForTests.php' );
+require_once( __DIR__ . '/../../defines.php' );
+require_once( __DIR__ . '/../../scan-files.php' );
 
 use PHPUnit\Framework\TestCase;
 

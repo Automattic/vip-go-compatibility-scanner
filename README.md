@@ -160,3 +160,43 @@ The parameters are the following, respectively:
 
 There is also optional parameter for Zendesk. See help message.
 
+## Tests
+
+To run the tests for `vip-go-compatibility-scanner`, you will need to install `phpunit` and any dependencies needed (this would include `xdebug`).
+
+### PHPUnit configuration file
+
+To run the tests, a configuration file for PHPUnit needs to be set up.
+
+Run:
+> cp phpunit.xml.dist phpunit.xml
+
+Replace the string `PROJECT_DIR` with your local project directory. E.g.:
+> <directory>PROJECT_DIR/tests/integration</directory>
+will be:
+> <directory>~/Projects/tests/integration</directory>
+
+
+### Unit test suite
+
+Run the unit tests using this command:
+
+> phpunit --testsuite=unit-tests -vv
+
+By running this command, you will run tests that do not make external calls nor call external scanners. 
+
+### Integration test suite
+
+First create and adjust the `unittests.ini` file:
+
+> cp unittests.ini.dist unittests.ini
+
+And configure any values as needed.
+
+
+Run the integration tests using the following command:
+
+> phpunit --testsuite=integration-tests -vv
+
+These tests may create temporary files, and may depend on external scanners, external APIs and so forth. 
+

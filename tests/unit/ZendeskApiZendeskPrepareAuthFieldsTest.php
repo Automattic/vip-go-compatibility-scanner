@@ -1,8 +1,8 @@
 <?php
 
-namespace Vipgocs\tests;
+namespace Vipgocs\Tests\Unit;
 
-require_once( __DIR__ . '/IncludesForTests.php' );
+require_once( __DIR__ . '/../../zendesk-api.php' );
 
 use PHPUnit\Framework\TestCase;
 

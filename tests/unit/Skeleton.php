@@ -1,8 +1,10 @@
 <?php
 
-namespace Vipgocs\tests;
+declare(strict_types=1);
 
-require_once( __DIR__ . '/IncludesForTests.php' );
+namespace Vipgocs\Tests\Unit;
+
+require_once( __DIR__ . '/../../FILE-TO-BE-TESTED' );
 
 use PHPUnit\Framework\TestCase;
 
