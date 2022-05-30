@@ -16,7 +16,7 @@ Note that the tool has two parts:
 
 ## System requirements
 
-- PHP 7.3 or later. PHP 7.4 is preferred. 
+- PHP 8.0 or later. PHP 8.1 is recommended. 
 - SQLite support is required if the Zendesk functionality is to be used. Same if PHPCSCacheDB functionality is to be used.
 - Linux is a preferred OS for `vip-go-compatibility-scanner`, but it should work on other platforms as well. 
 - See instructions for macOS below.
