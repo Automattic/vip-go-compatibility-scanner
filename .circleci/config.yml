@@ -13,7 +13,8 @@ commands:
       - run: php -v
       # Update software and install a few things
       - run: sudo apt update
-      - run: sudo docker-php-ext-install zip
+      - run: sudo apt install -y zip unzip gzip tar
+      - run: composer require --dev phpunit/phpunit ^9
       # Use production php.ini file
       - run: sudo mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
       # Install phpunit
