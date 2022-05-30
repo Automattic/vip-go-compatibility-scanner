@@ -36,28 +36,20 @@ commands:
 
 # List of images at: https://circleci.com/docs/2.0/circleci-images/
 jobs:
-  testphp73:
-    docker:
-      - image: circleci/php:7.3.22-cli
-    steps:
-      - build-cmd
-
-
-  testphp74:
-    docker:
-      - image: circleci/php:7.4.10-cli
-    steps:
-      - build-cmd
-
   testphp80:
     docker:
-      - image: circleci/php:8.0.1-cli
+      - image: cimg/php:8.0.15
+    steps:
+      - build-cmd
+
+  testphp81:
+    docker:
+      - image: cimg/php:8.1.2
     steps:
       - build-cmd
 
 workflows:
   vipgocompatibilityscannertests:
     jobs:
-     - testphp73
-     - testphp74
      - testphp80
+     - testphp81
