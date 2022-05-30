@@ -64,7 +64,7 @@ pushd testing123 && \
 git submodule init && \
 git submodule update --recursive && \
 popd && popd && \
-./compatibility-scanner.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/"  --repo-owner="mygithubuser" --repo-name="testing123" --token="xyz" --github-labels='PHP Compatibility' --github-issue-title="PHP Upgrade: Compatibility issues found in " --github-issue-body="The following issues were found when scanning branch <code>%branch_name%</code> for compatibility problems:  %error_msg% This is an automated report." --github-issue-assign="direct" --local-git-repo="/tmp/testing123" --phpcs-path="$HOME/vip-go-ci-tools/phpcs/bin/phpcs" --phpcs-standard="PHPCompatibilityWP" --phpcs-runtime-set='testVersion 7.3-' 
+./compatibility-scanner.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/"  --repo-owner="mygithubuser" --repo-name="testing123" --token="xyz" --github-labels='PHP Compatibility' --github-issue-title="PHP Upgrade: Compatibility issues found in " --github-issue-body="The following issues were found when scanning branch <code>%branch_name%</code> for compatibility problems:  %error_msg% This is an automated report." --github-issue-assign="direct" --local-git-repo="/tmp/testing123" --phpcs-path="$HOME/vip-go-ci-tools/phpcs/bin/phpcs" --phpcs-php-path=/usr/bin/php --phpcs-standard="PHPCompatibilityWP" --phpcs-runtime-set='testVersion 7.3-' 
 ```
 
 Use the `--github-issue-group-by` option to switch between posting issues on a per `file` and `folder` basis.

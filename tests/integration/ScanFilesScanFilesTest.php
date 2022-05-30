@@ -14,9 +14,10 @@ final class ScanFilesScanFilesTest extends TestCase {
 	);
 
 	var $options_phpcs_scan = array(
-		'phpcs-path'		=> null,
-		'phpcs-standard'	=> null,
-		'phpcs-severity'	=> null,
+		'phpcs-path'     => null,
+		'phpcs-php-path' => null,
+		'phpcs-standard' => null,
+		'phpcs-severity' => null,
 	);
 
 	/*

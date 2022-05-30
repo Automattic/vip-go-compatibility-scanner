@@ -216,7 +216,7 @@ function vipgocs_open_issues(
 		}
 
 		if ( false === $emulate_only ) {
-			$res = vipgoci_github_post_url(
+			$res = vipgoci_http_api_post_url(
 				$github_url,
 				$github_req_body,
 				$options['token']
