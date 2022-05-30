@@ -23,8 +23,8 @@ commands:
       # Install all the tools vip-go-compatibility-scanner needs, remove vip-go-compatibility-scanner and vip-go-ci
       - run: bash ~/project/install.sh
       - run: rm -rf ~/vip-go-ci-tools/vip-go-compatibility-scanner ~/vip-go-ci-tools/vip-go-ci
-      # Install vip-go-ci from main branch
-      - run: pushd ~/vip-go-ci-tools && wget -O vip-go-ci.tar.gz https://github.com/Automattic/vip-go-ci/archive/main.tar.gz && tar -zxvf vip-go-ci.tar.gz && mv vip-go-ci-main vip-go-ci && rm -f vip-go-ci.tar.gz && popd
+      # Install vip-go-ci from trunk branch
+      - run: pushd ~/vip-go-ci-tools && wget -O vip-go-ci.tar.gz https://github.com/Automattic/vip-go-ci/archive/trunk.tar.gz && tar -zxvf vip-go-ci.tar.gz && mv vip-go-ci-trunk vip-go-ci && rm -f vip-go-ci.tar.gz && popd
       # Change path to vital tools needed
       - run: sed 's/HOME_DIR/\/home\/circleci\//' < ~/project/unittests.ini.dist > ~/project/unittests.ini
       # Prepare phpunit configuration file
