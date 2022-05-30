@@ -27,7 +27,7 @@ Note that the tool has two parts:
 Included is a script to install `vip-go-compatibility-scanner`. You can use it like this:
 
 ```
-wget https://raw.githubusercontent.com/Automattic/vip-go-compatibility-scanner/main/install.sh && bash ./install.sh 
+wget https://raw.githubusercontent.com/Automattic/vip-go-compatibility-scanner/trunk/install.sh && bash ./install.sh 
 ```
 
 This will result in `vip-go-compatibility-scanner`, `vip-go-ci` and other dependencies being installed in your home directory under `vip-go-ci-tools`.
@@ -202,4 +202,4 @@ These tests may create temporary files, and may depend on external scanners, ext
 
 ## Contributing
 
-If you want to contribute to this project, please see [this file](https://github.com/Automattic/vip-go-ci/blob/main/CONTRIBUTING.md) from the [vip-go-ci project](https://github.com/Automattic/vip-go-ci/) on contributing.
+If you want to contribute to this project, please see [this file](https://github.com/Automattic/vip-go-ci/blob/trunk/CONTRIBUTING.md) from the [vip-go-ci project](https://github.com/Automattic/vip-go-ci/) on contributing.
