@@ -27,7 +27,7 @@ commands:
       # Install vip-go-ci from trunk branch
       - run: pushd ~/vip-go-ci-tools && wget -O vip-go-ci.tar.gz https://github.com/Automattic/vip-go-ci/archive/trunk.tar.gz && tar -zxvf vip-go-ci.tar.gz && mv vip-go-ci-trunk vip-go-ci && rm -f vip-go-ci.tar.gz && popd
       # Change path to vital tools needed
-      - run: sed 's/HOME_DIR/\/home\/circleci\//' < ~/project/unittests.ini.dist > ~/project/unittests.ini
+      - run: sed 's/HOME_DIR/\/home\/circleci/' < ~/project/unittests.ini.dist > ~/project/unittests.ini
       # Prepare phpunit configuration file
       - run: sed 's/PROJECT_DIR/\/home\/circleci\/project/g' < ~/project/phpunit.xml.dist > ~/project/phpunit.xml
       # Run unit tests
