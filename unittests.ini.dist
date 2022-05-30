@@ -3,6 +3,7 @@ git-path=/usr/bin/git
 
 [phpcs-scan]
 phpcs-path=HOME_DIR/vip-go-ci-tools/phpcs/bin/phpcs
+phpcs-php-path=/usr/bin/php
 phpcs-standard=WordPress-VIP-Go
 phpcs-severity=1
 

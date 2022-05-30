@@ -21,6 +21,7 @@ function vipgocs_options_recognized(): array {
 		 * PHPCS configuration
 		 */
 		'phpcs-path:',
+		'phpcs-php-path:',
 		'phpcs-standard:',
 		'phpcs-severity:',
 		'phpcs-runtime-set:',
@@ -78,6 +79,8 @@ function vipgocs_help( ) :void {
 		PHP_EOL .
 		"\t" . 'PHPCS configuration:' . PHP_EOL .
 		"\t" . '--phpcs-path=FILE                   Full path to PHPCS script.' . PHP_EOL .
+		"\t" . '--phpcs-php-path=FILE               Full path to PHP used to run PHPCS. If not specified the default in' . PHP_EOL .
+		"\t" . '                                    $PATH will be used instead.' . PHP_EOL .
 		"\t" . '--phpcs-standard=STRING             Specify which PHPCS standard to use.' . PHP_EOL .
 		"\t" . '--phpcs-severity=NUMBER             Specify severity for PHPCS.' . PHP_EOL .
 		"\t" . '--phpcs-runtime-set=STRING          Specify --runtime-set values passed on to PHPCS' . PHP_EOL .
@@ -249,6 +252,12 @@ function vipgocs_compatibility_scanner_init_phpcs(
 		$options,
 		'phpcs-path',
 		null
+	);
+
+	vipgoci_option_file_handle(
+		$options,
+		'phpcs-php-path',
+		'php'
 	);
 
 	vipgoci_option_array_handle(
@@ -479,7 +488,7 @@ function vipgocs_compatibility_scanner_init(
 	 * Get option-values
 	 */
 	$options = getopt(
-		null,
+		'',
 		vipgocs_options_recognized()
 	);
 
