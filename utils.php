@@ -1,14 +1,14 @@
 <?php
 
 /*
- * Check if we are running on PHP 7.3 or later.
+ * Check if we are running on PHP 8.0 or later.
  */
 function vipgocs_env_check() :void {
 	if ( version_compare(
 		phpversion(),
-		'7.3.0'
+		'8.0.0'
 	) < 0 ) {
-		echo 'Error: PHP 7.3 is required as a minimum.' . PHP_EOL;
+		echo 'Error: PHP 8.0 is required as a minimum.' . PHP_EOL;
 		exit( 251 ); /* System problem */
 	}
 }

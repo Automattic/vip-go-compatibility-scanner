@@ -16,7 +16,7 @@ Note that the tool has two parts:
 
 ## System requirements
 
-- PHP 7.3 or later. PHP 7.4 is preferred. 
+- PHP 8.0 or later. PHP 8.1 is recommended. 
 - SQLite support is required if the Zendesk functionality is to be used. Same if PHPCSCacheDB functionality is to be used.
 - Linux is a preferred OS for `vip-go-compatibility-scanner`, but it should work on other platforms as well. 
 - See instructions for macOS below.
@@ -27,7 +27,7 @@ Note that the tool has two parts:
 Included is a script to install `vip-go-compatibility-scanner`. You can use it like this:
 
 ```
-wget https://raw.githubusercontent.com/Automattic/vip-go-compatibility-scanner/main/install.sh && bash ./install.sh 
+wget https://raw.githubusercontent.com/Automattic/vip-go-compatibility-scanner/trunk/install.sh && bash ./install.sh 
 ```
 
 This will result in `vip-go-compatibility-scanner`, `vip-go-ci` and other dependencies being installed in your home directory under `vip-go-ci-tools`.
@@ -64,7 +64,7 @@ pushd testing123 && \
 git submodule init && \
 git submodule update --recursive && \
 popd && popd && \
-./compatibility-scanner.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/"  --repo-owner="mygithubuser" --repo-name="testing123" --token="xyz" --github-labels='PHP Compatibility' --github-issue-title="PHP Upgrade: Compatibility issues found in " --github-issue-body="The following issues were found when scanning branch <code>%branch_name%</code> for compatibility problems:  %error_msg% This is an automated report." --github-issue-assign="direct" --local-git-repo="/tmp/testing123" --phpcs-path="$HOME/vip-go-ci-tools/phpcs/bin/phpcs" --phpcs-standard="PHPCompatibilityWP" --phpcs-runtime-set='testVersion 7.3-' 
+./compatibility-scanner.php --vipgoci-path="$HOME/vip-go-ci-tools/vip-go-ci/"  --repo-owner="mygithubuser" --repo-name="testing123" --token="xyz" --github-labels='PHP Compatibility' --github-issue-title="PHP Upgrade: Compatibility issues found in " --github-issue-body="The following issues were found when scanning branch <code>%branch_name%</code> for compatibility problems:  %error_msg% This is an automated report." --github-issue-assign="direct" --local-git-repo="/tmp/testing123" --phpcs-path="$HOME/vip-go-ci-tools/phpcs/bin/phpcs" --phpcs-php-path=/usr/bin/php --phpcs-standard="PHPCompatibilityWP" --phpcs-runtime-set='testVersion 7.3-' 
 ```
 
 Use the `--github-issue-group-by` option to switch between posting issues on a per `file` and `folder` basis.
@@ -202,4 +202,4 @@ These tests may create temporary files, and may depend on external scanners, ext
 
 ## Contributing
 
-If you want to contribute to this project, please see [this file](https://github.com/Automattic/vip-go-ci/blob/main/CONTRIBUTING.md) from the [vip-go-ci project](https://github.com/Automattic/vip-go-ci/) on contributing.
+If you want to contribute to this project, please see [this file](https://github.com/Automattic/vip-go-ci/blob/trunk/CONTRIBUTING.md) from the [vip-go-ci project](https://github.com/Automattic/vip-go-ci/) on contributing.

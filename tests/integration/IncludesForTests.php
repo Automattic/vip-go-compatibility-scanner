@@ -33,7 +33,7 @@ define( 'VIPGOCI_UNIT_TESTS_INI_DIR_PATH', dirname( __DIR__ ) );
 
 define( 'VIPGOCI_GITHUB_SERVER_ADDR', '127.0.0.1:15701' );
 define( 'VIPGOCI_GITHUB_BASE_URL', 'http://' . VIPGOCI_GITHUB_SERVER_ADDR );
-define( 'VIPGOCI_TEST_HTTP_SERVER_FILES_PATH', dirname( __DIR__ ) . '/tests/test-server' );
+define( 'VIPGOCI_TEST_HTTP_SERVER_FILES_PATH', dirname( __DIR__ ) . '/integration/test-server' );
 
 /*
  * Function to start test HTTP server.

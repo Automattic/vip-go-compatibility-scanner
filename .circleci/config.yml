@@ -13,9 +13,8 @@ commands:
       - run: php -v
       # Update software and install a few things
       - run: sudo apt update
-      - run: sudo docker-php-ext-install zip
-      # Use production php.ini file
-      - run: sudo mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+      - run: sudo apt install -y zip unzip gzip tar
+      - run: composer require --dev phpunit/phpunit ^9
       # Install phpunit
       - run: composer require --dev phpunit/phpunit ^9
       # By default, php is not available in /usr/bin, fix that
@@ -23,10 +22,10 @@ commands:
       # Install all the tools vip-go-compatibility-scanner needs, remove vip-go-compatibility-scanner and vip-go-ci
       - run: bash ~/project/install.sh
       - run: rm -rf ~/vip-go-ci-tools/vip-go-compatibility-scanner ~/vip-go-ci-tools/vip-go-ci
-      # Install vip-go-ci from main branch
-      - run: pushd ~/vip-go-ci-tools && wget -O vip-go-ci.tar.gz https://github.com/Automattic/vip-go-ci/archive/main.tar.gz && tar -zxvf vip-go-ci.tar.gz && mv vip-go-ci-main vip-go-ci && rm -f vip-go-ci.tar.gz && popd
+      # Install vip-go-ci from trunk branch
+      - run: pushd ~/vip-go-ci-tools && wget -O vip-go-ci.tar.gz https://github.com/Automattic/vip-go-ci/archive/trunk.tar.gz && tar -zxvf vip-go-ci.tar.gz && mv vip-go-ci-trunk vip-go-ci && rm -f vip-go-ci.tar.gz && popd
       # Change path to vital tools needed
-      - run: sed 's/HOME_DIR/\/home\/circleci\//' < ~/project/unittests.ini.dist > ~/project/unittests.ini
+      - run: sed 's/HOME_DIR/\/home\/circleci/' < ~/project/unittests.ini.dist > ~/project/unittests.ini
       # Prepare phpunit configuration file
       - run: sed 's/PROJECT_DIR/\/home\/circleci\/project/g' < ~/project/phpunit.xml.dist > ~/project/phpunit.xml
       # Run unit tests
@@ -36,28 +35,20 @@ commands:
 
 # List of images at: https://circleci.com/docs/2.0/circleci-images/
 jobs:
-  testphp73:
-    docker:
-      - image: circleci/php:7.3.22-cli
-    steps:
-      - build-cmd
-
-
-  testphp74:
-    docker:
-      - image: circleci/php:7.4.10-cli
-    steps:
-      - build-cmd
-
   testphp80:
     docker:
-      - image: circleci/php:8.0.1-cli
+      - image: cimg/php:8.0.15
+    steps:
+      - build-cmd
+
+  testphp81:
+    docker:
+      - image: cimg/php:8.1.2
     steps:
       - build-cmd
 
 workflows:
   vipgocompatibilityscannertests:
     jobs:
-     - testphp73
-     - testphp74
      - testphp80
+     - testphp81
