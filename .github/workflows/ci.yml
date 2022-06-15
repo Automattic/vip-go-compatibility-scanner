@@ -34,7 +34,7 @@ jobs:
 
       - name: Prepare files
         run: |
-          sed "s:HOME_DIR:$(pwd):" unittests.ini.dist > unittests.ini
+          sed "s:HOME_DIR:$HOME:" unittests.ini.dist > unittests.ini
           sed "s:PROJECT_DIR:$(pwd):g" phpunit.xml.dist > phpunit.xml
 
       - name: Run unit tests
@@ -76,7 +76,7 @@ jobs:
 
       - name: Prepare files
         run: |
-          sed "s:HOME_DIR:$(pwd):" unittests.ini.dist > unittests.ini
+          sed "s:HOME_DIR:$HOME:" unittests.ini.dist > unittests.ini
           sed "s:PROJECT_DIR:$(pwd):g" phpunit.xml.dist > phpunit.xml
 
       - name: Run integration tests
