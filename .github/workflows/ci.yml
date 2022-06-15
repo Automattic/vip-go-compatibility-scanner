@@ -38,7 +38,7 @@ jobs:
           sed "s:PROJECT_DIR:$(pwd):g" phpunit.xml.dist > phpunit.xml
 
       - name: Run unit tests
-        run: VIPGOCI_PATH="$HOME/vip-go-ci-tools/vip-go-ci" phpunit --testsuite=unit-tests -vv
+        run: VIPGOCI_PATH="$HOME/vip-go-ci-tools/vip-go-ci" VIPGOCI_TESTING_DEBUG_MODE=true phpunit --testsuite=unit-tests -vv
 
   integration-tests:
     name: Run integration tests (PHP ${{ matrix.php }})
@@ -80,4 +80,4 @@ jobs:
           sed "s:PROJECT_DIR:$(pwd):g" phpunit.xml.dist > phpunit.xml
 
       - name: Run integration tests
-        run: VIPGOCI_PATH="$HOME/vip-go-ci-tools/vip-go-ci" phpunit --testsuite=integration-tests -vv
+        run: VIPGOCI_PATH="$HOME/vip-go-ci-tools/vip-go-ci" VIPGOCI_TESTING_DEBUG_MODE=true phpunit --testsuite=integration-tests -vv
