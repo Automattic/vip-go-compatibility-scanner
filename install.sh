@@ -46,7 +46,11 @@ if [[ "$OSTYPE" =~ "darwin" ]] ; then
 	sha1sum --help >/dev/null 2>/dev/null
 
 	if [ "$?" != "0" ] ; then
-		TMP_INSTALL="$TMP_INSTALL md5sha1sum"
+		if [ "$TMP_INSTALL" == "" ]; then
+			TMP_INSTALL="md5sha1sum"
+		else
+			TMP_INSTALL="$TMP_INSTALL md5sha1sum"
+		fi
 	fi
 
 	if [ "$TMP_INSTALL" != "" ] ; then
