@@ -2,14 +2,15 @@
 
 #
 # Support function to check for utilities
+# exit code 127: command does not exist
+# exit code 126: command exists but it is not executable
 #
 function check_utility() {
 	TMP_CMD="$1"
 	$TMP_CMD --help >/dev/null 2>/dev/null
-
-	if [ "$?" != "0" ] ; then
-		echo "$0: Missing utility $TMP_CMD, needs to be installed"
-		exit 1
+	EXIT_CODE="$?";
+	if [ "$EXIT_CODE" == "127" ] || [ "$EXIT_CODE" == "126" ] ; then
+		echo "Missing utility $TMP_CMD, needs to be installed. - Exit code: $EXIT_CODE"
 	fi
 }
 
