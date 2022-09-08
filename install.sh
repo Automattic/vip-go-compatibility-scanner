@@ -36,10 +36,17 @@ fi
 if [[ "$OSTYPE" =~ "darwin" ]] ; then
 	TMP_INSTALL=""
 
+  ##
+  ## @todo: remove code duplication
+  ##
 	wget --help >/dev/null 2>/dev/null
 
 	if [ "$?" != "0" ] ; then
-		TMP_INSTALL="$TMP_INSTALL wget"
+		if [ "$TMP_INSTALL" == "" ]; then
+			TMP_INSTALL="wget"
+		else
+			TMP_INSTALL="$TMP_INSTALL wget"
+		fi
 	fi
 
 	alias sha1sum='shasum -a 1'
