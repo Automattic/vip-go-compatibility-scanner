@@ -2,14 +2,15 @@
 
 #
 # Support function to check for utilities
+# exit code 127: command does not exist
+# exit code 126: command exists but it is not executable
 #
 function check_utility() {
 	TMP_CMD="$1"
 	$TMP_CMD --help >/dev/null 2>/dev/null
-
-	if [ "$?" != "0" ] ; then
-		echo "$0: Missing utility $TMP_CMD, needs to be installed"
-		exit 1
+	EXIT_CODE="$?";
+	if [ "$EXIT_CODE" == "127" ] || [ "$EXIT_CODE" == "126" ] ; then
+		echo "Missing utility $TMP_CMD, needs to be installed. - Exit code: $EXIT_CODE"
 	fi
 }
 
@@ -35,10 +36,17 @@ fi
 if [[ "$OSTYPE" =~ "darwin" ]] ; then
 	TMP_INSTALL=""
 
+  ##
+  ## @todo: remove code duplication
+  ##
 	wget --help >/dev/null 2>/dev/null
 
 	if [ "$?" != "0" ] ; then
-		TMP_INSTALL="$TMP_INSTALL wget"
+		if [ "$TMP_INSTALL" == "" ]; then
+			TMP_INSTALL="wget"
+		else
+			TMP_INSTALL="$TMP_INSTALL wget"
+		fi
 	fi
 
 	alias sha1sum='shasum -a 1'
@@ -46,7 +54,11 @@ if [[ "$OSTYPE" =~ "darwin" ]] ; then
 	sha1sum --help >/dev/null 2>/dev/null
 
 	if [ "$?" != "0" ] ; then
-		TMP_INSTALL="$TMP_INSTALL md5sha1sum"
+		if [ "$TMP_INSTALL" == "" ]; then
+			TMP_INSTALL="md5sha1sum"
+		else
+			TMP_INSTALL="$TMP_INSTALL md5sha1sum"
+		fi
 	fi
 
 	if [ "$TMP_INSTALL" != "" ] ; then
