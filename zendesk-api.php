@@ -53,7 +53,7 @@ function vipgocs_zendesk_check_auth(
 function vipgocs_zendesk_search_for_user(
 	array $options,
 	string $email
-) :?string {
+) :?array {
 	vipgoci_log(
 		'Searching for user on Zendesk...',
 		array(
