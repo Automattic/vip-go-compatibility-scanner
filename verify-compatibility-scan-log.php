@@ -192,7 +192,9 @@ function main() :int {
 	global $argv;
 
 	if ( count( $argv ) !== 3 ) {
-		die( 'Usage: ' . $argv[0] . ' expected-log-entries-file log-file' . PHP_EOL );
+		$argv_0_output = filter_var( $argv[0], FILTER_SANITIZE_SPECIAL_CHARS );
+
+		die( 'Usage: ' . $argv_0_output . ' expected-log-entries-file log-file' . PHP_EOL );
 	}
 
 	$expected_log_entres_file_path = $argv[1];
@@ -208,11 +210,13 @@ function main() :int {
 		$file_log_entries
 	);
 
+	$log_file_path_output = filter_var( $log_file_path, FILTER_SANITIZE_SPECIAL_CHARS );
+
 	if ( empty( $unexpected_log_entries ) ) {
-		echo 'No unexpected log entries found in file ' . $log_file_path . PHP_EOL;
+		echo 'No unexpected log entries found in file ' . $log_file_path_output . PHP_EOL;
 		return 0;
 	} else {
-		echo 'Unexpected log entries were found in file ' . $log_file_path . PHP_EOL;
+		echo 'Unexpected log entries were found in file ' . $log_file_path_output . PHP_EOL;
 		print_r( $unexpected_log_entries );
 		return 1;
 	}
