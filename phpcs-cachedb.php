@@ -287,7 +287,7 @@ function vipgocs_phpcs_cachedb_remove(
 	object &$db_conn,
 	string $file_path,
 	array $phpcs_options
-) :object {
+) :object|false {
 	
 	vipgoci_counter_report(
 		VIPGOCI_COUNTERS_DO,
