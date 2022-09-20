@@ -368,7 +368,7 @@ function vipgocs_scan_files(
 			vipgoci_log(
 				'Skipping file, PHPCS could not scan',
 				array(
-					'file_relative_path'	=> $file_relative_path,
+					'file_relative_path' => $file_relative_path,
 				)
 			);
 
@@ -384,7 +384,7 @@ function vipgocs_scan_files(
 			vipgoci_log(
 				'Skipping file, PHPCS could not scan',
 				array(
-					'file_relative_path'	=> $file_relative_path,
+					'file_relative_path' => $file_relative_path,
 				)
 			);
 
