@@ -219,7 +219,11 @@ function vipgocs_open_issues(
 			$res = vipgoci_http_api_post_url(
 				$github_url,
 				$github_req_body,
-				$options['token']
+				$options['token'],
+				false,
+				true,
+				CURL_HTTP_VERSION_1_1,
+				'application/x-www-form-urlencoded'
 			);
 		}
 
