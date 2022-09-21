@@ -16,7 +16,7 @@ function vipgocs_scan_single_file(
 	array $options,
 	string $file_relative_path,
 	&$phpcscachedb_conn
-) :array {
+) :?array {
 	
 	$file_results_cached = null;
 
@@ -111,7 +111,7 @@ function vipgocs_scan_single_file(
 				0
 			);
 
-			return false;
+			return null;
 		}
 
 		if ( null !== $phpcscachedb_conn ) {
@@ -355,10 +355,7 @@ function vipgocs_scan_files(
 		 * Scan a single file, possibly
 		 * use cached results.
 		 */
-		list(
-			$file_results,
-			$temp_file_name
-		) = vipgocs_scan_single_file(
+		$scan_single_file_result = vipgocs_scan_single_file(
 			$options,
 			$file_relative_path,
 			$phpcscachedb_conn
@@ -367,7 +364,30 @@ function vipgocs_scan_files(
 		/*
 		 * Some problem with file, continue.
 		 */
-		if ( false === $file_results ) {
+		if ( null === $scan_single_file_result ) {
+			vipgoci_log(
+				'Skipping file, PHPCS could not scan',
+				array(
+					'file_relative_path' => $file_relative_path,
+				)
+			);
+
+			continue;
+		}
+
+		list(
+			$file_results,
+			$temp_file_name
+		) = $scan_single_file_result;
+
+		if ( ( false === $file_results ) || ( null === $file_results ) ) {
+			vipgoci_log(
+				'Skipping file, PHPCS could not scan',
+				array(
+					'file_relative_path' => $file_relative_path,
+				)
+			);
+
 			continue;
 		}
 
