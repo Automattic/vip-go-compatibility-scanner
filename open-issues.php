@@ -85,6 +85,7 @@ function vipgocs_open_issues(
 		'phpcs_issues_found'	=> 0,
 		'github_issues_opened'	=> 0,
 	);
+	$bodies = [];
 
 	vipgoci_log(
 		( $emulate_only ? 'Emulating o' : 'O' ) . 'pening up issues on GitHub for problems found',
@@ -96,7 +97,8 @@ function vipgocs_open_issues(
 			'issues'			=> $all_results,
 			'assignees'			=> $assignees,
 			'emulate_only'			=> $emulate_only,
-		)
+		),
+		-2
 	);
 
 	/*
@@ -225,6 +227,10 @@ function vipgocs_open_issues(
 				CURL_HTTP_VERSION_1_1,
 				'application/x-www-form-urlencoded'
 			);
+
+			if ( $res !== 0 ) {
+				$bodies[] = $github_req_body;
+			}
 		}
 
 		$issue_statistics['github_issues_opened']++;
@@ -240,16 +246,26 @@ function vipgocs_open_issues(
 
 		gc_collect_cycles();
 
-		sleep( 2 + rand( 0, 3 ));
+		sleep( 25 + rand( 0, 3 ));
 	}
+
+	$github_url =
+	VIPGOCI_GITHUB_BASE_URL . '/' .
+	'repos/' .
+	rawurlencode( $options['repo-owner'] ) . '/' .
+	rawurlencode( $options['repo-name'] ) . '/' .
+	'issues';
+
 
 	vipgoci_log(
 		( $emulate_only ? 'Emulated' : 'Finished' ) . ' opening up issues on GitHub',
 		array(
 			'issue_statistics' => $issue_statistics,
-		)
+			'bodies' => $bodies,
+			'req_url' => $github_url,
+		),
+		-2
 	);
 
 	return $issue_statistics;
 }
-
