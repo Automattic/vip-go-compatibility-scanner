@@ -48,6 +48,7 @@ function vipgocs_scan_single_file(
 		);
 
 		$temp_file_name = $file_relative_path;
+		// echo $temp_file_name . PHP_EOL;
 
 		$file_results = array();
 
@@ -245,14 +246,22 @@ function vipgocs_scan_files(
 		)
 	);
 
+	$filter = $options['filter'] ?? array(
+		'file_extensions' => [ 'php' ],
+	);
+
 	/*
 	 * Get tree of files that are
 	 * available in the commit specified.
 	 */
 	$tree = vipgoci_gitrepo_fetch_tree(
 		$options,
-		$options['commit']
+		$options['commit'],
+		$filter
 	);
+
+	// HACK
+	var_dump( $tree );
 
 	$all_results = array(
 		'files'		=> array(),
@@ -345,6 +354,7 @@ function vipgocs_scan_files(
 				'Skipping file, as it is empty',
 				array(
 					'file_relative_path'	=> $file_relative_path,
+					-2
 				)
 			);
 
@@ -369,7 +379,8 @@ function vipgocs_scan_files(
 				'Skipping file, PHPCS could not scan',
 				array(
 					'file_relative_path' => $file_relative_path,
-				)
+				),
+				-2
 			);
 
 			continue;
@@ -385,7 +396,8 @@ function vipgocs_scan_files(
 				'Skipping file, PHPCS could not scan',
 				array(
 					'file_relative_path' => $file_relative_path,
-				)
+				),
+				-2
 			);
 
 			continue;
@@ -441,4 +453,3 @@ function vipgocs_scan_files(
 
 	return $all_results;
 }
-

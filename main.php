@@ -593,8 +593,40 @@ function vipgocs_compatibility_scanner_run(
 	 */
 
 	vipgoci_log(
-		'Starting processing...'
+		'Starting processing...',
+		[],
+		-2 
 	);
+
+	// HACK
+	$options['filter'] = [
+		'file_extensions' => [ 'php' ],
+		'skip_folders' => [
+			'plugins/wordpress-seo',
+			'amp',
+			'facebook-instant-articles',
+			'fb-instant-articles',
+			'facebook-instant-articles-4.0',
+			'facebook-instant-articles-wp',
+			'advanced-custom-fields',
+			'advanced-custom-fields-pro',
+			'woocommerce',
+			'wordpress-seo-premium',
+			'wordpress-seo',
+			'wp-all-export-pro',
+			'client-mu-plugins/jetpack',
+			'plugins/jetpack',
+			'phpcompatibility',
+			'squizlabs',
+			'vendor/wp-coding-standards',
+			'tests',
+			'guzzlehttp',
+			'wp-all-import-pro',
+			'gravityforms',
+			'official-facebook-pixel',
+			'phpseclib'
+		]
+	];
 
 	/*
 	 * Scan all relevant files in the Git repository,
@@ -681,7 +713,8 @@ function vipgocs_compatibility_scanner_run(
 					'phpcs_issues_found'
 				]
 			),
-			$issue_statistics
+			$issue_statistics,
+			-2
 		);
 
 		exit ( 0 );
@@ -794,7 +827,9 @@ function vipgocs_compatibility_scanner_run(
 
 			'github_api_rate_limit' =>
 				$github_api_rate_limit_usage->resources->core,
-		)
+		),
+		-2
+
 	);
 
 
