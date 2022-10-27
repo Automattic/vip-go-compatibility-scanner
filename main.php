@@ -526,6 +526,11 @@ function vipgocs_compatibility_scanner_init(
 	);
 
 	/*
+	 * Do not skip large files.
+	 */
+	$options['skip-large-files'] = false;
+
+	/*
 	 * Intialize Zendesk options.
 	 */
 	vipgocs_compatibility_scanner_init_zendesk(
