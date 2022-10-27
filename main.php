@@ -734,14 +734,6 @@ function vipgocs_compatibility_scanner_run(
 	}
 
 	/*
-	 * Get API rate limit usage.
-	 */
-	$github_api_rate_limit_usage =
-		vipgoci_github_rate_limit_usage(
-			$options['token']
-		);
-
-	/*
 	 * Close PHPCacheDB connection if open.
 	 * Clean the database first.
 	 */
@@ -775,7 +767,6 @@ function vipgocs_compatibility_scanner_run(
 		null
 	);
 
-
 	/*
 	 * Log information and return.
 	 */
@@ -793,7 +784,7 @@ function vipgocs_compatibility_scanner_run(
 			'counters_report'	=> $counter_report,
 
 			'github_api_rate_limit' =>
-				$github_api_rate_limit_usage->resources->core,
+				vipgoci_http_api_rate_limit_usage(),
 		)
 	);
 
