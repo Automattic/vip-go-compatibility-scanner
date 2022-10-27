@@ -136,30 +136,6 @@ Usage:
 ./compatibility-scanner.php ... --phpcs-cachedb="/tmp/vip-go-compatibility-scanner-phpcs-cachedb.sqlite"
 ```
 
-## Usage for multiple repositories
-
-Included is a script to run the `vip-go-compatibility-scanner` for multiple repositories. The script will clone each repository into a temporary directory, run `vip-go-compatibility-scanner`, and will leave a log for each execution in the temporary directory. It will remove the repositories cloned after scanning.
-
-Here is how the script can be run:
-
-```
-./scan-multiple-repositories.sh mygithubuser testing123,testing999 mytokenxyz "Compatibility-Issue,PHP Compatibility" "PHP Upgrade: Compatibility issues found in " "The following issues were found when scanning for compatibility issues: %error_msg% Note that this is an automated report." direct PHPCompatibilityWP 'testVersion 7.3-' main
-```
-
-The parameters are the following, respectively:
- * Repository owner
- * Repository name(s), comma separated
- * GitHub access token
- * Label(s) to apply to newly created GitHub issues, comma separated
- * Title prefix for each issue created
- * Body of created issue. String `%error_msg%` will be replaced by a list of problems noted, and `%branch_name%` with name of branch.
- * Type of admin collaborators to assign issues (direct, outside, all)
- * PHPCS standard to use when scanning
- * PHPCS runtime set
- * Git branch to check out
-
-There is also optional parameter for Zendesk. See help message.
-
 ## Tests
 
 To run the tests for `vip-go-compatibility-scanner`, you will need to install `phpunit` and any dependencies needed (this would include `xdebug`).
