@@ -3,3 +3,4 @@ unittests-secrets.ini
 *.dia~
 *.swp
 phpunit.xml
+.git/
