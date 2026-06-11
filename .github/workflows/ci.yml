@@ -23,7 +23,7 @@ jobs:
           - '8.1'
     steps:
       - name: Check out source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set up PHP environment
         uses: shivammathur/setup-php@e04e1d97f0c0481c6e1ba40f8a538454fe5d7709 # 2.21.2
@@ -51,7 +51,7 @@ jobs:
           - '8.1'
     steps:
       - name: Check out source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Set up PHP environment
         uses: shivammathur/setup-php@e04e1d97f0c0481c6e1ba40f8a538454fe5d7709 # 2.21.2
